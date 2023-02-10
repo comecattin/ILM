@@ -7,15 +7,49 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 class gromacs_output:
-    
+    """
+    Class to extract data from gromacs ernergy outputs
+    """
     def __init__(self,file_name):
+        """
+        Initialize the class
+
+        Parameters
+        ----------
+        file_name : str
+            Path to the .xvg gromacs output file to extract data from
+        """
         self.file_name = file_name
 
     def extract(self):
+        """
+        Extract gromacs data
+
+        Returns
+        -------
+        x : np.array
+            Array containing the extracted time simulation
+        y : np.array
+            Array containing the extracted observable 
+        """
         x,y = np.loadtxt(self.file_name, comments=["@", "#"], unpack=True)
         return x, y
 
     def plot(self, xlabel, ylabel, output_name,color="b"):
+        """
+        Plot the extracted gromacs output data
+
+        Parameters
+        ----------
+        xlabel : str
+            Label of the x-axis
+        ylabel : str
+            Label of the y-axis
+        output_name : str
+            Path to save the file
+        color : str, optional
+            color of the plot, by default "b"
+        """
         x,y = self.extract()
         fig, ax = plt.subplots()
         ax.plot(x,y,color=color)
