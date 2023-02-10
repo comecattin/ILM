@@ -11,8 +11,10 @@ class eau(xtract.gromacs_output):
 
 
     def density_to_volume(self):
+        Avogadro = 6.0221408e23
         x, density = self.extract()
-        volume = self.molar_mass/density
+        volume = self.molar_mass/(density*Avogadro)
+        volume = volume*1e30
         return x, volume
     
     def plot_volume(self, xlabel, ylabel, output_name,color="b"):
@@ -30,8 +32,8 @@ if __name__ == "__main__":
     file_name = "/home/ccattin/Documents/EAU/OPC/production/density.xvg"
 
     xlabel = "Time (ps)"
-    ylabel = r"Molecular volume (m$^{3}$.mol$^{-1}$)"
-    output_name = "molar_volume.pdf"
+    ylabel = r"Molecular volume ($\AA^{3}$.molec$^{-1}$)"
+    output_name = "/home/ccattin/Documents/Python/molar_volume.pdf"
     color = sns.color_palette("cool", 12)[6]
 
     molar_mass = 18.01528e-3
