@@ -11,20 +11,6 @@ class eau(xtract.gromacs_output):
     """
     Class of the different water model (OPC and TIP3P studied)
     """
-    def __init__(self, file_name, molar_mass):
-        """
-        Initialize function
-
-        Parameters
-        ----------
-        file_name : str
-            path to the .xvg gromacs output file to extract data from 
-        molar_mass : float
-            molar mass of the water
-        """
-        self.file_name = file_name
-        self.molar_mass = molar_mass
-
 
     def density_to_volume(self):
         """Convert the density calculated with gromacs to molecular volume
@@ -36,17 +22,32 @@ class eau(xtract.gromacs_output):
         volume : np.array
             Molecular volume as a function of the simulation time
             Unit : Angstrom^3 / molecule
+        volume_mean : float
+            Time average of the volume
+        volume_error : float
+            Volume associated error
         """
         #Avogadro constant
         Avogadro = 6.0221408e23
+        #Molar mass of water
+        molar_mass = 18.01528e-3
+
         x, density = self.extract()
+        
         #Mecular volume in m^3/molecule
-        volume = self.molar_mass/(density*Avogadro)
+        volume = molar_mass/(density*Avogadro)
         #Convert to Angstrom^3
         volume = volume*1e30
-        #Compute the mean
-        mean_volume = np.mean(volume)
-        return x, volume, mean_volume
+        
+        #Compute the mean and the error
+        density_mean_error = np.array(self.analyze())
+        density_mean = density_mean_error[0]
+        density_error  = density_mean_error[1]
+
+        volume_mean = molar_mass/(density_mean*Avogadro)*1e30
+        volume_error = molar_mass/(density_mean**2 *Avogadro)*1e30
+
+        return x, volume, volume_mean, volume_error
     
     def plot_volume(self, xlabel, ylabel, output_name,color="b"):
         """
@@ -63,10 +64,10 @@ class eau(xtract.gromacs_output):
         color : str, optional
             color of the plot, by default "b"
         """
-        x, volume, mean_volume = self.density_to_volume()
+        x, volume, volume_mean, volume_error = self.density_to_volume()
         fig, ax = plt.subplots()
         ax.plot(x, volume, color=color, label="Molecular volume")
-        ax.plot(x, np.ones(len(x))*mean_volume,linewidth=5, label="Mean")
+        ax.plot(x, np.ones(len(x))*volume_mean,linewidth=5, label="Mean")
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         ax.legend()
@@ -76,19 +77,23 @@ class eau(xtract.gromacs_output):
 
 if __name__ == "__main__":
     file_name = "/home/ccattin/Documents/EAU/OPC/production/density.xvg"
+    error_file = "/home/ccattin/Documents/EAU/OPC/production/errest.xvg"
 
     xlabel = "Time (ps)"
     ylabel = r"Molecular volume ($\AA^{3}$.molec$^{-1}$)"
     output_name = "/home/ccattin/Documents/Python/molar_volume.pdf"
     color = sns.color_palette("cool", 12)[6]
 
-    molar_mass = 18.01528e-3
-
-    OPC = eau(file_name, molar_mass)
-    x, volume, mean_volume = OPC.density_to_volume()
+    #######
+    # OPC #
+    #######
+    OPC = eau(file_name, error_file)
+    x, volume, volume_mean, volume_error = OPC.density_to_volume()
 
     print(
-        "\nMean molecular volume : {} Angstrom/molec\n".format(mean_volume))
+        """
+        Mean molecular volume : {} +/- {} Angstrom/molec
+        """.format(volume_mean, volume_error))
     
     OPC.plot_volume(xlabel=xlabel, ylabel=ylabel, 
                     output_name=output_name, color=color)
