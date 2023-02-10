@@ -65,9 +65,11 @@ class eau(xtract.gromacs_output):
         """
         x, volume, mean_volume = self.density_to_volume()
         fig, ax = plt.subplots()
-        ax.plot(x, volume, color=color)
+        ax.plot(x, volume, color=color, label="Molecular volume")
+        ax.plot(x, np.ones(len(x))*mean_volume,linewidth=5, label="Mean")
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
+        ax.legend()
         plt.savefig(output_name, format="pdf", dpi=300, bbox_inches='tight')
         plt.show()
 
