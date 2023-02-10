@@ -73,7 +73,6 @@ class eau(xtract.gromacs_output):
 
 
 if __name__ == "__main__":
-
     file_name = "/home/ccattin/Documents/EAU/OPC/production/density.xvg"
 
     xlabel = "Time (ps)"
