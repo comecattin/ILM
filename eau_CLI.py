@@ -37,11 +37,12 @@ def main():
     args = parser.parse_args()
 
     #Define the output and plot properties
-    output_name = "/home/ccattin/Documents/Python/molar_volume.pdf"
+    output_name = "/home/ccattin/Documents/Python/outputs/molar_volume.pdf"
     color = sns.color_palette("cool", 12)[6]
     xlabel = "Time (ps)"
     ylabel = r"Molecular volume ($\AA^{3}$.molec$^{-1}$)"
-    output_name = "/home/ccattin/Documents/Python/molar_volume.pdf"
+    output_name = "/home/ccattin/Documents/Python/outputs/molar_volume.pdf"
+    output_result_name = "/home/ccattin/Documents/Python/outputs/time_volume_mean_error.txt"
 
     #Open a water model
     water_model = eau.eau(args.file_name, args.error_file)
@@ -59,6 +60,8 @@ def main():
     water_model.plot_volume(xlabel=xlabel, ylabel=ylabel, 
                     output_name=output_name, color=color,
                     show=args.plot)
+    #Save the result
+    water_model.write(output_result_name)
 
 
 if __name__ == "__main__":

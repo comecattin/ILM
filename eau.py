@@ -77,6 +77,54 @@ class eau(xtract.gromacs_output):
         if show:
             plt.show()
 
+    def write(self, file_name):
+        """Write the results in an .txt file
+
+        Parameters
+        ----------
+        file_name : str
+            Path where to save the file
+        """
+        #Compute results
+        x, volume, volume_mean, volume_error = self.density_to_volume()
+        #Save the results
+        #The first line contain the mean volume and the estimated error
+        #The line after that contains the time and the volume
+        np.savetxt(
+            file_name,
+            np.array([x,volume]),
+            header="{} {}".format(volume_mean,volume_error)
+            )
+    
+    def read(self, file_name):
+        """Read the data from .txt file
+
+        Parameters
+        ----------
+        file_name : str
+            Path where the file has been saved
+
+        Returns
+        -------
+        x : np.array
+            Simulation time
+        volume : np.array
+            Molecular volume as a function of the simulation time
+            Unit : Angstrom^3 / molecule
+        volume_mean : float
+            Time average of the volume
+        volume_error : float
+            Volume associated error
+        """
+        x, volume = np.loadtxt(file_name)
+        with open(file_name) as f:
+            line = f.readline()
+        line = line.replace("#","").replace("\n","").split(" ")[1:]
+        volume_mean = float(line[0])
+        volume_error = float(line[1])
+
+        return x, volume, volume_mean, volume_error
+
 
 if __name__ == "__main__":
     file_name = "/home/ccattin/Documents/EAU/OPC/production/density.xvg"
@@ -84,7 +132,8 @@ if __name__ == "__main__":
 
     xlabel = "Time (ps)"
     ylabel = r"Molecular volume ($\AA^{3}$.molec$^{-1}$)"
-    output_name = "/home/ccattin/Documents/Python/molar_volume.pdf"
+    output_name = "/home/ccattin/Documents/Python/outputs/molar_volume.pdf"
+    output_result_name = "/home/ccattin/Documents/Python/outputs/time_volume_mean_error.txt"
     color = sns.color_palette("cool", 12)[6]
 
     #######
@@ -100,3 +149,7 @@ if __name__ == "__main__":
     
     OPC.plot_volume(xlabel=xlabel, ylabel=ylabel, 
                     output_name=output_name, color=color)
+
+    OPC.write(output_result_name)
+    (x, volume,
+    volume_mean, volume_error) = OPC.read(output_result_name)

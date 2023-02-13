@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     xlabel = "Time (ps)"
     ylabel = r"Density (kg.m$^{-3}$)"
-    output_name = "/home/ccattin/Documents/Python/density.pdf"
+    output_name = "/home/ccattin/Documents/Python/outputs/density.pdf"
     color = sns.color_palette("cool", 12)[6]
 
     density = gromacs_output(file_name,error_file)
