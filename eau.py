@@ -49,7 +49,7 @@ class eau(xtract.gromacs_output):
 
         return x, volume, volume_mean, volume_error
     
-    def plot_volume(self, xlabel, ylabel, output_name,color="b"):
+    def plot_volume(self, xlabel, ylabel, output_name,color="b",show=True):
         """
         Plot the molecular volume as a function of time
 
@@ -62,7 +62,9 @@ class eau(xtract.gromacs_output):
         output_name : str
             Path to save the file
         color : str, optional
-            color of the plot, by default "b"
+            Color of the plot, by default "b"
+        show : bool, optional
+            Show the plot in an external windown or not, by default True
         """
         x, volume, volume_mean, volume_error = self.density_to_volume()
         fig, ax = plt.subplots()
@@ -72,7 +74,8 @@ class eau(xtract.gromacs_output):
         ax.set_ylabel(ylabel)
         ax.legend()
         plt.savefig(output_name, format="pdf", dpi=300, bbox_inches='tight')
-        plt.show()
+        if show:
+            plt.show()
 
 
 if __name__ == "__main__":
