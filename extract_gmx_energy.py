@@ -68,10 +68,13 @@ class gromacs_output:
         #Estimate the mean
         mean_val = np.mean(y)
         #Estimate the error
-        estimate_error_line = subprocess.getoutput(
-            """grep "e " {}""".format(self.error_file)
-            )
-        error = float(estimate_error_line[-10:-1])
+        with open(self.error_file) as f:
+            lines = f.readlines()
+        for line in lines:
+            if """"ee """ in line:
+                estimate_error_line = line.split(" ")
+                error = estimate_error_line[-1].replace("\n","").replace('"',"")
+                error = float(error)
         return mean_val, error
 
 
@@ -83,7 +86,7 @@ if __name__ == "__main__":
 
     xlabel = "Time (ps)"
     ylabel = r"Density (kg.m$^{-3}$)"
-    output_name = "/home/ccattin/Documents/Python/outputs/density.pdf"
+    output_name = "/home/ccattin/Documents/Code/outputs/density.pdf"
     color = sns.color_palette("cool", 12)[6]
 
     density = gromacs_output(file_name,error_file)

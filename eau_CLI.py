@@ -34,15 +34,26 @@ def main():
         help="Plot the molecular volume as a function of time",
         action="store_true"
     )
+    #Get the path to the output pdf file
+    parser.add_argument(
+        "output_pdf",
+        help="Path where to output the .pdf file of the molar volume plot",
+        type=str,
+        default="/home/ccattin/Documents/Code/outputs/molar_volume.pdf"
+    )
+    #Get the path to the output txt file
+    parser.add_argument(
+        "output_txt",
+        help="Path where to output the .tx file of the results",
+        type=str,
+        default="/home/ccattin/Documents/Code/outputs/time_volume_mean_error.txt"
+    )
     args = parser.parse_args()
 
     #Define the output and plot properties
-    output_name = "/home/ccattin/Documents/Python/outputs/molar_volume.pdf"
     color = sns.color_palette("cool", 12)[6]
     xlabel = "Time (ps)"
     ylabel = r"Molecular volume ($\AA^{3}$.molec$^{-1}$)"
-    output_name = "/home/ccattin/Documents/Python/outputs/molar_volume.pdf"
-    output_result_name = "/home/ccattin/Documents/Python/outputs/time_volume_mean_error.txt"
 
     #Open a water model
     water_model = eau.eau(args.file_name, args.error_file)
@@ -58,10 +69,10 @@ def main():
     
     #Plot the result
     water_model.plot_volume(xlabel=xlabel, ylabel=ylabel, 
-                    output_name=output_name, color=color,
+                    output_name=args.output_pdf, color=color,
                     show=args.plot)
     #Save the result
-    water_model.write(output_result_name)
+    water_model.write(args.output_txt)
 
 
 if __name__ == "__main__":

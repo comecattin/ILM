@@ -1,0 +1,123 @@
+#! /bin/bash
+
+#Intial
+run_dir=$(pwd)
+echo "Working directory: $run_dir"
+input_dir=$run_dir/input
+echo "Input directory: $input_dir"
+
+##################################
+#          Minimization          #
+##################################
+printf "\n1 - Minimization step\n"
+mkdir -p $run_dir/minimization
+minim_dir=$run_dir/minimization
+echo "    Directory $minim_dir created"
+cd $minim_dir
+#Copy files
+cp $input_dir/minim.mdp .
+cp $input_dir/input.gro .
+cp $input_dir/input.pdb .
+cp $input_dir/topol.top .
+#Running gmx
+echo "    Running gmx grompp"
+gmx grompp -f minim.mdp -c input.gro -p topol.top -o em.tpr
+echo "    Running gmx mdrun"
+gmx mdrun -v -deffnm em
+echo "    Energy minimization done."
+cd $run_dir
+sleep 3
+
+###################################
+#          Equilibration          #
+###################################
+printf "\n\n2- Equilibration step\n"
+mkdir -p $run_dir/equilibration
+equi_dir=$run_dir/equilibration
+echo "    Directory $equi_dir created"
+cd $equi_dir
+
+    #-----#
+    # NVT #
+    #-----#
+echo "    2-1 NVT equilibration"
+mkdir -p $equi_dir/1-NVT
+nvt_dir=$equi_dir/1-NVT
+echo "        Directory $nvt_dir created"
+cd $nvt_dir
+#Copy files
+cp $input_dir/nvt.mdp .
+cp $minim_dir/em.gro .
+cp $input_dir/topol.top .
+cp $input_dir/index.ndx .
+#Running gmx
+echo "        Running gmx grompp"
+gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx
+echo "    Running gmx mdrun"
+gmx mdrun -v -deffnm nvt
+echo "        NVT equilibration done."
+cd $equi_dir
+
+    #-----#
+    # NPT #
+    #-----#
+echo "    2-2 NPT equilibration"
+mkdir -p $equi_dir/2-NPT
+npt_dir=$equi_dir/2-NPT
+echo "        Directory $npt_dir created"
+cd $npt_dir
+#Copy file
+cp $input_dir/npt.mdp .
+cp $nvt_dir/nvt.gro .
+cp $nvt_dir/nvt.cpt .
+cp $input_dir/topol.top .
+cp $input_dir/index.ndx .
+#Running gmx
+echo "        Running gmx grompp"
+gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx
+echo "    Running gmx mdrun"
+gmx mdrun -v -deffnm npt
+echo "        NPT equilibration done."
+cd $equi_dir
+
+###################################
+#             MD Run              #
+###################################
+printf "\n\n3- MD run\n"
+mkdir -p $run_dir/production
+prod_dir=$run_dir/production
+echo "    Directory $prod_dir created"
+cd $prod_dir
+#Copy files
+cp $input_dir/prod.mdp .
+cp $npt_dir/npt.gro .
+cp $npt_dir/npt.cpt .
+cp $input_dir/topol.top .
+cp $input_dir/index.ndx .
+#Running gmx
+echo "        Running gmx grompp"
+gmx grompp -f prod.mdp -c npt.gro -t npt.cpt -p topol.top -o prod.tpr -n index.ndx
+echo "    Running gmx mdrun"
+gmx mdrun -v -deffnm prod
+echo "        Production run done."
+cd $equi_dir
+
+###################################
+#            Analysis             #
+###################################
+printf "\n\n4- MD run\n"
+mkdir -p $run_dir/analysis
+prod_dir=$run_dir/production
+ana_dir=$run_dir/analysis
+echo "    Directory $ana_dir created"
+cd $ana_dir
+#Copy files
+cp $prod_dir/prod.edr .
+#Runing gmx energy
+echo -e '16' | gmx energy -f prod.edr -o density.xvg
+#Runing gmx analyse
+gmx analyze -f density.xvg -ac density_autocorr -ee
+#Runing python analysis
+python_code_dir=/home/ccattin/Documents/Code/eau_CLI.py
+$python_code_dir density.xvg errest.xvg molar_volume.pdf time_volume_mean_error.txt
+echo "    Analysis done !"

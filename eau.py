@@ -132,8 +132,8 @@ if __name__ == "__main__":
 
     xlabel = "Time (ps)"
     ylabel = r"Molecular volume ($\AA^{3}$.molec$^{-1}$)"
-    output_name = "/home/ccattin/Documents/Python/outputs/molar_volume.pdf"
-    output_result_name = "/home/ccattin/Documents/Python/outputs/time_volume_mean_error.txt"
+    output_name = "/home/ccattin/Documents/Code/outputs/molar_volume.pdf"
+    output_result_name = "/home/ccattin/Documents/Code/outputs/time_volume_mean_error.txt"
     color = sns.color_palette("cool", 12)[6]
 
     #######
