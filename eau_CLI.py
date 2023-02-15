@@ -16,6 +16,7 @@ def main():
     parser = argparse.ArgumentParser(
         "CLI for water simulations", description="Compute the molecular volume of water."
     )
+    #Analysis or not the molecular volume
     parser.add_argument(
         "--volume",
         dest="output_volume",
@@ -66,12 +67,14 @@ def main():
         help="Extract and plot the volume as a funtion of the cutoff",
         action="store_true"
     )
+    #Save the .pdf from the cutoff analysis
     parser.add_argument(
         "--cutoff-pdf",
         help="Path to save the pdf file of the plot of the volume as a function of the cutoff",
         default="cutoff.pdf",
         dest="cutoff_pdf"
     )
+    #Cutoff directory
     parser.add_argument(
         "--cutoff-dir",
         help="Directory where the pipeline has been run.",
@@ -85,6 +88,7 @@ def main():
     xlabel = "Time (ps)"
     ylabel = r"Molecular volume ($\AA^{3}$.molec$^{-1}$)"
 
+    #Raise error if no options are provided
     if args.output_volume == False and args.cutoff == False:
         raise Exception("No options provided. Please use the -h option.")
 
@@ -93,6 +97,7 @@ def main():
         #Molecular Volume part
         if args.output_volume:
             
+            #Raise error if some file are missing
             if args.file_name == None or args.error_file == None:
                 raise Exception("No file or no error file provided. Please use the -h option.")
             
