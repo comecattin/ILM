@@ -6,6 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import extract_gmx_energy as xtract
+import os
 
 class eau(xtract.gromacs_output):
     """
@@ -125,10 +126,46 @@ class eau(xtract.gromacs_output):
 
         return x, volume, volume_mean, volume_error
 
+    def cutoff_extract_volume(self,
+                            dir="/home/ccattin/Documents/EAU/Change_cutoff/TIP3P/300K/"):
+        volume_mean_list = []
+        volume_error_list = []
+        cutoff_list = []
+        for name in os.listdir(dir):
+            if "cutoff_" in name:
+                cutoff = float(name.replace("cutoff_",""))
+                cutoff_list.append(cutoff)
+                (x, volume, 
+                volume_mean, 
+                volume_error) = self.read(
+                                    dir+name+"/analysis/time_volume_mean_error.txt"
+                                    )
+                volume_mean_list.append(volume_mean)
+                volume_error_list.append(volume_error)
+        
+        return (np.array(cutoff_list),
+                np.array(volume_mean_list),
+                np.array(volume_error_list))
+
+    def cutoff_plot(self, cutoff_dir, color, show=True, output_path="cutoff.pdf"):
+        (cutoff_list, 
+            volume_mean_list, 
+            volume_error_list) = self.cutoff_extract_volume(cutoff_dir)
+        fig, ax = plt.subplots()
+        ax.errorbar(cutoff_list,volume_mean_list,
+                    volume_error_list,fmt=".",
+                    color=color)
+        ax.grid()
+        ax.set_xlabel("Cut-off (nm)")
+        ax.set_ylabel(r"Molecular volume ($\AA^{3}$.molec$^{-1}$)")
+        plt.savefig(output_name, format="pdf", dpi=300, bbox_inches='tight')
+        if show:
+            plt.show()
+
 
 if __name__ == "__main__":
-    file_name = "/home/ccattin/Documents/EAU/OPC/production/density.xvg"
-    error_file = "/home/ccattin/Documents/EAU/OPC/production/errest.xvg"
+    file_name = "/home/ccattin/Documents/EAU/Ludovic_parameters/computed_by_Come/OPC/300K/production/density.xvg"
+    error_file = "/home/ccattin/Documents/EAU/Ludovic_parameters/computed_by_Come/OPC/300K/production/errest.xvg"
 
     xlabel = "Time (ps)"
     ylabel = r"Molecular volume ($\AA^{3}$.molec$^{-1}$)"
@@ -153,3 +190,8 @@ if __name__ == "__main__":
     OPC.write(output_result_name)
     (x, volume,
     volume_mean, volume_error) = OPC.read(output_result_name)
+    
+    cutoff_dir = "/home/ccattin/Documents/EAU/Change_cutoff/TIP3P/300K/"
+    output_path="/home/ccattin/Documents/Code/outputs/cutoff.pdf"
+    cutoff_list, volume_mean_list, volume_error_list = OPC.cutoff_extract_volume(cutoff_dir)
+    OPC.cutoff_plot(cutoff_dir,color,show=True,output_path=output_path)
