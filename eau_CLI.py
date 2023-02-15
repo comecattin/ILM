@@ -48,6 +48,24 @@ def main():
         type=str,
         default="/home/ccattin/Documents/Code/outputs/time_volume_mean_error.txt"
     )
+    #Extract or not the cutoff
+    parser.add_argument(
+        "-c","--cutoff",
+        help="Extract and plot the volume as a funtion of the cutoff",
+        action="store_true"
+    )
+    parser.add_argument(
+        "--cutoff-pdf",
+        help="Path to save the pdf file of the plot of the volume as a function of the cutoff",
+        default="cutoff.pdf",
+        dest="cutoff_pdf"
+    )
+    parser.add_argument(
+        "--cutoff-dir",
+        help="Directory where the pipeline has been run.",
+        default="./",
+        dest="cutoff_dir"
+    )
     args = parser.parse_args()
 
     #Define the output and plot properties
@@ -73,6 +91,19 @@ def main():
                     show=args.plot)
     #Save the result
     water_model.write(args.output_txt)
+
+    #Cutoff part
+    if args.cutoff:
+        (cutoff_list,
+            volume_mean_list,
+            volume_error_list) = water_model.cutoff_extract_volume(
+                                                args.cutoff_dir
+                                                )
+        print(args.cutoff_pdf)
+        water_model.cutoff_plot(args.cutoff_dir,
+                                color,
+                                show=args.plot,
+                                output_path=args.cutoff_pdf)
 
 
 if __name__ == "__main__":

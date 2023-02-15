@@ -192,7 +192,9 @@ class eau(xtract.gromacs_output):
         ax.grid()
         ax.set_xlabel("Cut-off (nm)")
         ax.set_ylabel(r"Molecular volume ($\AA^{3}$.molec$^{-1}$)")
-        plt.savefig(output_name, format="pdf", dpi=300, bbox_inches='tight')
+
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        
         #Plot in an external window
         if show:
             plt.show()
