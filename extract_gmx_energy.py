@@ -11,15 +11,16 @@ class gromacs_output:
     """
     Class to extract data from gromacs ernergy outputs
     """
-    def __init__(self, file_name, error_file="errest.xvg"):
+    def __init__(self, file_name=None, error_file="errest.xvg"):
         """
         Initialize the class
 
         Parameters
         ----------
-        file_name : str
+        file_name : str, optional
             Path to the .xvg gromacs output file to extract data from
-        error_file : str
+            by default None
+        error_file : str, optional
             Path to the .xvg gromacs analyze output file estimate of the error,
             by default "errest.xvg"
         """
