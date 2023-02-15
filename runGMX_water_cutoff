@@ -1,0 +1,36 @@
+#! /bin/bash
+#Pipiline to produce various run with different cut-off
+
+#===================#
+#       Intial      #
+#===================# 
+run_dir=$(pwd)
+echo "Working directory: $run_dir"
+input_dir=$run_dir/input
+echo "Input directory: $input_dir"
+list_cutoff="0.7 0.9 1.1 1.3 1.5 1.7"
+
+#===================#
+#       Loop        #
+#===================# 
+
+for cutoff in $list_cutoff
+do
+    cutoff_dir=$run_dir/cutoff_$cutoff
+    mkdir -p $cutoff_dir
+    cd $cutoff_dir
+    cp -r $input_dir .
+    #Change all the mdp file
+    for mdp_file in input/*.mdp
+    do
+        echo "rlist                   = $cutoff
+vdwtype                 = Cut-off
+vdw-modifier            = None
+DispCorr                = EnerPres
+rvdw                    = $cutoff
+rcoulomb                = $cutoff" >> $mdp_file
+    done
+    #Run the simulations
+    runGMX_water
+    
+done
