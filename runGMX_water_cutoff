@@ -34,3 +34,15 @@ rcoulomb                = $cutoff" >> $mdp_file
     runGMX_water
     
 done
+cd $run_dir
+
+#=======================#
+#       Analysis        #
+#=======================#
+
+analysis_dir=$run_dir/analysis
+mkdir -p $analysis_dir
+#Runing python analysis
+python_code_dir=/home/ccattin/Documents/Code/eau_CLI.py
+$python_code_dir -c
+echo "    Analysis done !"
