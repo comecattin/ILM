@@ -128,13 +128,33 @@ class eau(xtract.gromacs_output):
 
     def cutoff_extract_volume(self,
                             dir="/home/ccattin/Documents/EAU/Change_cutoff/TIP3P/300K/"):
+        """Extract the volume and the associated cut-off from simulations
+
+        Parameters
+        ----------
+        dir : str, optional
+            Directory where the pipeline has been run, by default "/home/ccattin/Documents/EAU/Change_cutoff/TIP3P/300K/"
+
+        Returns
+        -------
+        cutoff_list : np.array
+            Array containing the cutoff
+        volume_mean_list : np.array
+            Array containing the average volumes
+        volume_error_list : np.array
+            Array containing the error associated
+        """
+        #Initialize
         volume_mean_list = []
         volume_error_list = []
         cutoff_list = []
+        #Get the cutoff directories name
         for name in os.listdir(dir):
+            #Ignore other directories
             if "cutoff_" in name:
                 cutoff = float(name.replace("cutoff_",""))
                 cutoff_list.append(cutoff)
+                #Extract values
                 (x, volume, 
                 volume_mean, 
                 volume_error) = self.read(
@@ -147,7 +167,21 @@ class eau(xtract.gromacs_output):
                 np.array(volume_mean_list),
                 np.array(volume_error_list))
 
-    def cutoff_plot(self, cutoff_dir, color, show=True, output_path="cutoff.pdf"):
+    def cutoff_plot(self, cutoff_dir, color="b", show=True, output_path="cutoff.pdf"):
+        """Plot the volume as a function of the used cut-off.
+
+        Parameters
+        ----------
+        cutoff_list : np.array
+            Array containing the cutoff
+        color : str, optional
+            Color of the plot, by default "b"
+        show : bool, optional
+            Show the plot in an external windown or not, by default True
+        output_path : str, optional
+            Path to save the file, by default "cutoff.pdf"
+        """
+        #Extract data
         (cutoff_list, 
             volume_mean_list, 
             volume_error_list) = self.cutoff_extract_volume(cutoff_dir)
@@ -159,6 +193,7 @@ class eau(xtract.gromacs_output):
         ax.set_xlabel("Cut-off (nm)")
         ax.set_ylabel(r"Molecular volume ($\AA^{3}$.molec$^{-1}$)")
         plt.savefig(output_name, format="pdf", dpi=300, bbox_inches='tight')
+        #Plot in an external window
         if show:
             plt.show()
 
