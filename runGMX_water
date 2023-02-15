@@ -119,5 +119,5 @@ echo -e '16' | gmx energy -f prod.edr -o density.xvg
 gmx analyze -f density.xvg -ac density_autocorr -ee
 #Runing python analysis
 python_code_dir=/home/ccattin/Documents/Code/eau_CLI.py
-$python_code_dir density.xvg errest.xvg molar_volume.pdf time_volume_mean_error.txt
+$python_code_dir --volume -f density.xvg -e errest.xvg --pdf molar_volume.pdf --txt time_volume_mean_error.txt
 echo "    Analysis done !"
