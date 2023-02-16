@@ -172,8 +172,8 @@ class eau(xtract.gromacs_output):
 
         Parameters
         ----------
-        cutoff_list : np.array
-            Array containing the cutoff
+        cutoff_dir : str
+            Path where the pipeline has been run
         color : str, optional
             Color of the plot, by default "b"
         show : bool, optional
@@ -239,6 +239,43 @@ class eau(xtract.gromacs_output):
         return (np.array(nsteps_list),
                 np.array(volume_mean_list),
                 np.array(volume_error_list))
+        
+    def simulation_length_plot(self,
+                    simulation_length_dir,
+                    color="b",
+                    show=True,
+                    output_path="simulation_length.pdf"):
+        """Plot the volume as a function of the used nsteps.
+
+        Parameters
+        ----------
+        cutoff_list : str
+            Path where the pipeline has been run
+        color : str, optional
+            Color of the plot, by default "b"
+        show : bool, optional
+            Show the plot in an external windown or not, by default True
+        output_path : str, optional
+            Path to save the file, by default "simulation_length.pdf"
+        """
+        #Extract data
+        (simulation_length_list, 
+            volume_mean_list, 
+            volume_error_list) = self.simulation_length_extract_volume(simulation_length_dir)
+        fig, ax = plt.subplots()
+        ax.errorbar(simulation_length_list,volume_mean_list,
+                    volume_error_list,fmt=".",
+                    color=color)
+        ax.grid()
+        ax.set_xlabel("nsteps")
+        ax.set_ylabel(r"Molecular volume ($\AA^{3}$.molec$^{-1}$)")
+
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        #Plot in an external window
+        if show:
+            plt.show()
+
+
 
 
 if __name__ == "__main__":
@@ -250,7 +287,7 @@ if __name__ == "__main__":
     output_name = "/home/ccattin/Documents/Code/outputs/molar_volume.pdf"
     output_result_name = "/home/ccattin/Documents/Code/outputs/time_volume_mean_error.txt"
     color = sns.color_palette("cool", 12)[6]
-    show = False
+    show = True
     #######
     # OPC #
     #######
@@ -283,9 +320,9 @@ if __name__ == "__main__":
     #####################
     # Simulation length #
     #####################
-    length_dir = "/home/ccattin/Documents/EAU/Change_simulation_length/TIP3P/300K/"
+    simulation_length_dir = "/home/ccattin/Documents/EAU/Change_simulation_length/TIP3P/300K/"
     output_path="/home/ccattin/Documents/Code/outputs/simulation_length.pdf"
     (cutoff_list,
         volume_mean_list,
-        volume_error_list) = OPC.simulation_length_extract_volume(length_dir)
-    #OPC.cutoff_plot(cutoff_dir,color,show=show,output_path=output_path)
+        volume_error_list) = OPC.simulation_length_extract_volume(simulation_length_dir)
+    OPC.simulation_length_plot(simulation_length_dir,color,show=show,output_path=output_path)
