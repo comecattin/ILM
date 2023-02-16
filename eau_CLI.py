@@ -81,6 +81,24 @@ def main():
         default="./",
         dest="cutoff_dir"
     )
+    parser.add_argument(
+        "--simulation-length",
+        dest="simulation_length",
+        action="store_true",
+        help="Extract and plot the volume as a function of the simulation length (as a function of the number of steps)"
+    )
+    parser.add_argument(
+        "--simulation-length-pdf",
+        help="Path to save the pdf file of the plot of the volume as a function of the simualtion length",
+        default="simulation_length.pdf",
+        dest="simulation_length_pdf"
+    )
+    parser.add_argument(
+        "--simulation-length-dir",
+        help="Directory where the pipeline has been run.",
+        default="./",
+        dest="simulation_length_dir"
+    )
     args = parser.parse_args()
 
     #Define the output and plot properties
@@ -89,7 +107,12 @@ def main():
     ylabel = r"Molecular volume ($\AA^{3}$.molec$^{-1}$)"
 
     #Raise error if no options are provided
-    if args.output_volume == False and args.cutoff == False:
+    no_option = (
+        args.output_volume == False and 
+        args.cutoff == False and 
+        args.simulation_length == False
+        )
+    if no_option:
         raise Exception("No options provided. Please use the -h option.")
 
     else:
@@ -132,6 +155,17 @@ def main():
                                     show=args.plot,
                                     output_path=args.cutoff_pdf)
 
+        if args.simulation_length:
+            water_model = eau.eau()
+            (simulation_length,
+                volume_mean_list,
+                volume_error_list) = water_model.simulation_length_extract_volume(
+                                                    args.simulation_length_dir
+                                                    )
+            water_model.simulation_length_plot(args.simulation_length_dir,
+                                    color,
+                                    show=args.plot,
+                                    output_path=args.simulation_length_pdf)
 
 if __name__ == "__main__":
     main()
