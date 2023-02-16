@@ -14,6 +14,10 @@ class eau(xtract.gromacs_output):
     Class of the different water model (OPC and TIP3P studied)
     """
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    #       Density to volume       #
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
     def density_to_volume(self):
         """Convert the density calculated with gromacs to molecular volume
 
@@ -127,6 +131,10 @@ class eau(xtract.gromacs_output):
 
         return x, volume, volume_mean, volume_error
 
+    #~~~~~~~~~~~~~~~~~~~~#
+    #       Cutoff       #
+    #~~~~~~~~~~~~~~~~~~~~#
+
     def cutoff_extract_volume(
         self, dir="/home/ccattin/Documents/EAU/Change_cutoff/TIP3P/300K/"
     ):
@@ -201,6 +209,10 @@ class eau(xtract.gromacs_output):
         # Plot in an external window
         if show:
             plt.show()
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    #       Simulation length       #
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     def simulation_length_extract_volume(
         self, dir="/home/ccattin/Documents/EAU/Change_simulatio_length/TIP3P/300K/"
