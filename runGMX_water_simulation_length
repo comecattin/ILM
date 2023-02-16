@@ -1,0 +1,80 @@
+#! /bin/bash
+#Pipeline to produce various run with different simulation length
+
+#===================#
+#       Intial      #
+#===================# 
+run_dir=$(pwd)
+echo "Working directory: $run_dir"
+input_dir=$run_dir/input
+echo "Input directory: $input_dir"
+list_length="600000 700000 800000"
+
+#===============================#
+#       First production        #
+#===============================#
+
+first_dir=$run_dir/nsteps_500000
+first_prod_dir=$first_dir/production
+#mkdir -p $first_dir
+#cd $first_dir
+#echo "Running the first production"
+#cp -r $input_dir .
+#echo "nsteps                    = 500000" >> input/prod.mdp
+#/home/ccattin/Documents/A3/Stage/Code/runGMX_water
+#cd $run_dir
+
+#===================#
+#       Loop        #
+#===================# 
+
+for nsteps in $list_length
+do
+    #Creation of the directory
+    nsteps_dir=$run_dir/nsteps_$nsteps
+    mkdir -p $nsteps_dir
+    cd $nsteps_dir
+    #Creation of the production directory
+    nsteps_prod_dir=$nsteps_dir/production
+    mkdir -p $nsteps_prod_dir
+    cd $nsteps_prod_dir
+    #Copy all the mdp file
+    echo $first_prod_dir
+    cp $input_dir/prod.mdp .
+    cp $first_prod_dir/npt.gro .
+    cp $first_prod_dir/npt.cpt .
+    cp $first_prod_dir/topol.top .
+    cp $first_prod_dir/index.ndx .
+    #Change the prodution file with the number of steps
+    echo "nsteps                    = $nsteps" >> prod.mdp
+    #Running gmx
+    echo "        Running gmx grompp"
+    gmx grompp -f prod.mdp -c npt.gro -t npt.cpt -p topol.top -o prod.tpr -n index.ndx
+    echo "    Running gmx mdrun"
+    gmx mdrun -v -deffnm prod
+    echo "        Production run done."
+    cd $nsteps_dir
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    #            Analysis             #
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    printf "\n\n4- Analysis\n"
+    ana_steps_dir=$nsteps_dir/analysis
+    mkdir -p $ana_steps_dir
+    
+    echo "    Directory $ana_steps_dir created"
+    cd $ana_steps_dir
+    #Copy files
+    cp $nsteps_prod_dir/prod.edr .
+    #Runing gmx energy
+    echo -e '16' | gmx energy -f prod.edr -o density.xvg
+    #Runing gmx analyse
+    gmx analyze -f density.xvg -ac density_autocorr -ee
+    #Runing python analysis
+    python_code_dir=/home/ccattin/Documents/A3/Stage/Code/eau_CLI.py
+    $python_code_dir --volume -f density.xvg -e errest.xvg --pdf molar_volume.pdf --txt time_volume_mean_error.txt
+    echo "    Analysis done !"
+
+
+done

@@ -105,7 +105,7 @@ cd $run_dir
 ###################################
 #            Analysis             #
 ###################################
-printf "\n\n4- MD run\n"
+printf "\n\n4- Analysis\n"
 mkdir -p $run_dir/analysis
 prod_dir=$run_dir/production
 ana_dir=$run_dir/analysis
