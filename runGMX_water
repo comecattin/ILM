@@ -6,6 +6,8 @@ echo "Working directory: $run_dir"
 input_dir=$run_dir/input
 echo "Input directory: $input_dir"
 
+code_dir=/home/ccattin/Documents/A3/Stage/Code
+
 ##################################
 #          Minimization          #
 ##################################
@@ -118,6 +120,6 @@ echo -e '16' | gmx energy -f prod.edr -o density.xvg
 #Runing gmx analyse
 gmx analyze -f density.xvg -ac density_autocorr -ee
 #Runing python analysis
-python_code_dir=/home/ccattin/Documents/Code/eau_CLI.py
+python_code_dir=$code_dir/eau_CLI.py
 $python_code_dir --volume -f density.xvg -e errest.xvg --pdf molar_volume.pdf --txt time_volume_mean_error.txt
 echo "    Analysis done !"

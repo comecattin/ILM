@@ -9,6 +9,7 @@ echo "Working directory: $run_dir"
 input_dir=$run_dir/input
 echo "Input directory: $input_dir"
 list_length="100000 200000 300000 400000 600000 700000 800000 900000 1000000"
+code_dir=/home/ccattin/Documents/A3/Stage/Code
 
 #===============================#
 #       First production        #
@@ -21,7 +22,7 @@ cd $first_dir
 echo "Running the first production"
 cp -r $input_dir .
 echo "nsteps                    = 500000" >> input/prod.mdp
-/home/ccattin/Documents/A3/Stage/Code/runGMX_water
+$code_dir/runGMX_water
 cd $run_dir
 
 #===================#
@@ -71,9 +72,20 @@ do
     #Runing gmx analyse
     gmx analyze -f density.xvg -ac density_autocorr -ee
     #Runing python analysis
-    python_code_dir=/home/ccattin/Documents/Code/eau_CLI.py
+    python_code_dir=$code_dir/eau_CLI.py
     $python_code_dir --volume -f density.xvg -e errest.xvg --pdf molar_volume.pdf --txt time_volume_mean_error.txt
-    echo "    Analysis done !"
-
+    echo "    First Analysis done !"
 
 done
+
+cd $run_dir
+
+#=======================#
+#       Analysis        #
+#=======================#
+
+ana_dir=$run_dir/analysis
+mkdir -p $ana_dir
+$python_code_dir --simulation-length --simulation-length-pdf $ana_dir/simulation_length.pdf
+echo "    Analysis completed !"
+
