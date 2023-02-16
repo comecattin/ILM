@@ -81,18 +81,21 @@ def main():
         default="./",
         dest="cutoff_dir"
     )
+    #Extract or not the simulation length
     parser.add_argument(
         "--simulation-length",
         dest="simulation_length",
         action="store_true",
         help="Extract and plot the volume as a function of the simulation length (as a function of the number of steps)"
     )
+    #Save the .pdf from the simulation length analysis
     parser.add_argument(
         "--simulation-length-pdf",
         help="Path to save the pdf file of the plot of the volume as a function of the simualtion length",
         default="simulation_length.pdf",
         dest="simulation_length_pdf"
     )
+    #Simulation analysis directory
     parser.add_argument(
         "--simulation-length-dir",
         help="Directory where the pipeline has been run.",
@@ -154,7 +157,8 @@ def main():
                                     color,
                                     show=args.plot,
                                     output_path=args.cutoff_pdf)
-
+        
+        #Simulation length part
         if args.simulation_length:
             water_model = eau.eau()
             (simulation_length,
