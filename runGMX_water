@@ -100,7 +100,7 @@ gmx grompp -f prod.mdp -c npt.gro -t npt.cpt -p topol.top -o prod.tpr -n index.n
 echo "    Running gmx mdrun"
 gmx mdrun -v -deffnm prod
 echo "        Production run done."
-cd $equi_dir
+cd $run_dir
 
 ###################################
 #            Analysis             #
