@@ -199,6 +199,47 @@ class eau(xtract.gromacs_output):
         if show:
             plt.show()
 
+    def simulation_length_extract_volume(self,
+                            dir="/home/ccattin/Documents/EAU/Change_simulatio_length/TIP3P/300K/"):
+        """Extract the volume and the associated simulation length from simulations
+
+        Parameters
+        ----------
+        dir : str, optional
+            Directory where the pipeline has been run, by default "/home/ccattin/Documents/EAU/Change_simulatio_length/TIP3P/300K/"
+
+        Returns
+        -------
+        nsteps_list : np.array
+            Array containing the number of steps done
+        volume_mean_list : np.array
+            Array containing the average volumes
+        volume_error_list : np.array
+            Array containing the error associated
+        """
+        #Initialize
+        volume_mean_list = []
+        volume_error_list = []
+        nsteps_list = []
+        #Get the nsteps directories name
+        for name in os.listdir(dir):
+            #Ignore other directories
+            if "nsteps_" in name:
+                nsteps = float(name.replace("nsteps_",""))
+                nsteps_list.append(nsteps)
+                #Extract values
+                (x, volume, 
+                volume_mean, 
+                volume_error) = self.read(
+                                    dir+name+"/analysis/time_volume_mean_error.txt"
+                                    )
+                volume_mean_list.append(volume_mean)
+                volume_error_list.append(volume_error)
+        
+        return (np.array(nsteps_list),
+                np.array(volume_mean_list),
+                np.array(volume_error_list))
+
 
 if __name__ == "__main__":
     file_name = "/home/ccattin/Documents/EAU/Ludovic_parameters/computed_by_Come/OPC/300K/production/density.xvg"
@@ -209,7 +250,7 @@ if __name__ == "__main__":
     output_name = "/home/ccattin/Documents/Code/outputs/molar_volume.pdf"
     output_result_name = "/home/ccattin/Documents/Code/outputs/time_volume_mean_error.txt"
     color = sns.color_palette("cool", 12)[6]
-
+    show = False
     #######
     # OPC #
     #######
@@ -222,13 +263,29 @@ if __name__ == "__main__":
         """.format(volume_mean, volume_error))
     
     OPC.plot_volume(xlabel=xlabel, ylabel=ylabel, 
-                    output_name=output_name, color=color)
+                    output_name=output_name, color=color,
+                    show=show)
 
     OPC.write(output_result_name)
     (x, volume,
     volume_mean, volume_error) = OPC.read(output_result_name)
     
+    ##########
+    # Cutoff #
+    ##########
     cutoff_dir = "/home/ccattin/Documents/EAU/Change_cutoff/TIP3P/300K/"
     output_path="/home/ccattin/Documents/Code/outputs/cutoff.pdf"
-    cutoff_list, volume_mean_list, volume_error_list = OPC.cutoff_extract_volume(cutoff_dir)
-    OPC.cutoff_plot(cutoff_dir,color,show=True,output_path=output_path)
+    (cutoff_list,
+        volume_mean_list,
+        volume_error_list) = OPC.cutoff_extract_volume(cutoff_dir)
+    OPC.cutoff_plot(cutoff_dir,color,show=show,output_path=output_path)
+
+    #####################
+    # Simulation length #
+    #####################
+    length_dir = "/home/ccattin/Documents/EAU/Change_simulation_length/TIP3P/300K/"
+    output_path="/home/ccattin/Documents/Code/outputs/simulation_length.pdf"
+    (cutoff_list,
+        volume_mean_list,
+        volume_error_list) = OPC.simulation_length_extract_volume(length_dir)
+    #OPC.cutoff_plot(cutoff_dir,color,show=show,output_path=output_path)

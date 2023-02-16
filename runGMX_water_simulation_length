@@ -8,7 +8,7 @@ run_dir=$(pwd)
 echo "Working directory: $run_dir"
 input_dir=$run_dir/input
 echo "Input directory: $input_dir"
-list_length="600000 700000 800000"
+list_length="100000 200000 300000 400000 600000 700000 800000 900000 1000000"
 
 #===============================#
 #       First production        #
@@ -16,13 +16,13 @@ list_length="600000 700000 800000"
 
 first_dir=$run_dir/nsteps_500000
 first_prod_dir=$first_dir/production
-#mkdir -p $first_dir
-#cd $first_dir
-#echo "Running the first production"
-#cp -r $input_dir .
-#echo "nsteps                    = 500000" >> input/prod.mdp
-#/home/ccattin/Documents/A3/Stage/Code/runGMX_water
-#cd $run_dir
+mkdir -p $first_dir
+cd $first_dir
+echo "Running the first production"
+cp -r $input_dir .
+echo "nsteps                    = 500000" >> input/prod.mdp
+/home/ccattin/Documents/A3/Stage/Code/runGMX_water
+cd $run_dir
 
 #===================#
 #       Loop        #
@@ -32,14 +32,13 @@ for nsteps in $list_length
 do
     #Creation of the directory
     nsteps_dir=$run_dir/nsteps_$nsteps
-    mkdir -p $nsteps_dir
+    #mkdir -p $nsteps_dir
     cd $nsteps_dir
     #Creation of the production directory
     nsteps_prod_dir=$nsteps_dir/production
-    mkdir -p $nsteps_prod_dir
+    #mkdir -p $nsteps_prod_dir
     cd $nsteps_prod_dir
     #Copy all the mdp file
-    echo $first_prod_dir
     cp $input_dir/prod.mdp .
     cp $first_prod_dir/npt.gro .
     cp $first_prod_dir/npt.cpt .
@@ -68,11 +67,11 @@ do
     #Copy files
     cp $nsteps_prod_dir/prod.edr .
     #Runing gmx energy
-    echo -e '16' | gmx energy -f prod.edr -o density.xvg
+    echo -e '14' | gmx energy -f prod.edr -o density.xvg
     #Runing gmx analyse
     gmx analyze -f density.xvg -ac density_autocorr -ee
     #Runing python analysis
-    python_code_dir=/home/ccattin/Documents/A3/Stage/Code/eau_CLI.py
+    python_code_dir=/home/ccattin/Documents/Code/eau_CLI.py
     $python_code_dir --volume -f density.xvg -e errest.xvg --pdf molar_volume.pdf --txt time_volume_mean_error.txt
     echo "    Analysis done !"
 
