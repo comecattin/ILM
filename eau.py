@@ -349,6 +349,53 @@ class eau(xtract.gromacs_output):
         if show:
             plt.show()
 
+    def simulation_length_write(self, dir, file_name):
+        """Write simulation length results in a .txt file
+
+        Parameters
+        ----------
+        dir : str
+            Directory where the pipeline has been run
+        file_name : str
+            File name of the output .txt to create.
+        """
+        #Extract
+        (simulation_length_list,
+            volume_mean_list,
+            volume_error_list
+            ) = self.simulation_length_extract_volume(dir)
+        #Save
+        np.savetxt(file_name,
+                    np.array([simulation_length_list,
+                            volume_mean_list,
+                            volume_error_list]))
+    
+    def simulation_length_read(self, file_name):
+        """Read the output .txt file made by the function simulation_length_write
+
+        Parameters
+        ----------
+        file_name : str
+            .txt file to read results from
+
+        Returns
+        -------
+        simulation_length_list : np.array
+            Array containing the simulation length
+        volume_mean_list : np.array
+            Array containing the average volumes
+        volume_error_list : np.array
+            Array containing the error associated
+        """
+        #Load file
+        [simulation_length_list,
+            volume_mean_list,
+            volume_error_list] = np.loadtxt(file_name)
+
+        return (simulation_length_list,
+            volume_mean_list,
+            volume_error_list)
+
 
 if __name__ == "__main__":
     file_name = "/home/ccattin/Documents/EAU/Ludovic_parameters/computed_by_Come/OPC/300K/production/density.xvg"
@@ -405,6 +452,7 @@ if __name__ == "__main__":
         "/home/ccattin/Documents/EAU/Change_simulation_length/TIP3P/300K/"
     )
     output_path = "/home/ccattin/Documents/Code/outputs/simulation_length.pdf"
+    file_name = "/home/ccattin/Documents/Code/outputs/simulation_length.txt"
     (
         cutoff_list,
         volume_mean_list,
@@ -413,3 +461,12 @@ if __name__ == "__main__":
     OPC.simulation_length_plot(
         simulation_length_dir, color, show=show, output_path=output_path
     )
+    OPC.simulation_length_write(simulation_length_dir, file_name)
+    (
+        simulation_length_list,
+        volume_mean_list,
+        volume_error_list,
+    ) = OPC.simulation_length_read(file_name)
+    print(simulation_length_list)
+    print(volume_mean_list)
+    print(volume_error_list)
