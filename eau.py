@@ -211,18 +211,43 @@ class eau(xtract.gromacs_output):
             plt.show()
 
     def cutoff_write(self, dir, file_name):
+        """Write cutoff results in a .txt file
 
+        Parameters
+        ----------
+        dir : str
+            Directory where the pipeline has been run
+        file_name : str
+            File name of the output .txt to create.
+        """
+        #Extract
         (cutoff_list,
             volume_mean_list,
             volume_error_list) = self.cutoff_extract_volume(dir)
-
+        #Save
         np.savetxt(file_name,
                     np.array([cutoff_list,
                             volume_mean_list,
                             volume_error_list]))
     
     def cutoff_read(self, file_name):
+        """Read the output .txt file made by the function cutoff_write
 
+        Parameters
+        ----------
+        file_name : str
+            .txt file to read results from
+
+        Returns
+        -------
+        cutoff_list : np.array
+            Array containing the cutoff
+        volume_mean_list : np.array
+            Array containing the average volumes
+        volume_error_list : np.array
+            Array containing the error associated
+        """
+        #Load file
         [cutoff_list,
             volume_mean_list,
             volume_error_list] = np.loadtxt(file_name)
