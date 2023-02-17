@@ -85,6 +85,13 @@ def main():
         default="./",
         dest="cutoff_dir",
     )
+    #Save the .txt results of the cutoff analysis
+    parser.add_argument(
+        "--cutoff-txt",
+        help="Path to save the txt file of the result of the volume as a function of the cutoff",
+        default="cutoff.txt",
+        dest="cutoff_txt"
+    )
     # Extract or not the simulation length
     parser.add_argument(
         "--simulation-length",
@@ -98,6 +105,7 @@ def main():
         help="Path to save the pdf file of the plot of the volume as a function of the simualtion length",
         default="simulation_length.pdf",
         dest="simulation_length_pdf",
+        type=str
     )
     # Simulation analysis directory
     parser.add_argument(
@@ -105,6 +113,14 @@ def main():
         help="Directory where the pipeline has been run.",
         default="./",
         dest="simulation_length_dir",
+        type=str
+    )
+    parser.add_argument(
+        "--simulation-length-txt",
+        help="Path to save the txt file of the result of the volume as a function of the simulation length",
+        default="simulation_length.txt",
+        dest="simulation_length_txt",
+        type=str
     )
     args = parser.parse_args()
 
@@ -168,6 +184,9 @@ def main():
             water_model.cutoff_plot(
                 args.cutoff_dir, color, show=args.plot, output_path=args.cutoff_pdf
             )
+            water_model.cutoff_write(
+                            args.cutoff_dir,
+                            args.cutoff_txt)
 
         # Simulation length part
         if args.simulation_length:
@@ -183,6 +202,9 @@ def main():
                 show=args.plot,
                 output_path=args.simulation_length_pdf,
             )
+            water_model.simulation_length_write(
+                                args.simulation_length_dir,
+                                args.simulation_length_txt)
 
 
 if __name__ == "__main__":
