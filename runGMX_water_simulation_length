@@ -86,6 +86,6 @@ cd $run_dir
 
 ana_dir=$run_dir/analysis
 mkdir -p $ana_dir
-$python_code_dir --simulation-length --simulation-length-pdf $ana_dir/simulation_length.pdf
+$python_code_dir --simulation-length --simulation-length-pdf $ana_dir/simulation_length.pdf --simulation-length-txt $ana_dir/simulation-length.txt
 echo "    Analysis completed !"
 

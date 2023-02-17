@@ -45,5 +45,5 @@ analysis_dir=$run_dir/analysis
 mkdir -p $analysis_dir
 #Runing python analysis
 python_code_dir=$code_dir/eau_CLI.py
-$python_code_dir -c
+$python_code_dir --cutoff --cutoff_pdf $analysis_dir/cutoff.pdf --cutoff-txt $analysis_dir/cutoff.txt
 echo "    Analysis done !"
