@@ -220,6 +220,17 @@ class eau(xtract.gromacs_output):
                     np.array([cutoff_list,
                             volume_mean_list,
                             volume_error_list]))
+    
+    def cutoff_read(self, file_name):
+
+        [cutoff_list,
+            volume_mean_list,
+            volume_error_list] = np.loadtxt(file_name)
+
+        return (cutoff_list,
+            volume_mean_list,
+            volume_error_list)
+
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #       Simulation length       #
@@ -358,6 +369,9 @@ if __name__ == "__main__":
     )
     OPC.cutoff_plot(cutoff_dir, color, show=show, output_path=output_path)
     OPC.cutoff_write(cutoff_dir, file_name)
+    (cutoff_list,
+        volume_mean_list,
+        volume_error_list) = OPC.cutoff_read(file_name)
 
     #####################
     # Simulation length #
