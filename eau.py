@@ -210,6 +210,17 @@ class eau(xtract.gromacs_output):
         if show:
             plt.show()
 
+    def cutoff_write(self, dir, file_name):
+
+        (cutoff_list,
+            volume_mean_list,
+            volume_error_list) = self.cutoff_extract_volume(dir)
+
+        np.savetxt(file_name,
+                    np.array([cutoff_list,
+                            volume_mean_list,
+                            volume_error_list]))
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #       Simulation length       #
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -341,10 +352,12 @@ if __name__ == "__main__":
     ##########
     cutoff_dir = "/home/ccattin/Documents/EAU/Change_cutoff/TIP3P/300K/"
     output_path = "/home/ccattin/Documents/Code/outputs/cutoff.pdf"
+    file_name = "/home/ccattin/Documents/Code/outputs/cutoff.txt"
     (cutoff_list, volume_mean_list, volume_error_list) = OPC.cutoff_extract_volume(
         cutoff_dir
     )
     OPC.cutoff_plot(cutoff_dir, color, show=show, output_path=output_path)
+    OPC.cutoff_write(cutoff_dir, file_name)
 
     #####################
     # Simulation length #
