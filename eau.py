@@ -14,9 +14,9 @@ class eau(xtract.gromacs_output):
     Class of the different water model (OPC and TIP3P studied)
     """
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #       Density to volume       #
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     def density_to_volume(self):
         """Convert the density calculated with gromacs to molecular volume
@@ -131,9 +131,9 @@ class eau(xtract.gromacs_output):
 
         return x, volume, volume_mean, volume_error
 
-    #~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~#
     #       Cutoff       #
-    #~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~#
 
     def cutoff_extract_volume(
         self, dir="/home/ccattin/Documents/EAU/Change_cutoff/TIP3P/300K/"
@@ -220,16 +220,15 @@ class eau(xtract.gromacs_output):
         file_name : str
             File name of the output .txt to create.
         """
-        #Extract
-        (cutoff_list,
-            volume_mean_list,
-            volume_error_list) = self.cutoff_extract_volume(dir)
-        #Save
-        np.savetxt(file_name,
-                    np.array([cutoff_list,
-                            volume_mean_list,
-                            volume_error_list]))
-    
+        # Extract
+        (cutoff_list, volume_mean_list, volume_error_list) = self.cutoff_extract_volume(
+            dir
+        )
+        # Save
+        np.savetxt(
+            file_name, np.array([cutoff_list, volume_mean_list, volume_error_list])
+        )
+
     def cutoff_read(self, file_name):
         """Read the output .txt file made by the function cutoff_write
 
@@ -247,19 +246,14 @@ class eau(xtract.gromacs_output):
         volume_error_list : np.array
             Array containing the error associated
         """
-        #Load file
-        [cutoff_list,
-            volume_mean_list,
-            volume_error_list] = np.loadtxt(file_name)
+        # Load file
+        [cutoff_list, volume_mean_list, volume_error_list] = np.loadtxt(file_name)
 
-        return (cutoff_list,
-            volume_mean_list,
-            volume_error_list)
+        return (cutoff_list, volume_mean_list, volume_error_list)
 
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #       Simulation length       #
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     def simulation_length_extract_volume(
         self, dir="/home/ccattin/Documents/EAU/Change_simulatio_length/TIP3P/300K/"
@@ -359,17 +353,18 @@ class eau(xtract.gromacs_output):
         file_name : str
             File name of the output .txt to create.
         """
-        #Extract
-        (simulation_length_list,
+        # Extract
+        (
+            simulation_length_list,
             volume_mean_list,
-            volume_error_list
-            ) = self.simulation_length_extract_volume(dir)
-        #Save
-        np.savetxt(file_name,
-                    np.array([simulation_length_list,
-                            volume_mean_list,
-                            volume_error_list]))
-    
+            volume_error_list,
+        ) = self.simulation_length_extract_volume(dir)
+        # Save
+        np.savetxt(
+            file_name,
+            np.array([simulation_length_list, volume_mean_list, volume_error_list]),
+        )
+
     def simulation_length_read(self, file_name):
         """Read the output .txt file made by the function simulation_length_write
 
@@ -387,14 +382,12 @@ class eau(xtract.gromacs_output):
         volume_error_list : np.array
             Array containing the error associated
         """
-        #Load file
-        [simulation_length_list,
-            volume_mean_list,
-            volume_error_list] = np.loadtxt(file_name)
+        # Load file
+        [simulation_length_list, volume_mean_list, volume_error_list] = np.loadtxt(
+            file_name
+        )
 
-        return (simulation_length_list,
-            volume_mean_list,
-            volume_error_list)
+        return (simulation_length_list, volume_mean_list, volume_error_list)
 
 
 if __name__ == "__main__":
@@ -441,9 +434,7 @@ if __name__ == "__main__":
     )
     OPC.cutoff_plot(cutoff_dir, color, show=show, output_path=output_path)
     OPC.cutoff_write(cutoff_dir, file_name)
-    (cutoff_list,
-        volume_mean_list,
-        volume_error_list) = OPC.cutoff_read(file_name)
+    (cutoff_list, volume_mean_list, volume_error_list) = OPC.cutoff_read(file_name)
 
     #####################
     # Simulation length #
@@ -467,6 +458,3 @@ if __name__ == "__main__":
         volume_mean_list,
         volume_error_list,
     ) = OPC.simulation_length_read(file_name)
-    print(simulation_length_list)
-    print(volume_mean_list)
-    print(volume_error_list)
