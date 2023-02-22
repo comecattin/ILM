@@ -24,7 +24,7 @@ cp $input_dir/topol.top .
 echo "    Running gmx grompp"
 gmx grompp -f minim.mdp -c input.gro -p topol.top -o em.tpr
 echo "    Running gmx mdrun"
-gmx mdrun -deffnm em
+gmx mdrun -v -deffnm em
 echo "    Energy minimization done."
 cd $run_dir
 
@@ -54,7 +54,7 @@ cp $input_dir/index.ndx .
 echo "        Running gmx grompp"
 gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx
 echo "    Running gmx mdrun"
-gmx mdrun -deffnm nvt
+gmx mdrun -v -deffnm nvt
 echo "        NVT equilibration done."
 cd $equi_dir
 
@@ -76,7 +76,7 @@ cp $input_dir/index.ndx .
 echo "        Running gmx grompp"
 gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx
 echo "    Running gmx mdrun"
-gmx mdrun -deffnm npt
+gmx mdrun -v -deffnm npt
 echo "        NPT equilibration done."
 cd $equi_dir
 
@@ -98,7 +98,7 @@ cp $input_dir/index.ndx .
 echo "        Running gmx grompp"
 gmx grompp -f prod.mdp -c npt.gro -t npt.cpt -p topol.top -o prod.tpr -n index.ndx
 echo "    Running gmx mdrun"
-gmx mdrun -deffnm prod
+gmx mdrun -v -deffnm prod
 echo "        Production run done."
 cd $run_dir
 
