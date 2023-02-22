@@ -52,7 +52,6 @@ class eau(xtract.gromacs_output):
 
         volume_mean = molar_mass / (density_mean * Avogadro) * 1e30
         volume_error = (molar_mass * density_error) / (density_mean**2 * Avogadro) * 1e30
-
         return x, volume, volume_mean, volume_error
 
     def plot_volume(self, xlabel, ylabel, output_name, color="b", show=True):
