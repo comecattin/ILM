@@ -40,7 +40,7 @@ class eau(xtract.gromacs_output):
 
         x, density = self.extract()
 
-        # Mecular volume in m^3/molecule
+        # Molecular volume in m^3/molecule
         volume = molar_mass / (density * Avogadro)
         # Convert to Angstrom^3
         volume = volume * 1e30
@@ -51,7 +51,7 @@ class eau(xtract.gromacs_output):
         density_error = density_mean_error[1]
 
         volume_mean = molar_mass / (density_mean * Avogadro) * 1e30
-        volume_error = molar_mass / (density_mean**2 * Avogadro) * 1e30
+        volume_error = (molar_mass * density_error) / (density_mean**2 * Avogadro) * 1e30
 
         return x, volume, volume_mean, volume_error
 
