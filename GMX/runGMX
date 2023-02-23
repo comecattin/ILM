@@ -32,3 +32,6 @@ cd $run_dir
 #            Analysis             #
 ###################################
 $gmx_code_dir/analysis_water $python_water_code_dir
+cd $run_dir
+$gmx_code_dir/analysis_center_prot
+cd $run_dir

@@ -4,9 +4,6 @@
 run_dir=$(pwd)
 prod_dir=$run_dir/production
 
-python_code_dir=$1
-echo $python_code_dir
-
 ###################################
 #            Analysis             #
 ###################################
@@ -15,9 +12,10 @@ mkdir -p $run_dir/analysis
 ana_dir=$run_dir/analysis
 echo "    Directory $ana_dir created"
 cd $ana_dir
+echo "    Water analysis..."
 #Copy files
 cp $prod_dir/prod.edr .
-Runing gmx energy
+#Runing gmx energy
 echo -e 'Density' | gmx energy -f prod.edr -o density.xvg
 #Runing gmx analyse
 gmx analyze -f density.xvg -ac density_autocorr -ee
