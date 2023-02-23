@@ -1,0 +1,59 @@
+#! /bin/bash
+
+#Intial
+run_dir=$(pwd)
+input_dir=$run_dir/input
+minim_dir=$run_dir/minimization
+
+###################################
+#          Equilibration          #
+###################################
+
+printf "\n\n2- Equilibration step\n"
+mkdir -p $run_dir/equilibration
+equi_dir=$run_dir/equilibration
+echo "    Directory $equi_dir created"
+cd $equi_dir
+
+    #-----#
+    # NVT #
+    #-----#
+echo "    2-1 NVT equilibration"
+mkdir -p $equi_dir/1-NVT
+nvt_dir=$equi_dir/1-NVT
+echo "        Directory $nvt_dir created"
+cd $nvt_dir
+#Copy files
+cp $input_dir/nvt.mdp .
+cp $minim_dir/em.gro .
+cp $input_dir/topol.top .
+cp $input_dir/index.ndx .
+#Running gmx
+echo "        Running gmx grompp"
+gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx
+echo "    Running gmx mdrun"
+gmx mdrun -v -deffnm nvt
+echo "        NVT equilibration done."
+cd $equi_dir
+
+    #-----#
+    # NPT #
+    #-----#
+echo "    2-2 NPT equilibration"
+mkdir -p $equi_dir/2-NPT
+npt_dir=$equi_dir/2-NPT
+echo "        Directory $npt_dir created"
+cd $npt_dir
+#Copy file
+cp $input_dir/npt.mdp .
+cp $nvt_dir/nvt.gro .
+cp $nvt_dir/nvt.cpt .
+cp $input_dir/topol.top .
+cp $input_dir/index.ndx .
+#Running gmx
+echo "        Running gmx grompp"
+gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx
+echo "    Running gmx mdrun"
+gmx mdrun -v -deffnm npt
+echo "        NPT equilibration done."
+cd $equi_dir

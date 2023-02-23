@@ -7,101 +7,24 @@ input_dir=$run_dir/input
 echo "Input directory: $input_dir"
 
 code_dir=/home/ccattin/Documents/A3/Stage/Code
+gmx_code_dir=$code_dir/GMX
 
 ##################################
 #          Minimization          #
 ##################################
-printf "\n1 - Minimization step\n"
-mkdir -p $run_dir/minimization
-minim_dir=$run_dir/minimization
-echo "    Directory $minim_dir created"
-cd $minim_dir
-#Copy files
-cp $input_dir/minim.mdp .
-cp $input_dir/input.gro .
-cp $input_dir/input.pdb .
-cp $input_dir/topol.top .
-#Running gmx
-echo "    Running gmx grompp"
-gmx grompp -f minim.mdp -c input.gro -p topol.top -o em.tpr
-echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm em
-echo "    Energy minimization done."
+$gmx_code_dir/minimization
 cd $run_dir
-sleep 3
 
 ###################################
 #          Equilibration          #
 ###################################
-printf "\n\n2- Equilibration step\n"
-mkdir -p $run_dir/equilibration
-equi_dir=$run_dir/equilibration
-echo "    Directory $equi_dir created"
-cd $equi_dir
-
-    #-----#
-    # NVT #
-    #-----#
-echo "    2-1 NVT equilibration"
-mkdir -p $equi_dir/1-NVT
-nvt_dir=$equi_dir/1-NVT
-echo "        Directory $nvt_dir created"
-cd $nvt_dir
-#Copy files
-cp $input_dir/nvt.mdp .
-cp $minim_dir/em.gro .
-cp $input_dir/topol.top .
-cp $input_dir/index.ndx .
-#Running gmx
-echo "        Running gmx grompp"
-gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx
-echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm nvt
-echo "        NVT equilibration done."
-cd $equi_dir
-
-    #-----#
-    # NPT #
-    #-----#
-echo "    2-2 NPT equilibration"
-mkdir -p $equi_dir/2-NPT
-npt_dir=$equi_dir/2-NPT
-echo "        Directory $npt_dir created"
-cd $npt_dir
-#Copy file
-cp $input_dir/npt.mdp .
-cp $nvt_dir/nvt.gro .
-cp $nvt_dir/nvt.cpt .
-cp $input_dir/topol.top .
-cp $input_dir/index.ndx .
-#Running gmx
-echo "        Running gmx grompp"
-gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx
-echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm npt
-echo "        NPT equilibration done."
-cd $equi_dir
+$gmx_code_dir/equilibration
+cd $run_dir
 
 ###################################
 #             MD Run              #
 ###################################
-printf "\n\n3- MD run\n"
-mkdir -p $run_dir/production
-prod_dir=$run_dir/production
-echo "    Directory $prod_dir created"
-cd $prod_dir
-#Copy files
-cp $input_dir/prod.mdp .
-cp $npt_dir/npt.gro .
-cp $npt_dir/npt.cpt .
-cp $input_dir/topol.top .
-cp $input_dir/index.ndx .
-#Running gmx
-echo "        Running gmx grompp"
-gmx grompp -f prod.mdp -c npt.gro -t npt.cpt -p topol.top -o prod.tpr -n index.ndx
-echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm prod
-echo "        Production run done."
+$gmx_code_dir/production
 cd $run_dir
 
 ###################################
