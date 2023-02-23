@@ -1,0 +1,27 @@
+#! /bin/bash
+
+#Intial
+run_dir=$(pwd)
+input_dir=$run_dir/input
+
+##################################
+#          Minimization          #
+##################################
+printf "\n1 - Minimization step\n"
+mkdir -p $run_dir/minimization
+minim_dir=$run_dir/minimization
+echo "    Directory $minim_dir created"
+cd $minim_dir
+#Copy files
+cp $input_dir/minim.mdp .
+cp $input_dir/input.gro .
+cp $input_dir/input.pdb .
+cp $input_dir/topol.top .
+#Running gmx
+echo "    Running gmx grompp"
+gmx grompp -f minim.mdp -c input.gro -p topol.top -o em.tpr
+echo "    Running gmx mdrun"
+gmx mdrun -v -deffnm em
+echo "    Energy minimization done."
+cd $run_dir
+sleep 3

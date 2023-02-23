@@ -8,6 +8,7 @@ echo "Input directory: $input_dir"
 
 code_dir=/home/ccattin/Documents/A3/Stage/Code
 gmx_code_dir=$code_dir/GMX
+python_water_code_dir=$code_dir/water/eau_CLI.py
 
 ##################################
 #          Minimization          #
@@ -30,19 +31,4 @@ cd $run_dir
 ###################################
 #            Analysis             #
 ###################################
-# printf "\n\n4- Analysis\n"
-# mkdir -p $run_dir/analysis
-# prod_dir=$run_dir/production
-# ana_dir=$run_dir/analysis
-# echo "    Directory $ana_dir created"
-# cd $ana_dir
-# Copy files
-# cp $prod_dir/prod.edr .
-# Runing gmx energy
-# echo -e 'Density' | gmx energy -f prod.edr -o density.xvg
-# Runing gmx analyse
-# gmx analyze -f density.xvg -ac density_autocorr -ee
-# Runing python analysis
-# python_code_dir=$code_dir/eau_CLI.py
-# $python_code_dir --volume -f density.xvg -e errest.xvg --pdf molar_volume.pdf --txt time_volume_mean_error.txt
-# echo "    Analysis done !"
+$gmx_code_dir/analysis_water $python_water_code_dir
