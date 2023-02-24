@@ -31,3 +31,5 @@ $code_dir/PSMN/runGMX_PSMN
 
 cd $SCRATCH/
 mv $SCRATCH/* $SLURM_SUBMIT_DIR
+cd $SLURM_SUBMIT_DIR
+rm -r $SCRATCH
