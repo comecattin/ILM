@@ -4,6 +4,7 @@
 run_dir=$(pwd)
 input_dir=$run_dir/input
 minim_dir=$run_dir/minimization
+number_core=$1
 
 ###################################
 #          Equilibration          #
@@ -32,7 +33,7 @@ cp $input_dir/index.ndx .
 echo "        Running gmx grompp"
 gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx
 echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm nvt
+gmx mdrun -v -deffnm nvt -nt $number_core
 echo "        NVT equilibration done."
 cd $equi_dir
 
@@ -54,6 +55,6 @@ cp $input_dir/index.ndx .
 echo "        Running gmx grompp"
 gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx
 echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm npt
+gmx mdrun -v -deffnm npt -nt $number_core
 echo "        NPT equilibration done."
 cd $equi_dir

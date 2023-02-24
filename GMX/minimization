@@ -3,6 +3,7 @@
 #Intial
 run_dir=$(pwd)
 input_dir=$run_dir/input
+number_core=$1
 
 ##################################
 #          Minimization          #
@@ -21,7 +22,7 @@ cp $input_dir/topol.top .
 echo "    Running gmx grompp"
 gmx grompp -f minim.mdp -c input.gro -p topol.top -o em.tpr
 echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm em
+gmx mdrun -v -deffnm em -nt $number_core
 echo "    Energy minimization done."
 cd $run_dir
 sleep 3
