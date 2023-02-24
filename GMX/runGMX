@@ -6,7 +6,7 @@ echo "Working directory: $run_dir"
 input_dir=$run_dir/input
 echo "Input directory: $input_dir"
 
-code_dir=/home/ccattin/Documents/A3/Stage/Code
+code_dir=/home/ccattin/Stage/Code
 gmx_code_dir=$code_dir/GMX
 python_water_code_dir=$code_dir/water/eau_CLI.py
 
