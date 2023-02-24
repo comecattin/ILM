@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=64
 #SBATCH --cpus-per-task=1
-#SBATCH --time=0-01:00:00           # day-hours:minutes:seconds
+#SBATCH --time=2-00:00:00           # day-hours:minutes:seconds
 #SBATCH --mem=1G
 #
 shopt -s extglob
@@ -27,7 +27,7 @@ mkdir -p $SCRATCH
 cp -r !(*.err|*.out) $SCRATCH/
 cd $SCRATCH/
 #Script to run
-$code_dir/PSMN/runGMX_PSMN
+$code_dir/PSMN/runGMX_PSMN $SLURM_NTASKS
 
 cd $SCRATCH/
 mv $SCRATCH/* $SLURM_SUBMIT_DIR
