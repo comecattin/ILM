@@ -6,6 +6,7 @@ input_dir=$run_dir/input
 minim_dir=$run_dir/minimization
 equi_dir=$run_dir/equilibration
 npt_dir=$equi_dir/2-NPT
+number_core=$1
 
 
 ###################################
@@ -27,6 +28,6 @@ cp $input_dir/index.ndx .
 echo "        Running gmx grompp"
 gmx grompp -f prod.mdp -c npt.gro -t npt.cpt -p topol.top -o prod.tpr -n index.ndx
 echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm prod
+gmx mdrun -v -deffnm prod -nt $number_core
 echo "        Production run done."
 cd $run_dir

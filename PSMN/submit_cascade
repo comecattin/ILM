@@ -27,7 +27,7 @@ mkdir -p $SCRATCH
 cp -r !(*.err|*.out) $SCRATCH/
 cd $SCRATCH/
 #Script to run
-$code_dir/GMX/runGMX
+$code_dir/PSMN/runGMX_PSMN $SLURM_NTASKS
 
 cd $SCRATCH/
 mv $SCRATCH/* $SLURM_SUBMIT_DIR
