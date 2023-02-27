@@ -14,7 +14,7 @@ echo "    Directory $ana_dir created"
 cd $ana_dir
 echo "    Water analysis..."
 #Copy files
-cp $prod_dir/prod.edr .
+ln -s $prod_dir/prod.edr .
 #Runing gmx energy
 echo -e 'Density' | gmx energy -f prod.edr -o density.xvg
 #Runing gmx analyse

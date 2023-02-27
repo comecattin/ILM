@@ -16,9 +16,9 @@ echo "    Directory $ana_dir created"
 cd $ana_dir
 echo "    Center the protein and remove the water from the trajectory"
 #Copy files
-cp $npt_dir/npt.tpr .
-cp $prod_dir/prod.xtc .
-cp $prod_dir/prod.gro .
+ln -s $npt_dir/npt.tpr .
+ln -s $prod_dir/prod.xtc .
+ln -s $prod_dir/prod.gro .
 #Compact system
     #XTC
 echo 'Protein' 'System' | gmx trjconv -s npt.tpr -f prod.xtc -pbc mol -ur compact -center -o prod_compact.xtc

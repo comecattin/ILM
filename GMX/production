@@ -20,10 +20,10 @@ echo "    Directory $prod_dir created"
 cd $prod_dir
 #Copy files
 cp $input_dir/prod.mdp .
-cp $npt_dir/npt.gro .
-cp $npt_dir/npt.cpt .
-cp $input_dir/topol.top .
-cp $input_dir/index.ndx .
+ln -s $npt_dir/npt.gro .
+ln -s $npt_dir/npt.cpt .
+ln -s $input_dir/topol.top .
+ln -s $input_dir/index.ndx .
 #Running gmx
 echo "        Running gmx grompp"
 gmx grompp -f prod.mdp -c npt.gro -t npt.cpt -p topol.top -o prod.tpr -n index.ndx
