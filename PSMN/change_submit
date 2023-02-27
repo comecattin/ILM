@@ -1,0 +1,51 @@
+#!/bin/bash
+#Get the arguments
+while [[ $# -gt 0 ]]; do
+    key="$1"
+
+    case $key in
+        #Submit file
+        -f|--filename)
+        submit="$2"
+        shift
+        shift
+        ;;
+        #Change the name of the job
+        -n|--name)
+        job_name="$2"
+        shift
+        shift
+        ;;
+        #Change the number of ntasks
+        --ntasks)
+        ntasks="$2"
+        shift
+        shift
+        ;;
+        #Help
+        -h|--help)
+        echo "Usage: ./myscript.sh -f <filename> -n/--name <New job name> --ntasks <ntasks>"
+        exit 0
+        ;;
+        #Unknown option
+        *)
+        echo "Unknown option: $1"
+        exit 1
+        ;;
+    esac
+done
+
+if [ -z "$submit" ]; then
+    echo "You must specify a filename with -f or --filename"
+    exit 1
+fi
+
+if [ -v job_name ]; then
+    # Change the job name in the submit file
+    sed -i "s/#SBATCH --job-name=.*/#SBATCH --job-name=${job_name}/" $submit
+fi 
+
+if [ -v ntasks ]; then
+    # Change the number of ntasks in the submit file
+    sed -i "s/#SBATCH --ntasks-per-node=.*/#SBATCH --ntasks-per-node=${ntasks}/" $submit
+fi
