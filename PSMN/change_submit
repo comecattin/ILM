@@ -1,4 +1,14 @@
 #!/bin/bash
+#Change the properties of the submit script
+#Usage: change_submit [options] arguments
+#OPTIONS:
+#   -f --filename:
+#       Slurm submit script to change
+#   -n --name:
+#       New name of the job
+#   --ntasks:
+#       New number of tasks per node
+
 #Get the arguments
 while [[ $# -gt 0 ]]; do
     key="$1"
