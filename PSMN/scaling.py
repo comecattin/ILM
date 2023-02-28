@@ -36,18 +36,24 @@ def speedup(cores_list,time_list):
 
     return cores_list, speedup
 
-def plot_speedup(cores_list, speeup, color='b'):
+def plot_speedup(cores_list, speeup, color='b',outputname='speedup.pdf'):
     fig, ax = plt.subplots()
-    ax.plot(cores_list,speedup,'.',color=color)
-    ax.set_xlabel("Numer of CPU")
+    linear = cores_list/np.amin(cores_list)
+    ax.plot(cores_list,linear,'--',label="Linear law")
+    ax.scatter(cores_list,speedup,color=color)
+    ax.set_xticks(cores_list)
+    ax.set_xlabel("Number of CPU")
     ax.set_ylabel("Speed-up")
+    ax.legend()
     ax.grid()
+    plt.savefig(outputname, format="pdf", dpi=300, bbox_inches="tight")
     plt.show()
 
 
 if __name__ == "__main__":
     color = sns.color_palette("cool", 12)[6]
     path = "/home/ccattin/Documents/HSP90_278K/test_parallel/"
+    outputname = "/home/ccattin/Documents/HSP90_278K/test_parallel/analysis/speedup.pdf"
     cores_list, time_list = get_time(path)
     cores_list, speedup = speedup(cores_list,time_list)
-    plot_speedup(cores_list,speedup,color)
+    plot_speedup(cores_list,speedup,color,outputname)
