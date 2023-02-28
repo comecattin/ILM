@@ -5,6 +5,8 @@ run_dir=$(pwd)
 input_dir=$run_dir/input
 minim_dir=$run_dir/minimization
 number_core=$1
+GMX_EXE=$2
+MPRUN_EXE=$3
 
 ###################################
 #          Equilibration          #
@@ -31,9 +33,9 @@ ln -s $input_dir/topol.top .
 ln -s $input_dir/index.ndx .
 #Running gmx
 echo "        Running gmx grompp"
-gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx
+$GMX_EXE grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx
 echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm nvt -nt $number_core
+$MPRUN_EXE $GMX_EXE mdrun -v -deffnm nvt -nt $number_core
 echo "        NVT equilibration done."
 cd $equi_dir
 
@@ -53,8 +55,8 @@ ln -s $input_dir/topol.top .
 ln -s $input_dir/index.ndx .
 #Running gmx
 echo "        Running gmx grompp"
-gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx
+$GMX_EXE grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx
 echo "    Running gmx mdrun"
-gmx mdrun -v -deffnm npt -nt $number_core
+$MPRUN_EXE $GMX_EXE mdrun -v -deffnm npt -nt $number_core
 echo "        NPT equilibration done."
 cd $equi_dir

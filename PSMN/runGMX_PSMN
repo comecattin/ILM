@@ -7,6 +7,8 @@ input_dir=$run_dir/input
 echo "Input directory: $input_dir"
 
 number_core=$1
+GMX_EXE=$2
+MPRUN_EXE=$3
 
 code_dir=/home/ccattin/Stage/Code
 gmx_code_dir=$code_dir/GMX
@@ -15,19 +17,19 @@ python_water_code_dir=$code_dir/water/eau_CLI.py
 ##################################
 #          Minimization          #
 ##################################
-$gmx_code_dir/minimization $number_core
+$gmx_code_dir/minimization $number_core $GMX_EXE $MPRUN_EXE
 cd $run_dir
 
 ###################################
 #          Equilibration          #
 ###################################
-$gmx_code_dir/equilibration $number_core
+$gmx_code_dir/equilibration $number_core $GMX_EXE $MPRUN_EXE
 cd $run_dir
 
 ###################################
 #             MD Run              #
 ###################################
-$gmx_code_dir/production $number_core
+$gmx_code_dir/production $number_core $GMX_EXE $MPRUN_EXE
 cd $run_dir
 
 ###################################
