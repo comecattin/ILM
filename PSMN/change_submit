@@ -8,6 +8,8 @@
 #       New name of the job
 #   --ntasks:
 #       New number of tasks per node
+#   --nodes:
+#       New number of nodes
 
 #Get the arguments
 while [[ $# -gt 0 ]]; do
@@ -29,6 +31,12 @@ while [[ $# -gt 0 ]]; do
         #Change the number of ntasks
         --ntasks)
         ntasks="$2"
+        shift
+        shift
+        ;;
+        #Change the number of nodes
+        --nodes)
+        nodes="$2"
         shift
         shift
         ;;
@@ -58,4 +66,9 @@ fi
 if [ -v ntasks ]; then
     # Change the number of ntasks in the submit file
     sed -i "s/#SBATCH --ntasks-per-node=.*/#SBATCH --ntasks-per-node=${ntasks}/" $submit
+fi
+
+if [ -v nodes ]; then
+    # Change the number of nodes in the submit file
+        sed -i "s/#SBATCH --nodes=.*/#SBATCH --nodes=${nodes}/" $submit
 fi
