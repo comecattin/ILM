@@ -306,6 +306,7 @@ class eau(xtract.gromacs_output):
         show=True,
         output_path="simulation_length.pdf",
         devided_value=[],
+        devided_color='r',
     ):
         """Plot the volume as a function of the used nsteps.
 
@@ -322,6 +323,8 @@ class eau(xtract.gromacs_output):
         devided_value : list, optional
             List containing the nteps obtained by devided the largest nstep,
             by default []
+        devided_color : str, optional
+            Color of the devided value, by default 'r'
         """
         # Extract data
         (
@@ -348,7 +351,8 @@ class eau(xtract.gromacs_output):
                 volume_mean_list[indices],
                 volume_error_list[indices],
                 fmt=".",
-                label="Devided simulation"
+                label="Devided simulation",
+                color=devided_color
             )
             ax.legend()
         
@@ -418,7 +422,8 @@ if __name__ == "__main__":
     output_result_name = (
         "/home/ccattin/Documents/Code/outputs/time_volume_mean_error.txt"
     )
-    color = sns.color_palette("cool", 12)[6]
+    color_palette = sns.color_palette("cool", 12)
+    color = color_palette[6]
     show = True
     #######
     # OPC #
@@ -462,7 +467,8 @@ if __name__ == "__main__":
     )
     output_path = "/home/ccattin/Documents/Code/outputs/simulation_length.pdf"
     file_name = "/home/ccattin/Documents/Code/outputs/simulation_length.txt"
-    devided_value=[500001]
+    devided_value=[100001,200001,300001,400001,500001,600001,700001,800001,900001]
+    devided_color = color_palette[-1]
     (
         cutoff_list,
         volume_mean_list,
@@ -473,7 +479,8 @@ if __name__ == "__main__":
         color, 
         show=show, 
         output_path=output_path,
-        devided_value=devided_value
+        devided_value=devided_value,
+        devided_color=devided_color
     )
     OPC.simulation_length_write(simulation_length_dir, file_name)
     (
