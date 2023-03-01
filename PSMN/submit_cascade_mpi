@@ -5,13 +5,15 @@
 #
 #SBATCH -p Cascade
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=64
+#SBATCH --ntasks-per-node=96
 #SBATCH --cpus-per-task=1
-#SBATCH --time=2-00:00:00           # day-hours:minutes:seconds
+#SBATCH --time=1-00:00:00           # day-hours:minutes:seconds
 #SBATCH --mem=1G
 #
 shopt -s extglob
 
+nMPI=1
+nOMP=96
 GMX_EXE="gmx_mpi"
 MPRUN_EXE="mpirun"
 code_dir=/home/ccattin/Stage/Code
@@ -31,7 +33,7 @@ mkdir -p $SCRATCH
 cp -r !(*.err|*.out) $SCRATCH/
 cd $SCRATCH/
 #Script to run
-$code_dir/PSMN/runGMX_PSMN $SLURM_NTASKS $GMX_EXE $MPRUN_EXE
+$code_dir/PSMN/runGMX_PSMN $nMPI $nOMP $GMX_EXE $MPRUN_EXE
 
 cd $SCRATCH/
 mv $SCRATCH/* $SLURM_SUBMIT_DIR
