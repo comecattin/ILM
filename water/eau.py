@@ -305,6 +305,7 @@ class eau(xtract.gromacs_output):
         color="b",
         show=True,
         output_path="simulation_length.pdf",
+        devided_value=[],
     ):
         """Plot the volume as a function of the used nsteps.
 
@@ -318,6 +319,9 @@ class eau(xtract.gromacs_output):
             Show the plot in an external windown or not, by default True
         output_path : str, optional
             Path to save the file, by default "simulation_length.pdf"
+        devided_value : list, optional
+            List containing the nteps obtained by devided the largest nstep,
+            by default []
         """
         # Extract data
         (
@@ -325,6 +329,7 @@ class eau(xtract.gromacs_output):
             volume_mean_list,
             volume_error_list,
         ) = self.simulation_length_extract_volume(simulation_length_dir)
+        
         fig, ax = plt.subplots()
         ax.errorbar(
             simulation_length_list,
@@ -333,6 +338,20 @@ class eau(xtract.gromacs_output):
             fmt=".",
             color=color,
         )
+        if devided_value != []:
+            #Get the devided values
+            devided_value=np.array(devided_value)
+            indices = np.where(np.in1d(simulation_length_list, 
+                                    devided_value))[0]
+            ax.errorbar(
+                simulation_length_list[indices],
+                volume_mean_list[indices],
+                volume_error_list[indices],
+                fmt=".",
+                label="Devided simulation"
+            )
+            ax.legend()
+        
         ax.grid()
         ax.set_xlabel("nsteps")
         ax.set_ylabel(r"Molecular volume ($\AA^{3}$.molec$^{-1}$)")
@@ -443,13 +462,18 @@ if __name__ == "__main__":
     )
     output_path = "/home/ccattin/Documents/Code/outputs/simulation_length.pdf"
     file_name = "/home/ccattin/Documents/Code/outputs/simulation_length.txt"
+    devided_value=[500001]
     (
         cutoff_list,
         volume_mean_list,
         volume_error_list,
     ) = OPC.simulation_length_extract_volume(simulation_length_dir)
     OPC.simulation_length_plot(
-        simulation_length_dir, color, show=show, output_path=output_path
+        simulation_length_dir, 
+        color, 
+        show=show, 
+        output_path=output_path,
+        devided_value=devided_value
     )
     OPC.simulation_length_write(simulation_length_dir, file_name)
     (
