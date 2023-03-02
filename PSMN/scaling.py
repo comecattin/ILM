@@ -198,10 +198,8 @@ def plot_CPU_node_time(
     plt.savefig(outputname, format="pdf", dpi=300, bbox_inches="tight")
     plt.show()
 
-def get_CPU_MPI_OMP_time(path,
-                         outputname="MPI_OMP.pdf",
-                         color=["b","r"]
-                         ):
+
+def get_CPU_MPI_OMP_time(path, outputname="MPI_OMP.pdf", color=["b", "r"]):
     """Get and plot the time as a function of MPI threads for various cores
 
     Parameters
@@ -216,41 +214,38 @@ def get_CPU_MPI_OMP_time(path,
     # Initialize
     cpu = []
     i = 0
-    fig,ax = plt.subplots()
+    fig, ax = plt.subplots()
     # Search inside directory
     for name in os.listdir(path):
         # Get only the right format
-        joined = os.path.join(path,name)
-        #Get the CPU
+        joined = os.path.join(path, name)
+        # Get the CPU
         if os.path.isdir(joined):
-            cpu_i = int(name.replace("_NODE_1",""))
+            cpu_i = int(name.replace("_NODE_1", ""))
             cpu.append(cpu_i)
             i = len(cpu) - 1
-            #Get the MPI and OMP
+            # Get the MPI and OMP
             MPI = []
             OMP = []
             time = []
             for file in os.listdir(joined):
-                #MPI = 0 represent the default selected by gromacs
+                # MPI = 0 represent the default selected by gromacs
                 if file == "ref.log":
                     MPI.append(0)
                 else:
-                    MPI_OMP = file.replace("MPI_","").replace("OMP_","").replace(".log","").split("_")
+                    MPI_OMP = (
+                        file.replace("MPI_", "")
+                        .replace("OMP_", "")
+                        .replace(".log", "")
+                        .split("_")
+                    )
                     MPI.append(int(MPI_OMP[0]))
                     OMP.append(int(MPI_OMP[1]))
-                #Extract the time
-                time.append(
-                    extract_simulation_time(
-                    os.path.join(joined,file)
-                    )
-                )
-            ax.scatter(
-                MPI,
-                time,
-                label="CPU= "+str(cpu_i),
-                color=color[i])
+                # Extract the time
+                time.append(extract_simulation_time(os.path.join(joined, file)))
+            ax.scatter(MPI, time, label="CPU= " + str(cpu_i), color=color[i])
     ax.legend()
-    ax.set_xticks((0,1,2,3,4))
+    ax.set_xticks((0, 1, 2, 3, 4))
     ax.grid()
     ax.set_xlabel("Number of MPI threads")
     ax.set_ylabel("Production time (s)")
@@ -265,7 +260,7 @@ if __name__ == "__main__":
     outputname = "/home/ccattin/Documents/HSP90_278K/test_parallel/analysis/speedup.pdf"
     cores_list, time_list = get_time(path)
     cores_list, speedup_list = speedup(cores_list, time_list)
-    #plot_speedup(cores_list, speedup_list, color_palette[6], outputname)
+    # plot_speedup(cores_list, speedup_list, color_palette[6], outputname)
 
     ###     Various node    ###
     path_node = "/home/ccattin/Documents/HSP90_278K/test_parallel/analysis"
@@ -274,15 +269,9 @@ if __name__ == "__main__":
     )
     cpu, node, time = get_CPU_node_time(path_node)
     color = [color_palette[i] for i in (0, 6, 11)]
-    #plot_CPU_node_time(cpu, node, time, color=color, outputname=outputname)
-    
+    # plot_CPU_node_time(cpu, node, time, color=color, outputname=outputname)
+
     ###     Same node MPI OMP different     ###
-    outputname = (
-        "/home/ccattin/Documents/HSP90_278K/test_parallel/analysis/MPI_OMP.pdf"
-    )
+    outputname = "/home/ccattin/Documents/HSP90_278K/test_parallel/analysis/MPI_OMP.pdf"
     color = [color_palette[i] for i in (0, 6)]
-    get_CPU_MPI_OMP_time(
-        path_node,
-        outputname=outputname,
-        color=color
-        )
+    get_CPU_MPI_OMP_time(path_node, outputname=outputname, color=color)
