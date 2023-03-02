@@ -202,6 +202,17 @@ def get_CPU_MPI_OMP_time(path,
                          outputname="MPI_OMP.pdf",
                          color=["b","r"]
                          ):
+    """Get and plot the time as a function of MPI threads for various cores
+
+    Parameters
+    ----------
+    path : str
+        Path were the analysis simulations are
+    outputname : str, optional
+        Output file name, by default "MPI_OMP.pdf"
+    color : list, optional
+        Color of the plot, by default ["b","r"]
+    """
     # Initialize
     cpu = []
     i = 0
@@ -220,12 +231,14 @@ def get_CPU_MPI_OMP_time(path,
             OMP = []
             time = []
             for file in os.listdir(joined):
+                #MPI = 0 represent the default selected by gromacs
                 if file == "ref.log":
                     MPI.append(0)
                 else:
                     MPI_OMP = file.replace("MPI_","").replace("OMP_","").replace(".log","").split("_")
                     MPI.append(int(MPI_OMP[0]))
                     OMP.append(int(MPI_OMP[1]))
+                #Extract the time
                 time.append(
                     extract_simulation_time(
                     os.path.join(joined,file)
