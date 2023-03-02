@@ -117,6 +117,7 @@ def plot_speedup(cores_list, speedup, color="b", outputname="speedup.pdf"):
     plt.savefig(outputname, format="pdf", dpi=300, bbox_inches="tight")
     plt.show()
 
+
 def get_CPU_node_time(path):
     """Get the number of cpu, of node and their associated job time
 
@@ -134,35 +135,31 @@ def get_CPU_node_time(path):
     time : np.array
         List of the associated time
     """
-    #Initialize
+    # Initialize
     cpu = []
     node = []
     time = []
-    #Search inside directory
+    # Search inside directory
     for name in os.listdir(path):
-        #Get only the right format
-        if 'CPU' in name:
-            #Extract the cpu and the node
-            list_CPU_NODE = name.replace(
-                "CPU_",""
-                ).replace(
-                "NODE_",""
-                ).replace(
-                ".log",""
-                ).split("_")
+        # Get only the right format
+        if "CPU" in name:
+            # Extract the cpu and the node
+            list_CPU_NODE = (
+                name.replace("CPU_", "")
+                .replace("NODE_", "")
+                .replace(".log", "")
+                .split("_")
+            )
             cpu.append(int(list_CPU_NODE[0]))
             node.append(int(list_CPU_NODE[1]))
-            #Extract the time
-            time.append(
-                extract_simulation_time(path+"/"+name)
-            )
+            # Extract the time
+            time.append(extract_simulation_time(path + "/" + name))
     return np.array(cpu), np.array(node), np.array(time)
 
-def plot_CPU_node_time(cpu,
-                       node,
-                       time,
-                       color=["b","r","g"],
-                       outputname="speedup_node.pdf"):
+
+def plot_CPU_node_time(
+    cpu, node, time, color=["b", "r", "g"], outputname="speedup_node.pdf"
+):
     """Plot the speedup as a function of node number and cpu number
 
     Parameters
@@ -179,30 +176,28 @@ def plot_CPU_node_time(cpu,
         Output filename, by default "speedup_node.pdf"
     """
     fig, ax = plt.subplots()
-    #Loop over the nodes
-    for i, node_i in enumerate((1,2,4)):
-        #Get the associated cpu and time
-        cpu_node_i = list(cpu[np.where(node==node_i)])
-        time_node_i = list(time[np.where(node==node_i)])
-        #Get the reference for the speedup
-        #   The reference is the time for 
-        #       the minimal number of node and cpu 
+    # Loop over the nodes
+    for i, node_i in enumerate((1, 2, 4)):
+        # Get the associated cpu and time
+        cpu_node_i = list(cpu[np.where(node == node_i)])
+        time_node_i = list(time[np.where(node == node_i)])
+        # Get the reference for the speedup
+        #   The reference is the time for
+        #       the minimal number of node and cpu
         if node_i == 1:
             minimal_cpu_index = np.argmin(cpu_node_i)
             ref = time_node_i[minimal_cpu_index]
-        #Compute the speedup
-        speedup = ref/time_node_i
-        ax.scatter(cpu_node_i,
-                   speedup,
-                   label=str(node_i)+" nodes",
-                   color=color[i])
+        # Compute the speedup
+        speedup = ref / time_node_i
+        ax.scatter(cpu_node_i, speedup, label=str(node_i) + " nodes", color=color[i])
     ax.legend()
     ax.grid()
-    ax.set_xticks([2,4,8,16,32,64,96,128])
+    ax.set_xticks([2, 4, 8, 16, 32, 64, 96, 128])
     ax.set_xlabel("Number of CPUs")
     ax.set_ylabel("Speed-up")
     plt.savefig(outputname, format="pdf", dpi=300, bbox_inches="tight")
     plt.show()
+
 
 if __name__ == "__main__":
     ###     One node    ###
@@ -212,10 +207,12 @@ if __name__ == "__main__":
     cores_list, time_list = get_time(path)
     cores_list, speedup_list = speedup(cores_list, time_list)
     plot_speedup(cores_list, speedup_list, color_palette[6], outputname)
-    
+
     ###     Various node    ###
     path_node = "/home/ccattin/Documents/HSP90_278K/test_parallel/analysis"
-    outputname="/home/ccattin/Documents/HSP90_278K/test_parallel/analysis/speedup_node.pdf"
+    outputname = (
+        "/home/ccattin/Documents/HSP90_278K/test_parallel/analysis/speedup_node.pdf"
+    )
     cpu, node, time = get_CPU_node_time(path_node)
-    color = [color_palette[i] for i in (0,6,11)]
-    plot_CPU_node_time(cpu,node,time,color=color,outputname=outputname)
+    color = [color_palette[i] for i in (0, 6, 11)]
+    plot_CPU_node_time(cpu, node, time, color=color, outputname=outputname)
