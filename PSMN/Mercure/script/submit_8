@@ -1,0 +1,73 @@
+#! /bin/bash
+#SBATCH --job-name=HSP90_8
+#SBATCH -o ./%x.%j.%N.out           # output file
+#SBATCH -e ./%x.%j.%N.err           # errors file
+#
+#SBATCH -p Cascade
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=96
+#SBATCH --cpus-per-task=1
+#SBATCH --time=0-16:00:00           # day-hours:minutes:seconds
+#SBATCH --mem=2G
+#
+# Variables
+code_dir=/home/ccattin/Stage/Code
+gmx_code_dir=$code_dir/GMX
+GMX_EXE="gmx"
+
+run_dir=$(pwd)
+step_7_dir=$run_dir/step_7
+step_8_dir=$run_dir/step_8
+input_dir=$step_8_dir/input
+input_global_dir=$run_dir/input
+sub_script_dir=$run_dir/script
+log_dir=$run_dir/LOGS
+
+printf "
+8th Production step : 100 ns
+"
+# Just for the copy
+shopt -s extglob
+
+# Heading
+echo "The job ${SLURM_JOB_ID} is running on these nodes:"
+echo ${SLURM_NODELIST}
+echo
+#
+cd $step_8_dir
+
+#Module
+module purge
+module use /applis/PSMN/debian11/Cascade/modules/all
+module load GROMACS/2021.5-foss-2021b
+
+#Copy to scratch
+SCRATCH=/scratch/Cascade/ccattin/${SLURM_JOB_ID}
+mkdir -p $SCRATCH
+cp -r !(*.err|*.out) $SCRATCH/
+cd $SCRATCH/
+
+#Script to run
+#Copy files
+cp $input_dir/prod.mdp .
+ln -s $step_7_dir/production/prod.gro prev.gro
+ln -s $step_7_dir/production/prod.cpt prev.cpt
+ln -s $input_dir/topol.top .
+ln -s $input_dir/index.ndx .
+#Running gmx
+echo "        Running gmx grompp"
+$GMX_EXE grompp -f prod.mdp -c prev.gro -t prev.cpt -p topol.top -o prod.tpr -n index.ndx
+echo "    Running gmx mdrun"
+$GMX_EXE mdrun -deffnm prod -nt $SLURM_NTASKS
+echo "        Production run done."
+
+mv $SCRATCH/* $step_8_dir
+cd $run_dir
+rm -r $SCRATCH
+
+step_9_dir=$run_dir/step_9
+mkdir -p $step_9_dir
+cp -r $input_global_dir/step_1 $step_9_dir/input
+mv *.err $log_dir
+mv *.out $log_dir
+sbatch $sub_script_dir/submit_9

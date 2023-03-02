@@ -1,0 +1,14 @@
+; Input file made from the HSP90NTD paper
+integrator                = steep
+nsteps                    = 50000
+emtol                     = 100.0
+emstep                    = 0.01
+cutoff-scheme             = Verlet
+verlet-buffer-tolerance   = 0.005
+coulombtype               = PME
+fourierspacing            = 0.16
+pme-order                 = 4
+constraints               = h-bonds
+constraint-algorithm      = LINCS
+lincs-iter                = 1
+lincs-order               = 4

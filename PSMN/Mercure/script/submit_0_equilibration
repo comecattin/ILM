@@ -1,0 +1,64 @@
+#! /bin/bash
+#SBATCH --job-name=HSP90eq
+#SBATCH -o ./%x.%j.%N.out           # output file
+#SBATCH -e ./%x.%j.%N.err           # errors file
+#
+#SBATCH -p Cascade
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=32
+#SBATCH --cpus-per-task=1
+#SBATCH --time=0-05:00:00           # day-hours:minutes:seconds
+#SBATCH --mem=2G
+#
+# Variables
+code_dir=/home/ccattin/Stage/Code
+gmx_code_dir=$code_dir/GMX
+GMX_EXE="gmx"
+
+run_dir=$(pwd)
+input_dir=$run_dir/input
+step_0_dir=$run_dir/step_0
+sub_script_dir=$run_dir/script
+log_dir=$run_dir/LOGS
+
+printf "
+1- Minimization
+2- Equilibration
+3- 25ns production
+"
+# Just for the copy
+shopt -s extglob
+
+# Heading
+echo "The job ${SLURM_JOB_ID} is running on these nodes:"
+echo ${SLURM_NODELIST}
+echo
+#
+cd $step_0_dir
+
+#Module
+module purge
+module use /applis/PSMN/debian11/Cascade/modules/all
+module load GROMACS/2021.5-foss-2021b
+
+#Copy to scratch
+SCRATCH=/scratch/Cascade/ccattin/${SLURM_JOB_ID}
+mkdir -p $SCRATCH
+cp -r !(*.err|*.out) $SCRATCH/
+cd $SCRATCH/
+
+#Script to run
+$code_dir/PSMN/runGMX_PSMN $SLURM_NTASKS $GMX_EXE
+
+cd $SCRATCH/
+mv $SCRATCH/* $step_0_dir
+cd $run_dir
+rm -r $SCRATCH
+
+#Next step
+step_1_dir=$run_dir/step_1
+mkdir -p $step_1_dir
+cp -r $input_dir/step_1 $step_1_dir/input
+mv *.err $log_dir
+mv *.out $log_dir
+sbatch $sub_script_dir/submit_1

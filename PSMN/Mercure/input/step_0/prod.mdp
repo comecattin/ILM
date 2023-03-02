@@ -1,0 +1,30 @@
+; Input file made from the HSP90NTD paper
+integrator                = md
+dt                        = 0.002
+nsteps                    = 12500000   ; 25ns
+cutoff-scheme             = Verlet
+verlet-buffer-tolerance   = 0.005
+coulombtype               = PME
+fourierspacing            = 0.16
+pme-order                 = 4
+tcoupl                    = v-rescale
+tc-grps                   = SOLU SOLV
+tau-t                     = 2.0  2.0
+ref-t                     = 278  278
+pcoupl                    = Parrinello-Rahman
+pcoupltype                = isotropic
+tau-p                     = 2.0
+compressibility           = 4.5e-5
+ref-p                     = 1.0
+constraints               = h-bonds
+constraint-algorithm      = LINCS
+lincs-iter                = 1
+lincs-order               = 4
+; Output control
+nstxout                   = 0         ; suppress bulky .trr file by specifying 
+nstvout                   = 0         ; 0 for output frequency of nstxout,
+nstfout                   = 0         ; nstvout, and nstfout
+nstenergy                 = 5000      ; save energies every 10.0 ps
+nstlog                    = 5000      ; update log file every 10.0 ps
+nstxout-compressed        = 5000      ; save compressed coordinates every 10.0 ps
+compressed-x-grps         = System    ; save the whole system

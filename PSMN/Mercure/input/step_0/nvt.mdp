@@ -1,0 +1,17 @@
+; Input file made from the HSP90NTD paper
+integrator                = md
+dt                        = 0.002
+nsteps                    = 50000
+cutoff-scheme             = Verlet
+verlet-buffer-tolerance   = 0.005
+coulombtype               = PME
+fourierspacing            = 0.16
+pme-order                 = 4
+tcoupl                    = v-rescale
+tc-grps                   = SOLU SOLV
+tau-t                     = 2.0  2.0
+ref-t                     = 278  278
+constraints               = h-bonds
+constraint-algorithm      = LINCS
+lincs-iter                = 1
+lincs-order               = 4

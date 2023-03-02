@@ -1,0 +1,34 @@
+#! /bin/bash
+#SBATCH --job-name=HSP90sub
+#SBATCH -o ./%x.%j.%N.out           # output file
+#SBATCH -e ./%x.%j.%N.err           # errors file
+#
+#SBATCH -p Cascade
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=2
+#SBATCH --cpus-per-task=1
+#SBATCH --time=0-00:10:00           # day-hours:minutes:seconds
+#SBATCH --mem=1G
+#
+#   Heading   #
+printf "
+  __  __                         
+ |  \/  |___ _ _ __ _  _ _ _ ___ 
+ | |\/| / -_) '_/ _| || | '_/ -_)
+ |_|  |_\___|_| \__|\_,_|_| \___|
+                                 
+"
+# Variables
+run_dir=$(pwd)
+input_dir=$run_dir/input
+step_0_dir=$run_dir/step_0
+sub_script_dir=$run_dir/script
+log_dir=$run_dir/LOGS
+
+# First step : minimization, equilibration, 25ns production
+mkdir -p $step_0_dir
+cp -r $input_dir/step_0 $step_0_dir/input
+mkdir -p $log_dir
+mv *.err $log_dir
+mv *.out $log_dir
+sbatch $sub_script_dir/submit_0_equilibration

@@ -24,6 +24,7 @@ ln -s $input_dir/topol.top .
 echo "    Running gmx grompp"
 $GMX_EXE grompp -f minim.mdp -c input.gro -p topol.top -o em.tpr
 echo "    Running gmx mdrun"
+echo $MPRUN_EXE $GMX_EXE mdrun -v -deffnm em -nt $number_core
 $MPRUN_EXE $GMX_EXE mdrun -v -deffnm em -nt $number_core
 echo "    Energy minimization done."
 cd $run_dir
