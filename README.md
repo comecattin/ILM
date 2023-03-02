@@ -12,5 +12,7 @@ Repository of the different python codes developed during my M2 insternship at t
 ## PSMN
   File for submiting jobs to the PSMN on the correct node
   
+  Mercure is a submit script to break down in smaller simulation one big simulation.
+  
 ## Outputs
   Test outputs of the various script done.
