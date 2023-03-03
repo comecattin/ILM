@@ -30,6 +30,6 @@ ln -s $input_dir/index.ndx .
 echo "        Running gmx grompp"
 $GMX_EXE grompp -f prod.mdp -c npt.gro -t npt.cpt -p topol.top -o prod.tpr -n index.ndx
 echo "    Running gmx mdrun"
-$MPRUN_EXE $GMX_EXE mdrun -v -deffnm prod -nt $number_core
+$MPRUN_EXE $GMX_EXE mdrun -deffnm prod -nt $number_core
 echo "        Production run done."
 cd $run_dir

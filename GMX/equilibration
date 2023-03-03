@@ -35,7 +35,7 @@ ln -s $input_dir/index.ndx .
 echo "        Running gmx grompp"
 $GMX_EXE grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx
 echo "    Running gmx mdrun"
-$MPRUN_EXE $GMX_EXE mdrun -v -deffnm nvt -nt $number_core
+$MPRUN_EXE $GMX_EXE mdrun -deffnm nvt -nt $number_core
 echo "        NVT equilibration done."
 cd $equi_dir
 
@@ -57,6 +57,6 @@ ln -s $input_dir/index.ndx .
 echo "        Running gmx grompp"
 $GMX_EXE grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx
 echo "    Running gmx mdrun"
-$MPRUN_EXE $GMX_EXE mdrun -v -deffnm npt -nt $number_core
+$MPRUN_EXE $GMX_EXE mdrun -deffnm npt -nt $number_core
 echo "        NPT equilibration done."
 cd $equi_dir
