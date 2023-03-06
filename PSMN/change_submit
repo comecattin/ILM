@@ -10,6 +10,10 @@
 #       New number of tasks per node
 #   --nodes:
 #       New number of nodes
+#   --time:
+#       New amount of time
+#   --mem:
+#       New amount of memory
 
 #Get the arguments
 while [[ $# -gt 0 ]]; do
