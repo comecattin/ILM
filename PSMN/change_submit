@@ -40,6 +40,18 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
+        #Change the time
+        --time)
+        time="$2"
+        shift
+        shift
+        ;;
+        #Change the memory
+        --mem)
+        mem="$2"
+        shift
+        shift
+        ;;
         #Help
         -h|--help)
         echo "Usage: ./myscript.sh -f <filename> -n/--name <New job name> --ntasks <ntasks>"
@@ -71,4 +83,12 @@ fi
 if [ -v nodes ]; then
     # Change the number of nodes in the submit file
         sed -i "s/#SBATCH --nodes=.*/#SBATCH --nodes=${nodes}/" $submit
+fi
+if [ -v time ]; then
+    # Change the time in the submit file
+        sed -i "s/#SBATCH --time=.*/#SBATCH --time=${time}/" $submit
+fi
+if [ -v mem ]; then
+    # Change the memory in the submit file
+        sed -i "s/#SBATCH --mem=.*/#SBATCH --mem=${mem}/" $submit
 fi
