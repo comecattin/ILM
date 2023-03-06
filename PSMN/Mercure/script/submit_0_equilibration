@@ -51,7 +51,7 @@ cd $SCRATCH/
 $code_dir/PSMN/runGMX_PSMN $SLURM_NTASKS $GMX_EXE
 
 cd $SCRATCH/
-mv $SCRATCH/* $step_0_dir
+cp -r $SCRATCH/* $step_0_dir
 cd $run_dir
 rm -r $SCRATCH
 

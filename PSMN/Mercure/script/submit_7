@@ -61,7 +61,7 @@ echo "    Running gmx mdrun"
 $GMX_EXE mdrun -deffnm prod -nt $SLURM_NTASKS
 echo "        Production run done."
 
-mv $SCRATCH/* $step_7_dir
+cp -r $SCRATCH/* $step_7_dir
 cd $run_dir
 rm -r $SCRATCH
 
