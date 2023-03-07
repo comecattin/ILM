@@ -1,0 +1,36 @@
+#! /bin/bash
+
+#Intial
+run_dir=$(pwd)
+input_dir=$run_dir/input
+number_core=$1
+GMX_EXE=$2
+MPRUN_EXE=$3
+
+
+#=====================#
+#       Prepare       #
+#=====================#
+OUTPUTDIR=$run_dir/OUTPUTDIR
+mkdir -p $OUTPUTDIR
+prepa_dir=$run_dir/preparation
+mkdir -p $prepa_dir
+
+cd $prepa_dir
+
+#Copy files
+cp $input_dir/ions.mdp .
+ln -sf $input_dir/processed.gro .
+ln -sf $input_dir/TIP3P.gro .
+ln -sf $input_dir/topol.top .
+
+$GMX_EXE editconf -f processed.gro -o box.gro -c -d 1.3  -bt dodecahedron &> $OUTPUTDIR/editconf.out
+$GMX_EXE solvate -cp box.gro -cs TIP3P.gro -o solv.gro -p topol.top &> $OUTPUTDIR/solvate.out
+#sed 's/SOL/TP3/g' topol.top > tmp  
+#mv tmp topol.top  
+$GMX_EXE grompp -f ions.mdp -c solv.gro -p topol.top -o ions.tpr -maxwarn 2 &> $OUTPUTDIR/grompp_genion.out 
+printf "TP3" | $GMX_EXE genion -s ions.tpr -o solv_ions.gro -p topol.top -pname  Na+ -nname  Cl- -neutral -conc 0.170  &>  $OUTPUTDIR/genion.out 
+$GMX_EXE grompp -f ions.mdp -c solv_ions.gro -p topol.top -o solv_ions.tpr -maxwarn 2 &> $OUTPUTDIR/grompp_visu.out 
+printf 'Protein' | $GMX_EXE trjconv -s solv_ions.tpr -f solv_ions.gro -o solv_ions_visu.gro -pbc mol  -ur compact  &>  $OUTPUTDIR/trjconv_visualisation.out 
+
+cd $run_dir
