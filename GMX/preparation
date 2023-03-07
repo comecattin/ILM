@@ -35,8 +35,12 @@ printf "TP3" | $GMX_EXE genion -s ions.tpr -o solv_ions.gro -p topol.top -pname 
 # Visualisation
 $GMX_EXE grompp -f ions.mdp -c solv_ions.gro -p topol.top -o solv_ions.tpr -maxwarn 2 &> $OUTPUTDIR/grompp_visu.out 
 printf 'Protein' | $GMX_EXE trjconv -s solv_ions.tpr -f solv_ions.gro -o solv_ions_visu.gro -pbc mol  -ur compact  &>  $OUTPUTDIR/trjconv_visualisation.out 
+# Index
+echo 'q' | $GMX_EXE make_ndx -f solv_ions.gro
 
+#Copy files
 cp solv_ions.gro $input_dir/input.gro
 cp topol.top $input_dir/
+cp index.ndx $input_dir/
 
 cd $run_dir
