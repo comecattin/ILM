@@ -1,0 +1,14 @@
+#! /bin/bash
+
+for i in GRO/*
+do
+    state=${i#GRO/}
+    mkdir -p $state
+    cp -r input $state/
+    cp -r script $state/
+    cp mercure $state
+    cp $i/processed.gro $state/input/step_0/
+    cd $state
+    sbatch mercure
+    cd ..
+done
