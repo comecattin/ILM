@@ -56,9 +56,15 @@ cd $run_dir
 rm -r $SCRATCH
 
 #Next step
+#Copy files
+cp $step_0_dir/production/topol.top $input_dir/step_1/
+cp $step_0_dir/production/index.ndx $input_dir/step_1/
+
 step_1_dir=$run_dir/step_1
 mkdir -p $step_1_dir
 cp -r $input_dir/step_1 $step_1_dir/input
+
 mv *.err $log_dir
 mv *.out $log_dir
+
 sbatch $sub_script_dir/submit_1
