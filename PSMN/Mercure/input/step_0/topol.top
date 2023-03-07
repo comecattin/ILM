@@ -8,11 +8,11 @@
 ;;
 
 ; Include forcefield parameters
-#include "/home/ccattin/Stage/HSP90_278K/04/toppar/forcefield.itp"
-#include "/home/ccattin/Stage/HSP90_278K/04/toppar/PROA.itp"
-#include "/home/ccattin/Stage/HSP90_278K/04/toppar/Na+.itp"
-#include "/home/ccattin/Stage/HSP90_278K/04/toppar/Cl-.itp"
-#include "/home/ccattin/Stage/HSP90_278K/04/toppar/TP3.itp"
+#include "/home/ccattin/Documents/HSP90_278K/04/toppar/forcefield.itp"
+#include "/home/ccattin/Documents/HSP90_278K/04/toppar/PROA.itp"
+#include "/home/ccattin/Documents/HSP90_278K/04/toppar/Na+.itp"
+#include "/home/ccattin/Documents/HSP90_278K/04/toppar/Cl-.itp"
+#include "/home/ccattin/Documents/HSP90_278K/04/toppar/TP3.itp"
 
 [ system ]
 ; Name
@@ -21,6 +21,3 @@ HSP90NTD 278K
 [ molecules ]
 ; Compound	#mols
 PROA  	           1
-Na+   	          43
-Cl-   	          32
-TP3   	       10210

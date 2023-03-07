@@ -15,6 +15,13 @@ gmx_code_dir=$code_dir/GMX
 python_water_code_dir=$code_dir/water/eau_CLI.py
 
 ##################################
+#          Preparation           #
+##################################
+$gmx_code_dir/preparation $number_core $GMX_EXE $MPRUN_EXE
+cd $run_dir
+
+
+##################################
 #          Minimization          #
 ##################################
 $gmx_code_dir/minimization $number_core $GMX_EXE $MPRUN_EXE
