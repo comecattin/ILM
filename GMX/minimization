@@ -17,9 +17,9 @@ echo "    Directory $minim_dir created"
 cd $minim_dir
 #Copy files
 cp $input_dir/minim.mdp .
-ln -s $input_dir/input.gro .
-ln -s $input_dir/input.pdb .
-ln -s $input_dir/topol.top .
+ln -sf $input_dir/input.gro .
+ln -sf $input_dir/input.pdb .
+ln -sf $input_dir/topol.top .
 #Running gmx
 echo "    Running gmx grompp"
 $GMX_EXE grompp -f minim.mdp -c input.gro -p topol.top -o em.tpr -maxwarn 2
