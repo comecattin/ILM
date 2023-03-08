@@ -7,10 +7,11 @@ import extract_gmx_energy as xtract
 import os
 import subprocess
 
-class protein():
+
+class protein:
     """Class of a protein"""
-    
-    def __init__(self,path,water_file,water_volume):
+
+    def __init__(self, path, water_file, water_volume):
         """Init function of the protein class
 
         Parameters
@@ -22,25 +23,25 @@ class protein():
         water_volume : float
             volume of a water molecule in Angstrom**3
         """
-        #Path
-        self.path=path
-        #Water file
-        self.water_file=[]
-        self.water_file.append(os.path.join(path,water_file[0]))
-        self.water_file.append(os.path.join(path,water_file[1]))
-        #Water volume
-        self.water_volume=water_volume
+        # Path
+        self.path = path
+        # Water file
+        self.water_file = []
+        self.water_file.append(os.path.join(path, water_file[0]))
+        self.water_file.append(os.path.join(path, water_file[1]))
+        # Water volume
+        self.water_volume = water_volume
 
-    def extract_volume_command(self,code):
-        """Runs the gmx analysis script 
+    def extract_volume_command(self, code):
+        """Runs the gmx analysis script
 
         Parameters
         ----------
         code : str
             Path to the script
         """
-        subprocess.call([code,self.path])
-    
+        subprocess.call([code, self.path])
+
     def number_water(self):
         """Get the number of water molecule
 
@@ -51,88 +52,74 @@ class protein():
                 0 : exited state
                 1 : ground state
         """
-        #Initialization
-        water=[[],[]]
-        #ES and GS
-        for i in (0,1):
-            with open(self.water_file[i],'r') as f:
+        # Initialization
+        water = [[], []]
+        # ES and GS
+        for i in (0, 1):
+            with open(self.water_file[i], "r") as f:
                 for line in f:
                     water[i].append(int(line.split()[-1]))
         return water
-    
-
 
     def remove_water(self):
-        """Remove the volume of water
-        """
-        #Get the number of water molecules
-        water_number=self.number_water()
-        
-        #For every configuration
+        """Remove the volume of water"""
+        # Get the number of water molecules
+        water_number = self.number_water()
+
+        # For every configuration
         for name in os.listdir(self.path):
-            #Don't consider .txt files
+            # Don't consider .txt files
             if ".txt" in name:
                 continue
-            #Get the configuration number
+            # Get the configuration number
             conf = int(name[7:9])
 
-            #For every trajectory
+            # For every trajectory
             #   (10 trajectories each time)
-            for traj in range(1,11):
-                
-                #File names
-                volume_file=os.path.join(
-                    self.path,
-                    name,
-                    "volume_md_"+str(traj)+".xvg"
+            for traj in range(1, 11):
+
+                # File names
+                volume_file = os.path.join(
+                    self.path, name, "volume_md_" + str(traj) + ".xvg"
                 )
-                error_file=os.path.join(
-                    self.path,
-                    name,
-                    "errest_md_"+str(traj)+".xvg"
+                error_file = os.path.join(
+                    self.path, name, "errest_md_" + str(traj) + ".xvg"
                 )
                 output = os.path.join(
-                    self.path,
-                    name,
-                    "no_water_md_"+str(traj)+".txt"
+                    self.path, name, "no_water_md_" + str(traj) + ".txt"
                 )
-                error_file=os.path.join(
-                    self.path,
-                    name,
-                    "errest_md_"+str(traj)+".xvg"
+                error_file = os.path.join(
+                    self.path, name, "errest_md_" + str(traj) + ".xvg"
                 )
 
-                #Extract the volume
+                # Extract the volume
                 volume = xtract.gromacs_output(
-                    file_name=volume_file,
-                    error_file=error_file
-                    )
-                time, volume_array = volume.extract()
-                
-                #Remove the water
-                if "ES" in name:
-                    no_water=volume_array-self.water_volume*1e-3*water_number[0][conf-1]
-                if "GS" in name:
-                    no_water=volume_array-self.water_volume*1e-3*water_number[1][conf-1]
-                
-                #Save the result
-                np.savetxt(
-                    output,
-                    np.array([time,no_water])
+                    file_name=volume_file, error_file=error_file
                 )
+                time, volume_array = volume.extract()
 
-            
+                # Remove the water
+                if "ES" in name:
+                    no_water = (
+                        volume_array
+                        - self.water_volume * 1e-3 * water_number[0][conf - 1]
+                    )
+                if "GS" in name:
+                    no_water = (
+                        volume_array
+                        - self.water_volume * 1e-3 * water_number[1][conf - 1]
+                    )
+
+                # Save the result
+                np.savetxt(output, np.array([time, no_water]))
+
 
 if __name__ == "__main__":
-    path="/home/ccattin/Documents/EAU/HSP90_simulation"
-    water_file=["ES.txt","GS.txt"]
-    water_volume=30.72669350142569
-    HSP90 = protein(
-        path=path,
-        water_file=water_file,
-        water_volume=water_volume
-        )
-    code="/home/ccattin/Documents/Code/GMX/analysis_water_protein"
-    #HSP90.extract_volume_command(code=code)
+    path = "/home/ccattin/Documents/EAU/HSP90_simulation"
+    water_file = ["ES.txt", "GS.txt"]
+    water_volume = 30.72669350142569
+    HSP90 = protein(path=path, water_file=water_file, water_volume=water_volume)
+    code = "/home/ccattin/Documents/Code/GMX/analysis_water_protein"
+    # HSP90.extract_volume_command(code=code)
     ES, GS = HSP90.number_water()
     HSP90.remove_water()
