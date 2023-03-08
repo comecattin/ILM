@@ -41,4 +41,4 @@ if __name__ == "__main__":
         )
     code="/home/ccattin/Documents/Code/GMX/analysis_water_protein"
     #HSP90.extract_volume_command(code=code)
-    ES = HSP90.number_water()
+    ES, GS = HSP90.number_water()
