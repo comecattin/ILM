@@ -1,14 +1,28 @@
-; Input file made from the HSP90NTD paper
-integrator                = steep
-nsteps                    = 50000
-emtol                     = 100.0
-emstep                    = 0.01
-cutoff-scheme             = Verlet
-verlet-buffer-tolerance   = 0.005
-coulombtype               = PME
-fourierspacing            = 0.16
-pme-order                 = 4
-constraints               = h-bonds
-constraint-algorithm      = LINCS
-lincs-iter                = 1
-lincs-order               = 4
+; define                  = -DPOSRES -DPOSRES_FC_BB=1000.0 -DPOSRES_FC_SC=1000.0 ; abs dans nos paramètres
+
+integrator              = steep                 ; Algorithm (steep = steepest descent minimization)
+emtol                   = 100.0        ;1000.0  ; default : Stop minimization when the maximum force < 100.0 kJ/mol/nm
+emstep                  = 0.01                  ; Minimization step size (ajout selon nos paramètres)
+nsteps                  = 50000        ;5000    ; Maximum number of (minimization) steps to perform
+
+; Parameters describing how to find the neighbors of each atom and how to calculate the interactions
+nstlist                 = 1            ;10      ; Frequency to update the neighbor list and long range forces
+cutoff-scheme           = Verlet                ; Buffered neighbor searching
+pbc                     = xyz                   ; Periodic Boundary Conditions in all 3 dimensions (ajout)
+
+; =============== AMBERFF19SB ========================
+; parameters for Amber14SB force fields, cutoff= ????nm in initial publication !
+; see the publication named >>> Ff19SB: Amino-Acid-Specific Protein Backbone Parameters Trained against 
+; Quantum Mechanics Energy Surfaces in Solution
+
+
+rlist                   = 1.2
+vdwtype                 = Cut-off
+vdw-modifier            = None
+DispCorr                = EnerPres
+rvdw                    = 1.0                    ;1.2           ;pour faire comme dans la publi ff19sb
+coulombtype             = PME
+rcoulomb                = 1.0                    ;1.2           ;pour faire comme dans la publi ff19sb
+;
+constraint_algorithm    = LINCS                 ; abs dans nos paramètres
+constraints             = h-bonds

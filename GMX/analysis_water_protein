@@ -1,0 +1,22 @@
+#! /bin/bash
+
+#Intial
+run_dir=$1
+code_dir=/home/ccattin/Documents/Code
+python_water_code_dir=$code_dir/water/eau_CLI.py
+###################################
+#            Analysis             #
+###################################
+cd $run_dir
+for dir in *JeanZay
+do
+    cd $dir
+    for edr_file in md_*.edr
+    do
+        md=${edr_file%.edr}
+        echo -e 'Volume' | gmx energy -f $edr_file -o volume_$md.xvg
+        gmx analyze -f volume_$md.xvg -ac volume_autocorr_$md -ee errest_$md
+        #$python_water_code_dir --volume -f density_$md.xvg -e errest_$md.xvg --txt time_volume_mean_error_$md.txt
+    done
+    cd ..
+done

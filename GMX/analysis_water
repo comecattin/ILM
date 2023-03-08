@@ -3,6 +3,7 @@
 #Intial
 run_dir=$(pwd)
 prod_dir=$run_dir/production
+python_water_code_dir=$1
 
 ###################################
 #            Analysis             #
@@ -20,5 +21,5 @@ echo -e 'Density' | gmx energy -f prod.edr -o density.xvg
 #Runing gmx analyse
 gmx analyze -f density.xvg -ac density_autocorr -ee
 #Runing python analysis
-$python_code_dir --volume -f density.xvg -e errest.xvg --pdf molar_volume.pdf --txt time_volume_mean_error.txt
+$python_water_code_dir --volume -f density.xvg -e errest.xvg --pdf molar_volume.pdf --txt time_volume_mean_error.txt
 echo "    Analysis done !"

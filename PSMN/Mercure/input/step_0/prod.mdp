@@ -1,30 +1,76 @@
-; Input file made from the HSP90NTD paper
-integrator                = md
-dt                        = 0.002
-nsteps                    = 12500000   ; 25ns
-cutoff-scheme             = Verlet
-verlet-buffer-tolerance   = 0.005
-coulombtype               = PME
-fourierspacing            = 0.16
-pme-order                 = 4
-tcoupl                    = v-rescale
-tc-grps                   = SOLU SOLV
-tau-t                     = 2.0  2.0
-ref-t                     = 278  278
-pcoupl                    = Parrinello-Rahman
-pcoupltype                = isotropic
-tau-p                     = 2.0
-compressibility           = 4.5e-5
-ref-p                     = 1.0
-constraints               = h-bonds
-constraint-algorithm      = LINCS
-lincs-iter                = 1
-lincs-order               = 4
+title                   = AMBER19SB HSP90-NT NVT equilibration 
+
+; =============== AMBER19SB ========================
+; parameters for Amber14SB force fields, cutoff= 0.8nm in initial publication !
+; from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4821407/pdf/nihms772276.pdf
+
+constraints = h-bonds  ; OK
+vdwtype = Cut-off   ; OK
+rvdw = 1.0  ; OK
+rcoulomb = 1.0  ; OK
+coulombtype = PME  ; OK
+DispCorr = EnerPres  ; OK
+vdw-modifier            = None; OK
+
+; dans les precedants calculs , on a pas mis rlist
+;  et on a laisse calculee gromacs avec verlet-buffer-tolerance = (0.005) [kJ mol-1 ps-1]
+; ici on tente de reproduire les calculs de la publi de FF19SB
+rlist                   = 1.2       
+nstlist                 = 10        ; 20 fs, largely irrelevant with Verlet ; OK
+verlet-buffer-tolerance = -1
+
+; =============== AMBER19SB ========================
+
+
+; Run parameters
+integrator              = md        ; leap-frog integrator ; OK
+nsteps                  =   10000000   ; 2 *  10000000 = 20ns  ; OK
+;nsteps                  = 500     ; FOR TESTING ; OK
+dt                      = 0.002     ; 2 fs ; OK
+
 ; Output control
-nstxout                   = 0         ; suppress bulky .trr file by specifying 
-nstvout                   = 0         ; 0 for output frequency of nstxout,
-nstfout                   = 0         ; nstvout, and nstfout
-nstenergy                 = 5000      ; save energies every 10.0 ps
-nstlog                    = 5000      ; update log file every 10.0 ps
-nstxout-compressed        = 5000      ; save compressed coordinates every 10.0 ps
-compressed-x-grps         = System    ; save the whole system
+nstxout                 = 0         ; suppress bulky .trr file by specifying 
+nstvout                 = 0         ; 0 for output frequency of nstxout,
+nstfout                 = 0         ; nstvout, and nstfout
+nstenergy               = 5000      ; save energies every 10.0 ps
+nstlog                  = 5000      ; update log file every 10.0 ps
+nstxout-compressed      = 50000      ; save compressed coordinates every 100.0 ps
+compressed-x-grps       = System    ; save the whole system
+
+; Bond parameters
+continuation            = yes        ; 
+constraint_algorithm    = lincs     ; holonomic constraints  ; OK
+lincs_iter              = 1         ; accuracy of LINCS ; OK
+lincs_order             = 4         ; also related to accuracy ; OK
+
+; Nonbonded settings 
+cutoff-scheme           = Verlet    ; Buffered neighbor searching ; OK
+ns_type                 = grid      ; search neighboring grid cells ; OK
+
+nstcomm                 = 100; A VERIFIER 
+comm_mode               = linear; A VERIFIER
+;comm_grps               = SOLU SOLV ; SYSTEM ?
+
+; Electrostatics
+pme_order               = 4         ; cubic interpolation; OK
+fourierspacing          = 0.16      ; grid spacing for FFT; OK
+
+; Temperature coupling is on
+tcoupl                  = V-rescale             ; modified Berendsen thermostat; OK
+tc-grps                 = Protein Non-Protein   ; two coupling groups - more accurate; OK
+tau_t                   = 0.1     0.1           ; time constant, in ps; OK
+ref_t                   = 278     278           ; reference temperature, one for each group, in K; OK
+
+; Pressure coupling is off
+pcoupl                  = Parrinello-Rahman     ; Pressure coupling on in NPT
+pcoupltype              = isotropic             ; uniform scaling of box vectors
+tau_p                   = 2.0                   ; time constant, in ps
+ref_p                   = 1.0                   ; reference pressure, in bar
+compressibility         = 4.5e-5                ; isothermal compressibility of water, bar^-1
+refcoord_scaling        = com
+
+; Periodic boundary conditions
+pbc                     = xyz       ; 3-D PBC  ; OK
+
+; Velocity generation
+gen_vel                 = no       ; assign velocities from Maxwell distribution; OK
