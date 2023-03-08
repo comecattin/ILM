@@ -4,6 +4,7 @@ Extract the molecular volume of protein of multiple simualtion.
 """
 import numpy as np
 import extract_gmx_energy as xtract
+import eau
 import os
 import subprocess
 
@@ -115,11 +116,27 @@ class protein:
 
 
 if __name__ == "__main__":
+    # Definition
+    #   Pathes
     path = "/home/ccattin/Documents/EAU/HSP90_simulation"
     water_file = ["ES.txt", "GS.txt"]
-    water_volume = 30.72669350142569
-    HSP90 = protein(path=path, water_file=water_file, water_volume=water_volume)
+    file_name = "/home/ccattin/Documents/EAU/Elisa_parameters/computed_by_Come/TIP3P/300K/analysis/density.xvg"
+    error_file = "/home/ccattin/Documents/EAU/Elisa_parameters/computed_by_Come/TIP3P/300K/analysis/errest.xvg"
     code = "/home/ccattin/Documents/Code/GMX/analysis_water_protein"
+
+    # Get the volume of water
+    TIP3P_300K = eau.eau(file_name, error_file)
+    water_volume = TIP3P_300K.density_to_volume()[2]
+    # water_volume = 30.72669350142569
+
+    # Initialize a protein object
+    HSP90 = protein(path=path, water_file=water_file, water_volume=water_volume)
+
+    # Run script to extract all the volume
     # HSP90.extract_volume_command(code=code)
+
+    # Get the number of water molecule
     ES, GS = HSP90.number_water()
+
+    # Remove the water volume
     HSP90.remove_water()
