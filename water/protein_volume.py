@@ -2,28 +2,58 @@
 """
 Extract the molecular volume of protein of multiple simualtion.
 """
-import seaborn as sns
-import matplotlib.pyplot as plt
 import numpy as np
 import extract_gmx_energy as xtract
-import eau
 import os
 import subprocess
 
 class protein():
+    """Class of a protein"""
     
     def __init__(self,path,water_file,water_volume):
+        """Init function of the protein class
+
+        Parameters
+        ----------
+        path : str
+            path where the simulation output are
+        water_file : str
+            name of the water file
+        water_volume : float
+            volume of a water molecule in Angstrom**3
+        """
+        #Path
         self.path=path
+        #Water file
         self.water_file=[]
         self.water_file.append(os.path.join(path,water_file[0]))
         self.water_file.append(os.path.join(path,water_file[1]))
+        #Water volume
         self.water_volume=water_volume
 
     def extract_volume_command(self,code):
+        """Runs the gmx analysis script 
+
+        Parameters
+        ----------
+        code : str
+            Path to the script
+        """
         subprocess.call([code,self.path])
     
     def number_water(self):
+        """Get the number of water molecule
+
+        Returns
+        -------
+        water : list
+            list containing number of water in two lists
+                0 : exited state
+                1 : ground state
+        """
+        #Initialization
         water=[[],[]]
+        #ES and GS
         for i in (0,1):
             with open(self.water_file[i],'r') as f:
                 for line in f:
@@ -32,12 +62,25 @@ class protein():
     
 
 
-    def remove_water(self,water_number):
+    def remove_water(self):
+        """Remove the volume of water
+        """
+        #Get the number of water molecules
+        water_number=self.number_water()
         
+        #For every configuration
         for name in os.listdir(self.path):
+            #Don't consider .txt files
             if ".txt" in name:
                 continue
+            #Get the configuration number
+            conf = int(name[7:9])
+
+            #For every trajectory
+            #   (10 trajectories each time)
             for traj in range(1,11):
+                
+                #File names
                 volume_file=os.path.join(
                     self.path,
                     name,
@@ -58,20 +101,25 @@ class protein():
                     name,
                     "errest_md_"+str(traj)+".xvg"
                 )
+
+                #Extract the volume
                 volume = xtract.gromacs_output(
                     file_name=volume_file,
                     error_file=error_file
                     )
                 time, volume_array = volume.extract()
-                no_water=volume_array-self.water_volume*1e-3*water_number
-
+                
+                #Remove the water
+                if "ES" in name:
+                    no_water=volume_array-self.water_volume*1e-3*water_number[0][conf-1]
+                if "GS" in name:
+                    no_water=volume_array-self.water_volume*1e-3*water_number[1][conf-1]
+                
+                #Save the result
                 np.savetxt(
                     output,
-                    time,
-                    no_water
+                    np.array([time,no_water])
                 )
-
-        return no_water
 
             
 
@@ -87,4 +135,4 @@ if __name__ == "__main__":
     code="/home/ccattin/Documents/Code/GMX/analysis_water_protein"
     #HSP90.extract_volume_command(code=code)
     ES, GS = HSP90.number_water()
-    no_water = HSP90.remove_water(GS[-1])
+    HSP90.remove_water()
