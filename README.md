@@ -10,7 +10,7 @@ Repository of the different python codes developed during my M2 insternship at t
   File for automated running gromacs. Energy minimization, equilibration NVT/NPT, production, analysis.
   
 ## PSMN
-  File for submiting jobs to the PSMN on the correct node
+  File for submiting jobs to the PSMN on the correct node.
   
   Mercure is a submit script to break down in smaller simulation one big simulation.
   
