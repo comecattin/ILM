@@ -49,6 +49,8 @@ cd $SCRATCH/
 
 #Script to run
 mkdir -p $SCRATCH/production
+OUTPUTDIR=$SCRATCH/OUTPUTDIR
+mkdir -p $OUTPUTDIR
 cd $SCRATCH/production
 #Copy files
 cp $input_dir/prod.mdp .
@@ -58,9 +60,9 @@ ln -s $input_dir/topol.top .
 ln -s $input_dir/index.ndx .
 #Running gmx
 echo "        Running gmx grompp"
-$GMX_EXE grompp -f prod.mdp -c prev.gro -t prev.cpt -p topol.top -o prod.tpr -n index.ndx
+$GMX_EXE grompp -f prod.mdp -c prev.gro -t prev.cpt -p topol.top -o prod.tpr -n index.ndx &> $OUTPUTDIR/grompp_prod.out
 echo "    Running gmx mdrun"
-$GMX_EXE mdrun -deffnm prod -nt $SLURM_NTASKS
+$GMX_EXE mdrun -deffnm prod -nt $SLURM_NTASKS &> $OUTPUTDIR/mdrun.out
 echo "        Production run done."
 
 cp -r $SCRATCH/* $step_5_dir
