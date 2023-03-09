@@ -10,6 +10,8 @@ MPRUN_EXE=$3
 ##################################
 #          Minimization          #
 ##################################
+OUTPUTDIR=$run_dir/OUTPUTDIR
+mkdir -p $OUTPUTDIR
 printf "\n1 - Minimization step\n"
 mkdir -p $run_dir/minimization
 minim_dir=$run_dir/minimization
@@ -22,10 +24,10 @@ ln -sf $input_dir/input.pdb .
 ln -sf $input_dir/topol.top .
 #Running gmx
 echo "    Running gmx grompp"
-$GMX_EXE grompp -f minim.mdp -c input.gro -p topol.top -o em.tpr -maxwarn 2
+$GMX_EXE grompp -f minim.mdp -c input.gro -p topol.top -o em.tpr -maxwarn 2 &> $OUTPUTDIR/grompp_minim.out
 echo "    Running gmx mdrun"
 echo $MPRUN_EXE $GMX_EXE mdrun -deffnm em -nt $number_core
-$MPRUN_EXE $GMX_EXE mdrun -deffnm em -nt $number_core
+$MPRUN_EXE $GMX_EXE mdrun -deffnm em -nt $number_core &> $OUTPUTDIR/minim.out
 echo "    Energy minimization done."
 cd $run_dir
 sleep 3

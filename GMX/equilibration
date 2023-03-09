@@ -15,6 +15,8 @@ MPRUN_EXE=$3
 printf "\n\n2- Equilibration step\n"
 mkdir -p $run_dir/equilibration
 equi_dir=$run_dir/equilibration
+OUTPUTDIR=$run_dir/OUTPUTDIR
+mkdir -p $OUTPUTDIR
 echo "    Directory $equi_dir created"
 cd $equi_dir
 
@@ -33,9 +35,9 @@ ln -sf $input_dir/topol.top .
 ln -sf $input_dir/index.ndx .
 #Running gmx
 echo "        Running gmx grompp"
-$GMX_EXE grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx
+$GMX_EXE grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx &> $OUTPUTDIR/grompp_nvt.out
 echo "    Running gmx mdrun"
-$MPRUN_EXE $GMX_EXE mdrun -deffnm nvt -nt $number_core
+$MPRUN_EXE $GMX_EXE mdrun -deffnm nvt -nt $number_core &> $OUTPUTDIR/nvt.out
 echo "        NVT equilibration done."
 cd $equi_dir
 
@@ -55,8 +57,8 @@ ln -sf $input_dir/topol.top .
 ln -sf $input_dir/index.ndx .
 #Running gmx
 echo "        Running gmx grompp"
-$GMX_EXE grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx
+$GMX_EXE grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -n index.ndx &> $OUTPUTDIR/grompp_npt.out
 echo "    Running gmx mdrun"
-$MPRUN_EXE $GMX_EXE mdrun -deffnm npt -nt $number_core
+$MPRUN_EXE $GMX_EXE mdrun -deffnm npt -nt $number_core &> $OUTPUTDIR/npt.out
 echo "        NPT equilibration done."
 cd $equi_dir
