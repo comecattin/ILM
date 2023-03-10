@@ -3,6 +3,7 @@
 Extract the molecular volume of protein of multiple simualtion.
 """
 import numpy as np
+import matplotlib.pyplot as plt
 import extract_gmx_energy as xtract
 import eau
 import os
@@ -74,7 +75,8 @@ class protein:
                 continue
             # Get the configuration number
             conf = int(name[7:9])
-
+            # Create an empty list to hold the trajectory data
+            traj_data = []
             # For every trajectory
             #   (10 trajectories each time)
             for traj in range(1, 11):
@@ -110,9 +112,19 @@ class protein:
                         volume_array
                         - self.water_volume * 1e-3 * water_number[1][conf - 1]
                     )
-
+                # Append the trajectory data to the list
+                traj_data.append(np.array([time, no_water]))
                 # Save the result
                 np.savetxt(output, np.array([time, no_water]))
+            
+            # Concatenate the trajectory data and save it to a single file
+            output_concatenated = os.path.join(
+                self.path, name, "no_water_md_concatenated.txt"
+                )
+            
+            np.savetxt(output_concatenated, np.concatenate(traj_data, axis=1))
+        
+        return np.concatenate(traj_data, axis=1)
 
 
 if __name__ == "__main__":
@@ -139,4 +151,6 @@ if __name__ == "__main__":
     ES, GS = HSP90.number_water()
 
     # Remove the water volume
-    HSP90.remove_water()
+    volume_cat = HSP90.remove_water()
+    plt.plot(volume_cat[0],volume_cat[1])
+    plt.show()
