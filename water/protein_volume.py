@@ -114,25 +114,23 @@ class protein:
                 traj_data.append(np.array([time, no_water]))
                 # Save the result
                 np.savetxt(output, np.array([time, no_water]))
-            
+
             # Concatenate the trajectory data
             output_concatenated = os.path.join(
                 self.path, name, "no_water_md_concatenated.txt"
-                )
+            )
             concatenated = np.concatenate(traj_data, axis=1)
-            
-            #Compute the mean and the error
+
+            # Compute the mean and the error
             volume_mean = np.mean(concatenated[1])
-            volume_mean_error = stats.sem(
-                concatenated[1],
-                axis=None
-                )
-            
+            volume_mean_error = stats.sem(concatenated[1], axis=None)
+
             # Save to a single file
-            np.savetxt(output_concatenated,
-                       concatenated,
-                       header="{} {}".format(volume_mean, volume_mean_error))
-        
+            np.savetxt(
+                output_concatenated,
+                concatenated,
+                header="{} {}".format(volume_mean, volume_mean_error),
+            )
 
 
 if __name__ == "__main__":
