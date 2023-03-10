@@ -5,10 +5,10 @@
 #
 #SBATCH -p Cascade
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=96
-#SBATCH --cpus-per-task=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=96
 #SBATCH --time=0-17:00:00           # day-hours:minutes:seconds
-#SBATCH --mem=2G
+#SBATCH --mem=64G
 #
 # Variables
 code_dir=/home/ccattin/Stage/Code
