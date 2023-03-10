@@ -56,9 +56,26 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
+        --cpu)
+        cpu="$2"
+        shift
+        shift
+        ;;
+        --cascade)
+        cascade="$1"
+        shift
+        shift
+        ;;
         #Help
         -h|--help)
-        echo "Usage: ./myscript.sh -f <filename> -n/--name <New job name> --ntasks <ntasks>"
+        echo "
+        Usage: ./myscript.sh -f <filename> 
+            -n/--name <New job name> 
+            --ntasks <ntasks>
+            --nodes <New number of nodes>    
+            --time <New amount of time>
+            --mem <New amount of memory>
+       "
         exit 0
         ;;
         #Unknown option
@@ -95,4 +112,15 @@ fi
 if [ -v mem ]; then
     # Change the memory in the submit file
         sed -i "s/#SBATCH --mem=.*/#SBATCH --mem=${mem}/" $submit
+fi
+if [ -v cpu ]; then
+    # Change the number of CPU per task in the submit file
+        sed -i "s/#SBATCH --cpus-per-task=.*/#SBATCH --cpus-per-task=${cpu}/" $submit
+fi
+if [ -v cascade ]; then
+    # Change the submit file to be adapted to cascade
+        sed -i "s/#SBATCH -p.*/#SBATCH -p Cascade/" $submit
+        sed -i "s/module use.*/module use \/applis\/PSMN\/debian11\/Cascade\/modules\/all/" $submit
+        sed -i "s/SCRATCH=.*/SCRATCH=\/scratch\/Cascade\/ccattin\/\${SLURM_JOB_ID}/" $submit
+
 fi
