@@ -4,6 +4,7 @@ Extract the molecular volume of protein of multiple simualtion.
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import stats
 import extract_gmx_energy as xtract
 import eau
 import os
@@ -91,9 +92,6 @@ class protein:
                 output = os.path.join(
                     self.path, name, "no_water_md_" + str(traj) + ".txt"
                 )
-                error_file = os.path.join(
-                    self.path, name, "errest_md_" + str(traj) + ".xvg"
-                )
 
                 # Extract the volume
                 volume = xtract.gromacs_output(
@@ -117,14 +115,24 @@ class protein:
                 # Save the result
                 np.savetxt(output, np.array([time, no_water]))
             
-            # Concatenate the trajectory data and save it to a single file
+            # Concatenate the trajectory data
             output_concatenated = os.path.join(
                 self.path, name, "no_water_md_concatenated.txt"
                 )
+            concatenated = np.concatenate(traj_data, axis=1)
             
-            np.savetxt(output_concatenated, np.concatenate(traj_data, axis=1))
+            #Compute the mean and the error
+            volume_mean = np.mean(concatenated[1])
+            volume_mean_error = stats.sem(
+                concatenated[1],
+                axis=None
+                )
+            
+            # Save to a single file
+            np.savetxt(output_concatenated,
+                       concatenated,
+                       header="{} {}".format(volume_mean, volume_mean_error))
         
-        return np.concatenate(traj_data, axis=1)
 
 
 if __name__ == "__main__":
@@ -151,6 +159,4 @@ if __name__ == "__main__":
     ES, GS = HSP90.number_water()
 
     # Remove the water volume
-    volume_cat = HSP90.remove_water()
-    plt.plot(volume_cat[0],volume_cat[1])
-    plt.show()
+    HSP90.remove_water()
