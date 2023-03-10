@@ -14,6 +14,12 @@
 #       New amount of time
 #   --mem:
 #       New amount of memory
+#   --cpu:
+#       New number of CPU per task
+#   --cascade:
+#       Adapt the script to the Cascade partition
+#   --e5:
+#       Adapt the script to the E5 partition
 
 #Get the arguments
 while [[ $# -gt 0 ]]; do
@@ -56,16 +62,19 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
+        #Change the number of CPU per task
         --cpu)
         cpu="$2"
         shift
         shift
         ;;
+        #Adapt to Cascade partition
         --cascade)
         cascade="$1"
         shift
         shift
         ;;
+        #Adapt to E5 partion
         --e5)
         e5="$1"
         shift
@@ -80,6 +89,9 @@ while [[ $# -gt 0 ]]; do
             --nodes <New number of nodes>    
             --time <New amount of time>
             --mem <New amount of memory>
+            --cpu <New number of CPU>
+            --cascade
+            --e5
        "
         exit 0
         ;;
