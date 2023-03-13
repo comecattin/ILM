@@ -166,13 +166,17 @@ class configuration():
              smoothing,
              window_size):
         fig,ax = plt.subplots()
-        ax.plot(time,no_water,color=color[0])
+        ax.plot(time,no_water,color=color[-1])
         volume_mean_array = volume_mean*np.ones(len(time))
-        ax.plot(time,volume_mean_array,label="Mean",color=color[1])
+        ax.plot(time,volume_mean_array,label="Mean",color=color[-2])
         ax.errorbar(time,volume_mean_array,yerr=volume_error,color=color[1])
         for i, smooth in enumerate(smoothing):
-            ax.plot(smooth,label=f'Window size : {window_size[i]}')
+            ax.plot(smooth,
+                    color=color[i],
+                    label=f'Window size : {window_size[i]}')
         ax.legend()
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel(r"Volume (nm$^{3}$)")
         plt.show()
 
 if __name__ == "__main__":
@@ -183,9 +187,6 @@ if __name__ == "__main__":
     file_name = "/home/ccattin/Documents/EAU/Elisa_parameters/computed_by_Come/TIP3P/300K/analysis/density.xvg"
     error_file = "/home/ccattin/Documents/EAU/Elisa_parameters/computed_by_Come/TIP3P/300K/analysis/errest.xvg"
     code = "/home/ccattin/Documents/Code/GMX/analysis_water_protein"
-    #   Color
-    color_palette = sns.color_palette("cool", 12)
-    color=[color_palette[6],color_palette[0]]
 
     # Get the volume of water
     TIP3P_300K = eau.eau(file_name, error_file)
@@ -207,6 +208,8 @@ if __name__ == "__main__":
     # Plot the result
     output_name = path+'/R6OA_GS01_2021_11_19_Amber19SB_OPC_NaCl170mM_GMX_JeanZay/no_water_md_concatenated.txt'
     window_size=[3,6,12]
+    #   Color
+    color = sns.color_palette("cool", len(window_size)+2)
     GS_1 = configuration(number=1,state='GS')
     (time,
      no_water,
