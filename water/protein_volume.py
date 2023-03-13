@@ -101,11 +101,13 @@ class protein:
 
                 # Remove the water
                 if "ES" in name:
+                    state='ES'
                     no_water = (
                         volume_array
                         - self.water_volume * 1e-3 * water_number[0][conf - 1]
                     )
                 if "GS" in name:
+                    state='GS'
                     no_water = (
                         volume_array
                         - self.water_volume * 1e-3 * water_number[1][conf - 1]
@@ -119,19 +121,63 @@ class protein:
             output_concatenated = os.path.join(
                 self.path, name, "no_water_md_concatenated.txt"
             )
-            concatenated = np.concatenate(traj_data, axis=1)
+            configuration_i = configuration(number=conf,state=state)
+            configuration_i.save_txt(traj_data=traj_data,output_name=output_concatenated)
+            if conf == 2 :
+                time, no_water, volume_mean, volume_error = configuration_i.load_txt(output_name=output_concatenated)
+                configuration_i.plot(time=time,
+                                     no_water=no_water,
+                                     volume_mean=volume_mean,
+                                     volume_error=volume_error)
+            # concatenated = np.concatenate(traj_data, axis=1)
 
-            # Compute the mean and the error
-            volume_mean = np.mean(concatenated[1])
-            volume_mean_error = stats.sem(concatenated[1], axis=None)
+            # # Compute the mean and the error
+            # volume_mean = np.mean(concatenated[1])
+            # volume_mean_error = stats.sem(concatenated[1], axis=None)
 
-            # Save to a single file
-            np.savetxt(
-                output_concatenated,
-                concatenated,
-                header="{} {}".format(volume_mean, volume_mean_error),
-            )
+            # # Save to a single file
+            # np.savetxt(
+            #     output_concatenated,
+            #     concatenated,
+            #     header="{} {}".format(volume_mean, volume_mean_error),
+            # )
 
+class configuration():
+
+    def __init__(self,number,state):
+        self.num=number
+        self.state=state
+    
+    def save_txt(self,traj_data,output_name):
+        concatenated = np.concatenate(traj_data, axis=1)
+        # Compute the mean and the error
+        volume_mean = np.mean(concatenated[1])
+        volume_mean_error = stats.sem(concatenated[1], axis=None)
+        # Save to a single file
+        np.savetxt(
+            output_name,
+            concatenated,
+            header="{} {}".format(volume_mean, volume_mean_error),
+        )
+    
+    def load_txt(self,output_name):
+        time,no_water = np.loadtxt(output_name)
+        with open(output_name) as f:
+            line = f.readline()
+        line = line.replace("#", "").replace("\n", "").split(" ")[1:]
+        volume_mean = float(line[0])
+        volume_error = float(line[1])
+        
+        return time,no_water,volume_mean,volume_error
+    
+    def plot(self,time,no_water,volume_mean,volume_error):
+        fig,ax = plt.subplots()
+        ax.plot(time,no_water)
+        volume_mean_array = volume_mean*np.ones(len(time))
+        ax.plot(time,volume_mean_array,label="Mean")
+        ax.errorbar(time,volume_mean_array,yerr=volume_error)
+        ax.legend()
+        plt.show()
 
 if __name__ == "__main__":
     # Definition
