@@ -9,6 +9,7 @@ import extract_gmx_energy as xtract
 import eau
 import os
 import subprocess
+import seaborn as sns
 
 
 class protein:
@@ -125,22 +126,14 @@ class protein:
             configuration_i.save_txt(traj_data=traj_data,output_name=output_concatenated)
             if conf == 2 :
                 time, no_water, volume_mean, volume_error = configuration_i.load_txt(output_name=output_concatenated)
+                smooth = configuration_i.smoothing(time,no_water,3)
                 configuration_i.plot(time=time,
                                      no_water=no_water,
                                      volume_mean=volume_mean,
-                                     volume_error=volume_error)
-            # concatenated = np.concatenate(traj_data, axis=1)
-
-            # # Compute the mean and the error
-            # volume_mean = np.mean(concatenated[1])
-            # volume_mean_error = stats.sem(concatenated[1], axis=None)
-
-            # # Save to a single file
-            # np.savetxt(
-            #     output_concatenated,
-            #     concatenated,
-            #     header="{} {}".format(volume_mean, volume_mean_error),
-            # )
+                                     volume_error=volume_error,
+                                     color=color,
+                                     smoothing=smooth,
+                                     window_size=3)
 
 class configuration():
 
@@ -148,6 +141,11 @@ class configuration():
         self.num=number
         self.state=state
     
+    def smoothing(self,time,no_water,window_size):
+        weights = np.repeat(1.0, window_size) / window_size
+        smoothing = np.convolve(no_water, weights, 'valid')
+        return smoothing
+
     def save_txt(self,traj_data,output_name):
         concatenated = np.concatenate(traj_data, axis=1)
         # Compute the mean and the error
@@ -170,12 +168,15 @@ class configuration():
         
         return time,no_water,volume_mean,volume_error
     
-    def plot(self,time,no_water,volume_mean,volume_error):
+    def plot(self,time,no_water,volume_mean,volume_error,color,
+             smoothing=None,
+             window_size=1):
         fig,ax = plt.subplots()
-        ax.plot(time,no_water)
+        ax.plot(time,no_water,color=color[0])
         volume_mean_array = volume_mean*np.ones(len(time))
-        ax.plot(time,volume_mean_array,label="Mean")
-        ax.errorbar(time,volume_mean_array,yerr=volume_error)
+        ax.plot(time,volume_mean_array,label="Mean",color=color[1])
+        ax.errorbar(time,volume_mean_array,yerr=volume_error,color=color[1])
+        ax.plot(smoothing)
         ax.legend()
         plt.show()
 
@@ -187,6 +188,9 @@ if __name__ == "__main__":
     file_name = "/home/ccattin/Documents/EAU/Elisa_parameters/computed_by_Come/TIP3P/300K/analysis/density.xvg"
     error_file = "/home/ccattin/Documents/EAU/Elisa_parameters/computed_by_Come/TIP3P/300K/analysis/errest.xvg"
     code = "/home/ccattin/Documents/Code/GMX/analysis_water_protein"
+    #   Color
+    color_palette = sns.color_palette("cool", 12)
+    color=[color_palette[6],color_palette[0]]
 
     # Get the volume of water
     TIP3P_300K = eau.eau(file_name, error_file)
