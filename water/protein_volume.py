@@ -222,7 +222,15 @@ class configuration:
         return time, no_water, volume_mean, volume_error
 
     def plot(
-        self, time, no_water, volume_mean, volume_error, color, smoothing, window_size
+        self,
+        time,
+        no_water,
+        volume_mean,
+        volume_error,
+        color,
+        smoothing,
+        window_size,
+        output_path,
     ):
         """Plot of the volume as a function of the time
 
@@ -242,6 +250,8 @@ class configuration:
             Smoothed value of the volume at different window size
         window_size : list
             The different windw sizes for the smoothing
+        output_path : str
+            Path where to save the output .pdf
         """
 
         fig, ax = plt.subplots()
@@ -260,6 +270,7 @@ class configuration:
         ax.legend()
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"Volume (nm$^{3}$)")
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
         plt.show()
 
 
@@ -294,6 +305,7 @@ if __name__ == "__main__":
         path
         + "/R6OA_GS01_2021_11_19_Amber19SB_OPC_NaCl170mM_GMX_JeanZay/no_water_md_concatenated.txt"
     )
+    output_plot = "/home/ccattin/Documents/Code/outputs/no_water.pdf"
     window_size = [100, 1000, 10000]
     #   Color
     color = sns.color_palette("cool", len(window_size) + 2)
@@ -312,4 +324,5 @@ if __name__ == "__main__":
         color=color,
         smoothing=smooth,
         window_size=window_size,
+        output_path=output_plot,
     )
