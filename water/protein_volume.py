@@ -127,6 +127,47 @@ class protein:
                 traj_data=traj_data, output_name=output_concatenated
             )
 
+    def mean_GS(self):
+        mean_list = []
+        error_list = []
+        for name in os.listdir(self.path):
+            if ".txt" in name :
+                continue
+            if "GS" in name:
+                conf = int(name[7:9])
+                output_concatenated = os.path.join(
+                self.path, name, "no_water_md_concatenated.txt"
+                )
+                GS_i = configuration(conf,"GS")
+                (time, no_water, 
+                    volume_mean, volume_error
+                    ) = GS_i.load_txt(output_concatenated)
+                mean_list.append(volume_mean)
+                error_list.append(volume_error)
+        return mean_list, error_list
+    
+    def plot_GS_mean(self, mean_list,error_list,output_path,color):
+        fig, ax = plt.subplots()
+        ax.errorbar(range(20),mean_list,
+                    yerr=error_list,
+                    fmt=".",
+                    color=color)
+        ax.set_xlabel("Configuration")
+        ax.set_ylabel(r"Mean volume (nm$^3$)")
+        ax.set_xticks(range(20))
+        ax.text(
+            0.95, 0.95, 
+            f"Mean: {np.mean(mean_list):.4f} nm$^3$", 
+            transform=plt.gca().transAxes, 
+            ha='right', va='top',
+            )
+
+        ax.grid()
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
+        plt.show()
+
+
+
 
 class configuration:
     """Configuration class"""
@@ -298,7 +339,7 @@ if __name__ == "__main__":
     ES, GS = HSP90.number_water()
 
     # Remove the water volume
-    HSP90.remove_water()
+    #HSP90.remove_water()
 
     # Plot the result
     output_name = (
@@ -326,3 +367,11 @@ if __name__ == "__main__":
         window_size=window_size,
         output_path=output_plot,
     )
+
+    output_plot = "/home/ccattin/Documents/Code/outputs/mean_GS.pdf"
+    mean_list, error_list = HSP90.mean_GS()
+    color = sns.color_palette("cool", 12)
+    HSP90.plot_GS_mean(mean_list=mean_list,
+                       error_list=error_list,
+                       color=color[6],
+                       output_path=output_plot)
