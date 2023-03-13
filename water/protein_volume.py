@@ -3,10 +3,13 @@
 Extract the molecular volume of protein of multiple simualtion.
 """
 import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
 import extract_gmx_energy as xtract
 import eau
 import os
 import subprocess
+import seaborn as sns
 
 
 class protein:
@@ -74,7 +77,8 @@ class protein:
                 continue
             # Get the configuration number
             conf = int(name[7:9])
-
+            # Create an empty list to hold the trajectory data
+            traj_data = []
             # For every trajectory
             #   (10 trajectories each time)
             for traj in range(1, 11):
@@ -89,9 +93,6 @@ class protein:
                 output = os.path.join(
                     self.path, name, "no_water_md_" + str(traj) + ".txt"
                 )
-                error_file = os.path.join(
-                    self.path, name, "errest_md_" + str(traj) + ".xvg"
-                )
 
                 # Extract the volume
                 volume = xtract.gromacs_output(
@@ -101,18 +102,248 @@ class protein:
 
                 # Remove the water
                 if "ES" in name:
+                    state = "ES"
                     no_water = (
                         volume_array
                         - self.water_volume * 1e-3 * water_number[0][conf - 1]
                     )
                 if "GS" in name:
+                    state = "GS"
                     no_water = (
                         volume_array
                         - self.water_volume * 1e-3 * water_number[1][conf - 1]
                     )
-
+                # Append the trajectory data to the list
+                traj_data.append(np.array([time, no_water]))
                 # Save the result
                 np.savetxt(output, np.array([time, no_water]))
+
+            # Concatenate the trajectory data
+            output_concatenated = os.path.join(
+                self.path, name, "no_water_md_concatenated.txt"
+            )
+            configuration_i = configuration(number=conf, state=state)
+            configuration_i.save_txt(
+                traj_data=traj_data, output_name=output_concatenated
+            )
+
+    def mean_GS(self):
+        """Compute the mean over all the ground states
+
+        Returns
+        -------
+        mean_list : list
+            Mean values of the volume of the protein of each configuration
+        error_list : list
+            Error associated
+        """
+        # Initialize
+        mean_list = []
+        error_list = []
+        # For every configuration
+        for name in os.listdir(self.path):
+            # Ignore the .txt files
+            if ".txt" in name:
+                continue
+            # Get only the GS configurations
+            if "GS" in name:
+                # Get the configuration number
+                conf = int(name[7:9])
+
+                # Extract the mean volume and the associated error
+                output_concatenated = os.path.join(
+                    self.path, name, "no_water_md_concatenated.txt"
+                )
+                GS_i = configuration(conf, "GS")
+                (time, no_water, volume_mean, volume_error) = GS_i.load_txt(
+                    output_concatenated
+                )
+
+                # Append the list
+                mean_list.append(volume_mean)
+                error_list.append(volume_error)
+
+        return mean_list, error_list
+
+    def plot_GS_mean(self, mean_list, error_list, output_path, color):
+        """Plot of the ground state mean with their associated error.
+
+        Parameters
+        ----------
+        mean_list : list
+            Mean values of the volume of the protein of each configuration
+        error_list : list
+            Error associated
+        output_path : str
+            Path where to save the output .pdf
+        color : str
+            Color of the plot
+        """
+        fig, ax = plt.subplots()
+        # Plot the mean of the different configurations
+        ax.errorbar(range(20), mean_list, yerr=error_list, fmt=".", color=color)
+        ax.set_xlabel("Configuration")
+        ax.set_ylabel(r"Mean volume (nm$^3$)")
+        ax.set_xticks(range(20))
+        ax.grid()
+        # Add a text to have the mean over all the ground state
+        ax.text(
+            0.95,
+            0.95,
+            f"Mean: {np.mean(mean_list):.4f} nm$^3$",
+            transform=plt.gca().transAxes,
+            ha="right",
+            va="top",
+        )
+        # Save and show
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
+        plt.show()
+
+
+class configuration:
+    """Configuration class"""
+
+    def __init__(self, number, state):
+        """Init function for the configuration class
+
+        Parameters
+        ----------
+        number : float
+            Number of the configuration (between 1 and 20 usually)
+        state : str
+            Ground state ('GS') or excited state ('ES')
+        """
+        self.num = number
+        self.state = state
+
+    def smoothing(self, time, no_water, window_size):
+        """Do a rolling average
+
+        Parameters
+        ----------
+        time : np.array
+            time of the simulation
+        no_water : np.array
+            volume of the protein without water
+        window_size : list
+            The different window size
+
+        Returns
+        -------
+        smooth : np.array
+            Smoothed values
+        """
+        # Initialize
+        smooth = []
+        # For each window values
+        for window in window_size:
+            weights = np.repeat(1.0, window) / window
+            smoothing = np.convolve(no_water, weights, "valid")
+            smooth.append(smoothing)
+        return smooth
+
+    def save_txt(self, traj_data, output_name):
+        """Save the value of the volume of the protein without water
+
+        Parameters
+        ----------
+        traj_data : np.array
+            Data containing the volume in each trajectories
+        output_name : str
+            Path where to save the file
+        """
+        concatenated = np.concatenate(traj_data, axis=1)
+        # Compute the mean and the error
+        volume_mean = np.mean(concatenated[1])
+        volume_mean_error = stats.sem(concatenated[1], axis=None)
+        # Save to a single file
+        np.savetxt(
+            output_name,
+            concatenated,
+            header="{} {}".format(volume_mean, volume_mean_error),
+        )
+
+    def load_txt(self, output_name):
+        """Load the result previously saved with the function save_txt
+
+        Parameters
+        ----------
+        output_name : str
+            Path where the file has been saved
+
+        Returns
+        -------
+        time : np.array
+            time of the simulation
+        no_water : np.array
+            volume of the protein without water
+        volume_mean : float
+            Mean of the volume of the protein without water
+        volume_error : float
+            Associated error to the mean
+        """
+        # Load the file
+        time, no_water = np.loadtxt(output_name)
+        # Get the mean and the error
+        with open(output_name) as f:
+            line = f.readline()
+        line = line.replace("#", "").replace("\n", "").split(" ")[1:]
+        volume_mean = float(line[0])
+        volume_error = float(line[1])
+
+        return time, no_water, volume_mean, volume_error
+
+    def plot(
+        self,
+        time,
+        no_water,
+        volume_mean,
+        volume_error,
+        color,
+        smoothing,
+        window_size,
+        output_path,
+    ):
+        """Plot of the volume as a function of the time
+
+        Parameters
+        ----------
+        time : np.array
+            time of the simulation
+        no_water : np.array
+            volume of the protein without water
+        volume_mean : float
+            Mean of the volume of the protein without water
+        volume_error : float
+            Associated error to the mean
+        color : list
+            Color of the different plot
+        smoothing : list
+            Smoothed value of the volume at different window size
+        window_size : list
+            The different windw sizes for the smoothing
+        output_path : str
+            Path where to save the output .pdf
+        """
+
+        fig, ax = plt.subplots()
+
+        # Plot of the raw volume
+        ax.plot(time, no_water, color=color[-1])
+
+        # Plot of the mean and its associated error
+        volume_mean_array = volume_mean * np.ones(len(time))
+        ax.plot(time, volume_mean_array, label="Mean", color=color[-2])
+        ax.errorbar(time, volume_mean_array, yerr=volume_error, color=color[1])
+
+        # Plot of the smoothed values for each window value
+        for i, smooth in enumerate(smoothing):
+            ax.plot(smooth, color=color[i], label=f"Window size : {window_size[i]}")
+        ax.legend()
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel(r"Volume (nm$^{3}$)")
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -139,4 +370,44 @@ if __name__ == "__main__":
     ES, GS = HSP90.number_water()
 
     # Remove the water volume
-    HSP90.remove_water()
+    # HSP90.remove_water()
+
+    # Plot the result
+    output_name = (
+        path
+        + "/R6OA_GS01_2021_11_19_Amber19SB_OPC_NaCl170mM_GMX_JeanZay/no_water_md_concatenated.txt"
+    )
+    output_plot = "/home/ccattin/Documents/Code/outputs/no_water.pdf"
+    window_size = [100, 1000, 10000]
+    #   Color
+    color = sns.color_palette("cool", len(window_size) + 2)
+    # Initialize a configuration
+    GS_1 = configuration(number=1, state="GS")
+    # Get its results
+    (time, no_water, volume_mean, volume_error) = GS_1.load_txt(output_name=output_name)
+    # Smooth the results
+    smooth = GS_1.smoothing(time, no_water, window_size)
+    # Plot the results
+    GS_1.plot(
+        time=time,
+        no_water=no_water,
+        volume_mean=volume_mean,
+        volume_error=volume_error,
+        color=color,
+        smoothing=smooth,
+        window_size=window_size,
+        output_path=output_plot,
+    )
+
+    # Mean on the ground states
+    output_plot = "/home/ccattin/Documents/Code/outputs/mean_GS.pdf"
+    # Get the means and the associated errors
+    mean_list, error_list = HSP90.mean_GS()
+    color = sns.color_palette("cool", 12)
+    # Plot the result
+    HSP90.plot_GS_mean(
+        mean_list=mean_list,
+        error_list=error_list,
+        color=color[6],
+        output_path=output_plot,
+    )
