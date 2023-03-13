@@ -133,45 +133,45 @@ class protein:
         Returns
         -------
         mean_list : list
-            Mean values of the volume of the protein of each configuration 
+            Mean values of the volume of the protein of each configuration
         error_list : list
             Error associated
         """
-        #Initialize
+        # Initialize
         mean_list = []
         error_list = []
-        #For every configuration
+        # For every configuration
         for name in os.listdir(self.path):
-            #Ignore the .txt files
-            if ".txt" in name :
+            # Ignore the .txt files
+            if ".txt" in name:
                 continue
-            #Get only the GS configurations
+            # Get only the GS configurations
             if "GS" in name:
-                #Get the configuration number
+                # Get the configuration number
                 conf = int(name[7:9])
-                
-                #Extract the mean volume and the associated error
+
+                # Extract the mean volume and the associated error
                 output_concatenated = os.path.join(
-                self.path, name, "no_water_md_concatenated.txt"
+                    self.path, name, "no_water_md_concatenated.txt"
                 )
-                GS_i = configuration(conf,"GS")
-                (time, no_water, 
-                    volume_mean, volume_error
-                    ) = GS_i.load_txt(output_concatenated)
-                
-                #Append the list
+                GS_i = configuration(conf, "GS")
+                (time, no_water, volume_mean, volume_error) = GS_i.load_txt(
+                    output_concatenated
+                )
+
+                # Append the list
                 mean_list.append(volume_mean)
                 error_list.append(volume_error)
-        
+
         return mean_list, error_list
-    
-    def plot_GS_mean(self, mean_list,error_list,output_path,color):
+
+    def plot_GS_mean(self, mean_list, error_list, output_path, color):
         """Plot of the ground state mean with their associated error.
 
         Parameters
         ----------
         mean_list : list
-            Mean values of the volume of the protein of each configuration 
+            Mean values of the volume of the protein of each configuration
         error_list : list
             Error associated
         output_path : str
@@ -180,27 +180,24 @@ class protein:
             Color of the plot
         """
         fig, ax = plt.subplots()
-        #Plot the mean of the different configurations
-        ax.errorbar(range(20),mean_list,
-                    yerr=error_list,
-                    fmt=".",
-                    color=color)
+        # Plot the mean of the different configurations
+        ax.errorbar(range(20), mean_list, yerr=error_list, fmt=".", color=color)
         ax.set_xlabel("Configuration")
         ax.set_ylabel(r"Mean volume (nm$^3$)")
         ax.set_xticks(range(20))
         ax.grid()
         # Add a text to have the mean over all the ground state
         ax.text(
-            0.95, 0.95, 
-            f"Mean: {np.mean(mean_list):.4f} nm$^3$", 
-            transform=plt.gca().transAxes, 
-            ha='right', va='top',
-            )
-        #Save and show
+            0.95,
+            0.95,
+            f"Mean: {np.mean(mean_list):.4f} nm$^3$",
+            transform=plt.gca().transAxes,
+            ha="right",
+            va="top",
+        )
+        # Save and show
         plt.savefig(output_path, dpi=300, bbox_inches="tight")
         plt.show()
-
-
 
 
 class configuration:
@@ -373,7 +370,7 @@ if __name__ == "__main__":
     ES, GS = HSP90.number_water()
 
     # Remove the water volume
-    #HSP90.remove_water()
+    # HSP90.remove_water()
 
     # Plot the result
     output_name = (
@@ -404,11 +401,13 @@ if __name__ == "__main__":
 
     # Mean on the ground states
     output_plot = "/home/ccattin/Documents/Code/outputs/mean_GS.pdf"
-    #Get the means and the associated errors
+    # Get the means and the associated errors
     mean_list, error_list = HSP90.mean_GS()
     color = sns.color_palette("cool", 12)
-    #Plot the result
-    HSP90.plot_GS_mean(mean_list=mean_list,
-                       error_list=error_list,
-                       color=color[6],
-                       output_path=output_plot)
+    # Plot the result
+    HSP90.plot_GS_mean(
+        mean_list=mean_list,
+        error_list=error_list,
+        color=color[6],
+        output_path=output_plot,
+    )
