@@ -102,13 +102,13 @@ class protein:
 
                 # Remove the water
                 if "ES" in name:
-                    state='ES'
+                    state = "ES"
                     no_water = (
                         volume_array
                         - self.water_volume * 1e-3 * water_number[0][conf - 1]
                     )
                 if "GS" in name:
-                    state='GS'
+                    state = "GS"
                     no_water = (
                         volume_array
                         - self.water_volume * 1e-3 * water_number[1][conf - 1]
@@ -122,14 +122,16 @@ class protein:
             output_concatenated = os.path.join(
                 self.path, name, "no_water_md_concatenated.txt"
             )
-            configuration_i = configuration(number=conf,state=state)
-            configuration_i.save_txt(traj_data=traj_data,output_name=output_concatenated)
-            
+            configuration_i = configuration(number=conf, state=state)
+            configuration_i.save_txt(
+                traj_data=traj_data, output_name=output_concatenated
+            )
 
-class configuration():
+
+class configuration:
     """Configuration class"""
 
-    def __init__(self,number,state):
+    def __init__(self, number, state):
         """Init function for the configuration class
 
         Parameters
@@ -139,10 +141,10 @@ class configuration():
         state : str
             Ground state ('GS') or excited state ('ES')
         """
-        self.num=number
-        self.state=state
-    
-    def smoothing(self,time,no_water,window_size):
+        self.num = number
+        self.state = state
+
+    def smoothing(self, time, no_water, window_size):
         """Do a rolling average
 
         Parameters
@@ -159,16 +161,16 @@ class configuration():
         smooth : np.array
             Smoothed values
         """
-        #Initialize
+        # Initialize
         smooth = []
-        #For each window values
+        # For each window values
         for window in window_size:
             weights = np.repeat(1.0, window) / window
-            smoothing = np.convolve(no_water, weights, 'valid')
+            smoothing = np.convolve(no_water, weights, "valid")
             smooth.append(smoothing)
         return smooth
 
-    def save_txt(self,traj_data,output_name):
+    def save_txt(self, traj_data, output_name):
         """Save the value of the volume of the protein without water
 
         Parameters
@@ -188,8 +190,8 @@ class configuration():
             concatenated,
             header="{} {}".format(volume_mean, volume_mean_error),
         )
-    
-    def load_txt(self,output_name):
+
+    def load_txt(self, output_name):
         """Load the result previously saved with the function save_txt
 
         Parameters
@@ -208,25 +210,20 @@ class configuration():
         volume_error : float
             Associated error to the mean
         """
-        #Load the file
-        time,no_water = np.loadtxt(output_name)
-        #Get the mean and the error
+        # Load the file
+        time, no_water = np.loadtxt(output_name)
+        # Get the mean and the error
         with open(output_name) as f:
             line = f.readline()
         line = line.replace("#", "").replace("\n", "").split(" ")[1:]
         volume_mean = float(line[0])
         volume_error = float(line[1])
-        
-        return time,no_water,volume_mean,volume_error
-    
-    def plot(self,
-             time,
-             no_water,
-             volume_mean,
-             volume_error,
-             color,
-             smoothing,
-             window_size):
+
+        return time, no_water, volume_mean, volume_error
+
+    def plot(
+        self, time, no_water, volume_mean, volume_error, color, smoothing, window_size
+    ):
         """Plot of the volume as a function of the time
 
         Parameters
@@ -247,25 +244,24 @@ class configuration():
             The different windw sizes for the smoothing
         """
 
-        fig,ax = plt.subplots()
-        
-        #Plot of the raw volume
-        ax.plot(time,no_water,color=color[-1])
-        
-        #Plot of the mean and its associated error
-        volume_mean_array = volume_mean*np.ones(len(time))
-        ax.plot(time,volume_mean_array,label="Mean",color=color[-2])
-        ax.errorbar(time,volume_mean_array,yerr=volume_error,color=color[1])
-        
-        #Plot of the smoothed values for each window value
+        fig, ax = plt.subplots()
+
+        # Plot of the raw volume
+        ax.plot(time, no_water, color=color[-1])
+
+        # Plot of the mean and its associated error
+        volume_mean_array = volume_mean * np.ones(len(time))
+        ax.plot(time, volume_mean_array, label="Mean", color=color[-2])
+        ax.errorbar(time, volume_mean_array, yerr=volume_error, color=color[1])
+
+        # Plot of the smoothed values for each window value
         for i, smooth in enumerate(smoothing):
-            ax.plot(smooth,
-                    color=color[i],
-                    label=f'Window size : {window_size[i]}')
+            ax.plot(smooth, color=color[i], label=f"Window size : {window_size[i]}")
         ax.legend()
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"Volume (nm$^{3}$)")
         plt.show()
+
 
 if __name__ == "__main__":
     # Definition
@@ -294,26 +290,26 @@ if __name__ == "__main__":
     HSP90.remove_water()
 
     # Plot the result
-    output_name = path+'/R6OA_GS01_2021_11_19_Amber19SB_OPC_NaCl170mM_GMX_JeanZay/no_water_md_concatenated.txt'
-    window_size=[100,1000,10000]
+    output_name = (
+        path
+        + "/R6OA_GS01_2021_11_19_Amber19SB_OPC_NaCl170mM_GMX_JeanZay/no_water_md_concatenated.txt"
+    )
+    window_size = [100, 1000, 10000]
     #   Color
-    color = sns.color_palette("cool", len(window_size)+2)
+    color = sns.color_palette("cool", len(window_size) + 2)
     # Initialize a configuration
-    GS_1 = configuration(number=1,state='GS')
+    GS_1 = configuration(number=1, state="GS")
     # Get its results
-    (time,
-     no_water,
-     volume_mean,
-     volume_error
-     ) = GS_1.load_txt(output_name=output_name)
+    (time, no_water, volume_mean, volume_error) = GS_1.load_txt(output_name=output_name)
     # Smooth the results
-    smooth = GS_1.smoothing(time,no_water,window_size)
+    smooth = GS_1.smoothing(time, no_water, window_size)
     # Plot the results
-    GS_1.plot(time=time,
-                        no_water=no_water,
-                        volume_mean=volume_mean,
-                        volume_error=volume_error,
-                        color=color,
-                        smoothing=smooth,
-                        window_size=window_size)
-
+    GS_1.plot(
+        time=time,
+        no_water=no_water,
+        volume_mean=volume_mean,
+        volume_error=volume_error,
+        color=color,
+        smoothing=smooth,
+        window_size=window_size,
+    )
