@@ -9,6 +9,18 @@ import os
 
 #%%
 def get_dir():
+    """Get and strore in variables the different path
+
+    Returns
+    -------
+    pdb : str
+        Path to the .pdb file
+    refGS : str
+        Path to the .pdb reference ground state
+    refES, 
+    allxtc, 
+    OUTDIR
+    """
     WD = os.getcwd()
     PICTDIR = WD + '/Figures'
     #DATADIR = WD + '/Data/'
@@ -188,3 +200,8 @@ if __name__ == '__main__' :
         OUTDIR,
         kT
     )
+    #%%
+    #Write the results
+    write_distance(allxtc,
+                   OUTDIR,
+                   data)
