@@ -127,9 +127,13 @@ class protein:
                 traj_data=traj_data, output_name=output_concatenated
             )
 
-    def mean_GS(self):
-        """Compute the mean over all the ground states
+    def mean_GS_ES(self,state):
+        """Compute the mean over all the ground or exctited states
 
+        Parameters
+        ----------
+        state : str
+            State to compute the mean : 'GS' or 'ES'
         Returns
         -------
         mean_list : list
@@ -146,7 +150,7 @@ class protein:
             if ".txt" in name:
                 continue
             # Get only the GS configurations
-            if "GS" in name:
+            if state in name:
                 # Get the configuration number
                 conf = int(name[7:9])
 
@@ -154,8 +158,8 @@ class protein:
                 output_concatenated = os.path.join(
                     self.path, name, "no_water_md_concatenated.txt"
                 )
-                GS_i = configuration(conf, "GS")
-                (time, no_water, volume_mean, volume_error) = GS_i.load_txt(
+                state_i = configuration(conf, state)
+                (time, no_water, volume_mean, volume_error) = state_i.load_txt(
                     output_concatenated
                 )
 
@@ -165,8 +169,8 @@ class protein:
 
         return mean_list, error_list
 
-    def plot_GS_mean(self, mean_list, error_list, output_path, color):
-        """Plot of the ground state mean with their associated error.
+    def plot_state_mean(self, mean_list, error_list, output_path, color):
+        """Plot of the ground or excited state mean with their associated error.
 
         Parameters
         ----------
@@ -402,10 +406,23 @@ if __name__ == "__main__":
     # Mean on the ground states
     output_plot = "/home/ccattin/Documents/Code/outputs/mean_GS.pdf"
     # Get the means and the associated errors
-    mean_list, error_list = HSP90.mean_GS()
+    mean_list, error_list = HSP90.mean_GS_ES("GS")
     color = sns.color_palette("cool", 12)
     # Plot the result
-    HSP90.plot_GS_mean(
+    HSP90.plot_state_mean(
+        mean_list=mean_list,
+        error_list=error_list,
+        color=color[6],
+        output_path=output_plot,
+    )
+
+    # Mean on the excited states
+    output_plot = "/home/ccattin/Documents/Code/outputs/mean_ES.pdf"
+    # Get the means and the associated errors
+    mean_list, error_list = HSP90.mean_GS_ES("ES")
+    color = sns.color_palette("cool", 12)
+    # Plot the result
+    HSP90.plot_state_mean(
         mean_list=mean_list,
         error_list=error_list,
         color=color[6],
