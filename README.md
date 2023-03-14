@@ -1,5 +1,5 @@
 # ILM
-Repository of the different python codes developed during my M2 insternship at the ILM
+Repository of the different codes developed during my M2 insternship at the ILM
 
 ## Water simulation
   Inside the water/ directory.
