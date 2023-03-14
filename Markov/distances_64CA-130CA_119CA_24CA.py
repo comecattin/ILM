@@ -8,41 +8,45 @@ import pyemma
 import os
 
 #%%
-def get_dir():
-    """Get and strore in variables the different path
-
+def get_dir(DATADIR,OUTDIR):
+    """Get and store in variables the different path
+    
+    Parameters
+    ----------
+    DATADIR : str
+            Path to the data directory
+    OUTDIR : str
+            Path to the output directory
     Returns
     -------
     pdb : str
         Path to the .pdb file
     refGS : str
         Path to the .pdb reference ground state
-    refES, 
-    allxtc, 
-    OUTDIR
+    refES : str
+        Path to the .pdb reference excited state
+    allxtc : list
+        All the .xtc files 
     """
-    WD = os.getcwd()
-    PICTDIR = WD + '/Figures'
-    #DATADIR = WD + '/Data/'
-    DATADIR = '/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC'
-    OUTDIR =  WD + f'/Output_{DataType}_{ClusterType}{ClusterNumber}_lag{LagSteps}/'
-
+    
+    #If the output directory doesn't exist -> create one
     if not os.path.exists(OUTDIR):
         os.makedirs(OUTDIR)
 
+    #PDB file
     pdb  = DATADIR + "/GS_cluster1.pdb"
+    #XTC files
     allfiles =  os.listdir(DATADIR)
     GSfiles = sorted([ f"{DATADIR}/{fn}" for fn in allfiles if (fn.startswith("GS") and fn.endswith(".xtc"))])
     ESfiles = sorted([ f"{DATADIR}/{fn}" for fn in allfiles if (fn.startswith("ES") and fn.endswith(".xtc"))])
     TRJ15files = sorted([ f"{DATADIR}/{fn}" for fn in allfiles if (fn.startswith("trj15") and fn.endswith(".xtc"))])
-
     allxtc = GSfiles + ESfiles + TRJ15files
-    #allxtc = TRJ15files
 
+    #Reference pdb files
     refGS = DATADIR+ '/GS_cluster1.pdb'
     refES = DATADIR+ '/ES_cluster1.pdb'
 
-    return pdb, refGS, refES, allxtc, OUTDIR
+    return pdb, refGS, refES, allxtc
 
 def create_pairIndices_from_pairNames(pdbfilename, pairNames):
     refu = mda.Universe(pdbfilename)
@@ -167,12 +171,15 @@ if __name__ == '__main__' :
     ClusterNumber = 500
     timestep = 0.1
     pairNames = ['64_CA-130_CA', '119_CA-24_CA']
+    #Path definition
+    DATA = '/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC'
+    OUTDIR = '/home/ccattin/Documents/Markov/volume_pressure/Output_distances_64CA-130CA_119CA-24CA/'
     
     #%%
     #Get the directories, 
     #       the indices
     #       and the features
-    pdb, refGS, refES, allxtc, OUTDIR = get_dir()
+    pdb, refGS, refES, allxtc = get_dir(DATA,OUTDIR)
     indices = create_pairIndices_from_pairNames(pdbfilename = refGS, 
                                                 pairNames = pairNames )
     feat = pyemma_feat(pdb,pairNames,refGS)
@@ -205,3 +212,4 @@ if __name__ == '__main__' :
     write_distance(allxtc,
                    OUTDIR,
                    data)
+# %%
