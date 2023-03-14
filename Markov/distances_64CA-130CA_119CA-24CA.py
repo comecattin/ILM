@@ -63,7 +63,7 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
     pairsListIndices : list
         Indices of the pair, can be opened with pyEmma
     """
-    
+
     refu = mda.Universe(pdbfilename)
     pairsListIndices = []
     for pairname in pairNames:
@@ -89,13 +89,46 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
     return pairsListIndices
 
 def pyemma_feat(pdb,pairNames,refGS):
-    feat = pyemma.coordinates.featurizer(pdb)
-    pair_indices = create_pairIndices_from_pairNames(pdbfilename = refGS, pairNames = pairNames)
+    """Get the features
 
+    Parameters
+    ----------
+    pdb : str
+        Path to the pdb file to load
+    pairNames : list of str
+        Pair names to analyze
+    refGS : str
+        Path to the .pdb reference ground state
+
+    Returns
+    -------
+    feat : PyEmma feature object
+        Features
+    """
+    #Initialyze
+    feat = pyemma.coordinates.featurizer(pdb)
+    #Get the indices
+    pair_indices = create_pairIndices_from_pairNames(pdbfilename = refGS, pairNames = pairNames)
+    #Add the feature
     feat.add_distances(indices = pair_indices, periodic=True, indices2=None)
+    
     return feat
 
 def load_allxtc(allxtc,feat):
+    """Load all the .xtc file. Can be long
+
+    Parameters
+    ----------
+    allxtc : list of str
+        contain all the path to the .xtc files
+    feat : PyEmma feature object
+        Features to analyze
+
+    Returns
+    -------
+    data : list of np.array
+        List containing all the data extracted
+    """
     data = pyemma.coordinates.load(allxtc,
                                    features=feat,stride=1
                                    )
@@ -107,7 +140,24 @@ def plot_density_free_energy(data_concatenated,
                              pairNames,
                              OUTDIR,
                              kT):
+    """Plot the density and the associated free energy
 
+    Parameters
+    ----------
+    data_concatenated : np.array
+        All the data of all the trajectories
+    allxtc : list of str
+        contain all the path to the .xtc files
+    timestep : float
+        Time step between every file save in the MD simulation
+    pairNames : list of str
+        Pair names to analyze
+    OUTDIR : str
+            Path to the output directory
+    kT : float
+        Value of kT
+    """
+    #Dentisty map
     fig, axes = plt.subplots(1, 
                              1, 
                              figsize=(6, 4), 
@@ -125,10 +175,9 @@ def plot_density_free_energy(data_concatenated,
     axes.set_xlabel(f' {pairNames[0]} (nm)')
     axes.set_ylabel(f' {pairNames[1]} (nm)')
     fig.tight_layout()
-    
     fig.savefig(f'{OUTDIR}/data_density.png')
 
-    
+    #Free energy map
     fig, axes = plt.subplots(
         1,
         1,
@@ -136,6 +185,7 @@ def plot_density_free_energy(data_concatenated,
         sharex=True,
         sharey=True
         )
+    
     fig,axes = pyemma.plots.plot_free_energy(
         *data_concatenated.T[0:2],
         ax=axes,
@@ -151,8 +201,20 @@ def plot_density_free_energy(data_concatenated,
     fig.savefig(f'{OUTDIR}/data_free_energy_direct_from_density.png')
 
 def write_distance(allxtc,outdir,data):
+    """Write for every time step and every trajectories the value of the distance
+
+    Parameters
+    ----------
+    allxtc : list of str
+        contain all the path to the .xtc files
+    outdir : str
+        Path where to save the file
+    data : list of np.array
+        List containing all the data extracted
+    """
+    #Explore every trajectory
     for i, name in enumerate(allxtc):
-        
+        #Ground state
         if "/GS" in name:
             state = name.split("/")[-1][:4]
             conf = int(state[-2:])
@@ -160,7 +222,7 @@ def write_distance(allxtc,outdir,data):
                 OUTDIR,
                 f"GS_{conf}_distance.txt"
             )
-            
+        #Exited state 
         if "/ES" in name:
             state = name.split("/")[-1][:4]
             conf = int(state[-2:])
@@ -170,7 +232,7 @@ def write_distance(allxtc,outdir,data):
             )
         else:
             continue
-        
+        #Save
         np.savetxt(output_name,
                    data[i])
 
