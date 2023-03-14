@@ -49,6 +49,21 @@ def get_dir(DATADIR,OUTDIR):
     return pdb, refGS, refES, allxtc
 
 def create_pairIndices_from_pairNames(pdbfilename, pairNames):
+    """Get the indices using pair names
+
+    Parameters
+    ----------
+    pdbfilename : str
+        Path to the pdb file
+    pairNames : list of str
+        Pair names to analyze
+
+    Returns
+    -------
+    pairsListIndices : list
+        Indices of the pair, can be opened with pyEmma
+    """
+    
     refu = mda.Universe(pdbfilename)
     pairsListIndices = []
     for pairname in pairNames:
