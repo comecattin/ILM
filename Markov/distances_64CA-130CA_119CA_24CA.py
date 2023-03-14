@@ -1,14 +1,12 @@
 #! /usr/bin/env python3
-#%%
+"""Extract and write distance"""
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import scipy as sp
 import numpy as np
 import pyemma
 import os
-# for visualization of molecular structures:
 
-# Importing the library to get the memory usages 
 #%%
 def get_dir():
     WD = os.getcwd()
@@ -145,15 +143,12 @@ def write_distance(allxtc,outdir,data):
         np.savetxt(output_name,
                    data[i])
 
-write_distance(allxtc,OUTDIR,data)
-    #%%
-
 if __name__ == '__main__' :
-    
-
+    #Temperature
     T = 300
     kT = sp.constants.R *T/1000
 
+    #Input
     ClusterType = "kmeans"
     DataType = "distances_64CA-130CA_119CA-24CA"
     LagSteps = 2000
@@ -162,18 +157,29 @@ if __name__ == '__main__' :
     pairNames = ['64_CA-130_CA', '119_CA-24_CA']
     
     #%%
+    #Get the directories, 
+    #       the indices
+    #       and the features
     pdb, refGS, refES, allxtc, OUTDIR = get_dir()
     indices = create_pairIndices_from_pairNames(pdbfilename = refGS, 
                                                 pairNames = pairNames )
     feat = pyemma_feat(pdb,pairNames,refGS)
     
     #%%
+    #Load the date
+    #Warning : this can be really long
     data = load_allxtc(allxtc,feat)
     
     #%%
+    #Plot the histogramm of the features
     data_concatenated = np.concatenate(data)
-    fig, ax = pyemma.plots.plot_feature_histograms(data_concatenated, feature_labels=feat,ignore_dim_warning=True)
+    fig, ax = pyemma.plots.plot_feature_histograms(
+        data_concatenated,
+        feature_labels=feat,
+        ignore_dim_warning=True
+        )
     # %%
+    #Plot the density and the free energy landscape associated
     plot_density_free_energy(
         data_concatenated,
         allxtc,
@@ -182,5 +188,3 @@ if __name__ == '__main__' :
         OUTDIR,
         kT
     )
-
-# %%
