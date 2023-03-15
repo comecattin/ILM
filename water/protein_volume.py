@@ -237,7 +237,7 @@ class configuration:
             time of the simulation
         no_water : np.array
             volume of the protein without water
-        window_size : list
+        window_size : list or int
             The different window size
 
         Returns
@@ -245,14 +245,24 @@ class configuration:
         smooth : np.array
             Smoothed values
         """
-        # Initialize
-        smooth = []
-        # For each window values
-        for window in window_size:
-            weights = np.repeat(1.0, window) / window
+
+        # If only one value of window size
+        if type(window_size) == int:
+            weights = np.repeat(1.0, window_size) / window_size
             smoothing = np.convolve(no_water, weights, "valid")
-            smooth.append(smoothing)
-        return smooth
+
+            return smoothing
+
+        else:
+            # Initialize
+            smooth = []
+            # For each window values
+            for window in window_size:
+                weights = np.repeat(1.0, window) / window
+                smoothing = np.convolve(no_water, weights, "valid")
+                smooth.append(smoothing)
+    
+                return smooth
 
     def save_txt(self, traj_data, error, output_name):
         """Save the value of the volume of the protein without water
