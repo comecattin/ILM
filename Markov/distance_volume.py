@@ -42,10 +42,10 @@ def load_volume_distance(data_volume,data_distance,state,number):
     # only take 1/10 of the data on the volume
     return no_water[::10], d_64_CA_130_CA, d_119_CA_24_CA, time
 
-def plot_volume_distance_2d(volume,d_64_CA_130_CA,d_119_CA_24_CA):
+def plot_volume_distance_2d(volume,d1,d2,output):
     fig, ax = plt.subplots()
-    heatmap = ax.scatter(d_64_CA_130_CA,
-                         d_119_CA_24_CA,
+    heatmap = ax.scatter(d1,
+                         d2,
                          c=volume,
                          cmap='cool',
                          s=5)
@@ -58,6 +58,8 @@ def plot_volume_distance_2d(volume,d_64_CA_130_CA,d_119_CA_24_CA):
     cbar = fig.colorbar(heatmap)
     cbar.set_label(r"Volume (nm$^3$)")
 
+    # Save the plot
+    plt.savefig(output, dpi=300, bbox_inches="tight")
     # Show the plot
     plt.show()
 
@@ -87,14 +89,18 @@ if __name__ == '__main__':
                          data_distance=data_distance,
                          state=state,
                          number=number)
+    output = f'/home/ccattin/Documents/Code/outputs/volume_distance.pdf'
     plot_volume_distance_2d(volume=volume,
-                            d_64_CA_130_CA=d_64_CA_130_CA,
-                            d_119_CA_24_CA=d_119_CA_24_CA)
+                            d1=d_64_CA_130_CA,
+                            d2=d_119_CA_24_CA,
+                            output=output)
     
     window_size = [100,1000,3000]
 
     for window in window_size:
         smoothed, d1, d2 = smoothing(volume,d_64_CA_130_CA,d_119_CA_24_CA,time,window)
+        output = f'/home/ccattin/Documents/Code/outputs/volume_distance_smooth_{window}.pdf'
         plot_volume_distance_2d(volume=smoothed,
-                                d_64_CA_130_CA=d1,
-                                d_119_CA_24_CA=d2)
+                                d1=d1,
+                                d2=d2,
+                                output=output)
