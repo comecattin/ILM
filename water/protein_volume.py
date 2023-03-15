@@ -15,7 +15,7 @@ import seaborn as sns
 class protein:
     """Class of a protein"""
 
-    def __init__(self, path, water_file, water_volume):
+    def __init__(self, path, water_file, water_volume,water_volume_error):
         """Init function of the protein class
 
         Parameters
@@ -33,8 +33,9 @@ class protein:
         self.water_file = []
         self.water_file.append(os.path.join(path, water_file[0]))
         self.water_file.append(os.path.join(path, water_file[1]))
-        # Water volume
+        # Water volume and its error
         self.water_volume = water_volume
+        self.water_volume_error = water_volume_error
 
     def extract_volume_command(self, code):
         """Runs the gmx analysis script
@@ -107,12 +108,14 @@ class protein:
                         volume_array
                         - self.water_volume * 1e-3 * water_number[0][conf - 1]
                     )
+                    error = self.water_volume_error * 1e-3 * water_number[0][conf - 1]
                 if "GS" in name:
                     state = "GS"
                     no_water = (
                         volume_array
                         - self.water_volume * 1e-3 * water_number[1][conf - 1]
                     )
+                    error = self.water_volume_error * 1e-3 * water_number[1][conf - 1]
                 # Append the trajectory data to the list
                 traj_data.append(np.array([time, no_water]))
                 # Save the result
@@ -124,7 +127,8 @@ class protein:
             )
             configuration_i = configuration(number=conf, state=state)
             configuration_i.save_txt(
-                traj_data=traj_data, output_name=output_concatenated
+                traj_data=traj_data, error=error,
+                output_name=output_concatenated
             )
 
     def mean_GS_ES(self,state):
@@ -246,7 +250,7 @@ class configuration:
             smooth.append(smoothing)
         return smooth
 
-    def save_txt(self, traj_data, output_name):
+    def save_txt(self, traj_data, error, output_name):
         """Save the value of the volume of the protein without water
 
         Parameters
@@ -260,6 +264,7 @@ class configuration:
         # Compute the mean and the error
         volume_mean = np.mean(concatenated[1])
         volume_mean_error = stats.sem(concatenated[1], axis=None)
+        volume_mean_error += error
         # Save to a single file
         np.savetxt(
             output_name,
@@ -361,11 +366,14 @@ if __name__ == "__main__":
 
     # Get the volume of water
     TIP3P_300K = eau.eau(file_name, error_file)
-    water_volume = TIP3P_300K.density_to_volume()[2]
+    water_volume, water_volume_error = TIP3P_300K.density_to_volume()[2:4]
     # water_volume = 30.72669350142569
 
     # Initialize a protein object
-    HSP90 = protein(path=path, water_file=water_file, water_volume=water_volume)
+    HSP90 = protein(path=path,
+                    water_file=water_file,
+                    water_volume=water_volume,
+                    water_volume_error=water_volume_error)
 
     # Run script to extract all the volume
     # HSP90.extract_volume_command(code=code)
@@ -374,7 +382,7 @@ if __name__ == "__main__":
     ES, GS = HSP90.number_water()
 
     # Remove the water volume
-    # HSP90.remove_water()
+    HSP90.remove_water()
 
     # Plot the result
     output_name = (
