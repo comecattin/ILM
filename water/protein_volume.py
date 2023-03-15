@@ -21,11 +21,14 @@ class protein:
         Parameters
         ----------
         path : str
-            path where the simulation output are
+            Path where the simulation output are
         water_file : str
-            name of the water file
+            Name of the water file
         water_volume : float
-            volume of a water molecule in Angstrom**3
+            Volume of a water molecule in Angstrom**3
+        water_volume : float
+            Error on the estimation of the volume 
+            of a water molecule in Angstrom**3
         """
         # Path
         self.path = path
@@ -108,6 +111,7 @@ class protein:
                         volume_array
                         - self.water_volume * 1e-3 * water_number[0][conf - 1]
                     )
+                    # Get the error
                     error = self.water_volume_error * 1e-3 * water_number[0][conf - 1]
                 if "GS" in name:
                     state = "GS"
@@ -115,6 +119,7 @@ class protein:
                         volume_array
                         - self.water_volume * 1e-3 * water_number[1][conf - 1]
                     )
+                    # Get the error
                     error = self.water_volume_error * 1e-3 * water_number[1][conf - 1]
                 # Append the trajectory data to the list
                 traj_data.append(np.array([time, no_water]))
@@ -257,13 +262,17 @@ class configuration:
         ----------
         traj_data : np.array
             Data containing the volume in each trajectories
+        error : float
+            Error related with the estimation of the water volume
         output_name : str
             Path where to save the file
         """
         concatenated = np.concatenate(traj_data, axis=1)
         # Compute the mean and the error
+        # Error on the mean
         volume_mean = np.mean(concatenated[1])
         volume_mean_error = stats.sem(concatenated[1], axis=None)
+        # Systematic error on the water volume
         volume_mean_error += error
         # Save to a single file
         np.savetxt(
@@ -364,7 +373,7 @@ if __name__ == "__main__":
     error_file = "/home/ccattin/Documents/EAU/Elisa_parameters/computed_by_Come/TIP3P/300K/analysis/errest.xvg"
     code = "/home/ccattin/Documents/Code/GMX/analysis_water_protein"
 
-    # Get the volume of water
+    # Get the volume and its error of water
     TIP3P_300K = eau.eau(file_name, error_file)
     water_volume, water_volume_error = TIP3P_300K.density_to_volume()[2:4]
     # water_volume = 30.72669350142569
