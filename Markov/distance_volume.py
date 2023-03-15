@@ -40,10 +40,36 @@ def load_volume_distance(data_volume,data_distance,state,number):
     
     #Seems that all the .xtc files have been saved less regularly 
     # only take 1/10 of the data on the volume
-    return no_water[::10], d_64_CA_130_CA, d_119_CA_24_CA
+    return no_water[::10], d_64_CA_130_CA, d_119_CA_24_CA, time
 
 def plot_volume_distance_2d(volume,d_64_CA_130_CA,d_119_CA_24_CA):
     fig, ax = plt.subplots()
+    heatmap = ax.scatter(d_64_CA_130_CA,
+                         d_119_CA_24_CA,
+                         c=volume,
+                         cmap='cool',
+                         s=5)
+
+    # Set axis labels and title
+    ax.set_xlabel('64CA-130CA')
+    ax.set_ylabel('119CA-24CA')
+
+    # Add colorbar
+    cbar = fig.colorbar(heatmap)
+    cbar.set_label(r"Volume (nm$^3$)")
+
+    # Show the plot
+    plt.show()
+
+def smoothing(volume,d_1,d_2,time,window_size):
+
+    config = protein_volume.configuration(None,None)
+    smoothed = config.smoothing(time=time,
+                                 no_water=volume,
+                                 window_size = window_size)
+    return (smoothed,
+            d_1[window_size//2:-window_size//2+1],
+            d_2[window_size//2:-window_size//2+1])
 
 
 
@@ -56,7 +82,19 @@ if __name__ == '__main__':
     number = 1
     (volume,
      d_64_CA_130_CA,
-     d_119_CA_24_CA) = load_volume_distance(data_volume=data_volume,
+     d_119_CA_24_CA,
+     time) = load_volume_distance(data_volume=data_volume,
                          data_distance=data_distance,
                          state=state,
                          number=number)
+    plot_volume_distance_2d(volume=volume,
+                            d_64_CA_130_CA=d_64_CA_130_CA,
+                            d_119_CA_24_CA=d_119_CA_24_CA)
+    
+    window_size = [100,1000,3000]
+
+    for window in window_size:
+        smoothed, d1, d2 = smoothing(volume,d_64_CA_130_CA,d_119_CA_24_CA,time,window)
+        plot_volume_distance_2d(volume=smoothed,
+                                d_64_CA_130_CA=d1,
+                                d_119_CA_24_CA=d2)

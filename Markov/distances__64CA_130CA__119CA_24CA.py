@@ -272,7 +272,7 @@ if __name__ == "__main__":
     )
     # %%
     # Plot the density and the free energy landscape associated
-    plot_density_free_energy(data_concatenated, allxtc, timestep, pairNames, OUTDIR, kT)
+    plot_density_free_energy(data_concatenated, allxtc, 0.1, pairNames, OUTDIR, kT)
     #%%
     # Write the results
     write_distance(allxtc, OUTDIR, data)
