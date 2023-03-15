@@ -15,7 +15,7 @@ import seaborn as sns
 class protein:
     """Class of a protein"""
 
-    def __init__(self, path, water_file, water_volume,water_volume_error):
+    def __init__(self, path, water_file, water_volume, water_volume_error):
         """Init function of the protein class
 
         Parameters
@@ -27,7 +27,7 @@ class protein:
         water_volume : float
             Volume of a water molecule in Angstrom**3
         water_volume : float
-            Error on the estimation of the volume 
+            Error on the estimation of the volume
             of a water molecule in Angstrom**3
         """
         # Path
@@ -132,11 +132,10 @@ class protein:
             )
             configuration_i = configuration(number=conf, state=state)
             configuration_i.save_txt(
-                traj_data=traj_data, error=error,
-                output_name=output_concatenated
+                traj_data=traj_data, error=error, output_name=output_concatenated
             )
 
-    def mean_GS_ES(self,state):
+    def mean_GS_ES(self, state):
         """Compute the mean over all the ground or exctited states
 
         Parameters
@@ -379,10 +378,12 @@ if __name__ == "__main__":
     # water_volume = 30.72669350142569
 
     # Initialize a protein object
-    HSP90 = protein(path=path,
-                    water_file=water_file,
-                    water_volume=water_volume,
-                    water_volume_error=water_volume_error)
+    HSP90 = protein(
+        path=path,
+        water_file=water_file,
+        water_volume=water_volume,
+        water_volume_error=water_volume_error,
+    )
 
     # Run script to extract all the volume
     # HSP90.extract_volume_command(code=code)
