@@ -207,14 +207,14 @@ def plot_density_free_energy(
     fig.savefig(f"{OUTDIR}/data_free_energy_direct_from_density.png")
 
 
-def write_distance(allxtc, outdir, data):
+def write_distance(allxtc, OUTDIR, data):
     """Write for every time step and every trajectories the value of the distance
 
     Parameters
     ----------
     allxtc : list of str
         contain all the path to the .xtc files
-    outdir : str
+    OUTDIR : str
         Path where to save the file
     data : list of np.array
         List containing all the data extracted
@@ -222,19 +222,21 @@ def write_distance(allxtc, outdir, data):
     # Explore every trajectory
     for i, name in enumerate(allxtc):
         # Ground state
-        if "/GS" in name:
+        if "GS" in name:
             state = name.split("/")[-1][:4]
             conf = int(state[-2:])
             output_name = os.path.join(OUTDIR, f"GS_{conf}_distance.txt")
+            # Save
+            np.savetxt(output_name, data[i])
         # Exited state
         if "/ES" in name:
             state = name.split("/")[-1][:4]
             conf = int(state[-2:])
             output_name = os.path.join(OUTDIR, f"ES_{conf}_distance.txt")
+            # Save
+            np.savetxt(output_name, data[i])
         else:
             continue
-        # Save
-        np.savetxt(output_name, data[i])
 
 
 if __name__ == "__main__":
@@ -243,11 +245,7 @@ if __name__ == "__main__":
     kT = sp.constants.R * T / 1000
 
     # Input
-    ClusterType = "kmeans"
     DataType = "distances_64CA-130CA_119CA-24CA"
-    LagSteps = 2000
-    ClusterNumber = 500
-    timestep = 0.1
     pairNames = ["64_CA-130_CA", "119_CA-24_CA"]
     # Path definition
     DATA = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC"
