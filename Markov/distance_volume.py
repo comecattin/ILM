@@ -67,14 +67,15 @@ def load_volume_distance_RMSD(data_volume, data_distance, state, number):
     data = np.loadtxt(path_distance)
     d1 = data[:, 0]
     d2 = data[:, 1]
-    rmsd_GS = data[:,2]
-    rmsd_ES = data[:,3]
+    rmsd_GS = data[:, 2]
+    rmsd_ES = data[:, 3]
 
     # Seems that all the .xtc files have been saved less regularly
     # only take 1/10 of the data on the volume
     return no_water[::10], d1, d2, time, rmsd_GS, rmsd_ES
 
-def mean_volume_distance_RMSD(data_volume,data_distance,state):
+
+def mean_volume_distance_RMSD(data_volume, data_distance, state):
     """Get the mean over all the conformation of a state of :
           - Volume
           - Distances
@@ -103,40 +104,36 @@ def mean_volume_distance_RMSD(data_volume,data_distance,state):
         Contain the time average of the RMSD compared to the reference GS at every conformation
     list_mean_rmsd_ES : list
         Contain the time average of the RMSD compared to the reference ES at every conformation
-    
+
     """
-    #Init
+    # Init
     list_mean_volume = []
     list_mean_d1 = []
     list_mean_d2 = []
     list_mean_rmsd_GS = []
     list_mean_rmsd_ES = []
 
-    #Loop over all the configuration
-    for i in range(1,21):
-        (volume,
-         d1, d2,
-         time,
-         rmsd_GS, rmsd_ES) = load_volume_distance_RMSD(data_volume=data_volume,
-                                                       data_distance=data_distance,
-                                                       state=state,
-                                                       number=i)
+    # Loop over all the configuration
+    for i in range(1, 21):
+        (volume, d1, d2, time, rmsd_GS, rmsd_ES) = load_volume_distance_RMSD(
+            data_volume=data_volume, data_distance=data_distance, state=state, number=i
+        )
         list_mean_volume.append(np.mean(volume))
         list_mean_d1.append(np.mean(d1))
         list_mean_d2.append(np.mean(d2))
         list_mean_rmsd_GS.append(np.mean(rmsd_GS))
         list_mean_rmsd_ES.append(np.mean(rmsd_ES))
-    
-    return (list_mean_volume,
-            list_mean_d1,
-            list_mean_d2,
-            list_mean_rmsd_GS,
-            list_mean_rmsd_ES)
+
+    return (
+        list_mean_volume,
+        list_mean_d1,
+        list_mean_d2,
+        list_mean_rmsd_GS,
+        list_mean_rmsd_ES,
+    )
 
 
-
-
-def plot_volume_distance_2d(volume, d1, d2, output,size=2):
+def plot_volume_distance_2d(volume, d1, d2, output, size=2):
     """Scatter plot the volume and the two distances
 
     Parameters
@@ -154,33 +151,25 @@ def plot_volume_distance_2d(volume, d1, d2, output,size=2):
     """
     fig, ax = plt.subplots()
     # Scatter plot
-    heatmap = ax.scatter(d1,
-                         d2,
-                         c=volume,
-                         cmap="cool",
-                         s=size,
-                         vmin=20.7, vmax=21)
+    heatmap = ax.scatter(d1, d2, c=volume, cmap="cool", s=size, vmin=20.7, vmax=21)
 
     # Set axis labels and title
     ax.set_xlabel("64CA-130CA")
     ax.set_ylabel("119CA-24CA")
-    ax.set_xlim(0.9,5)
-    ax.set_ylim(0.25,3.7)
+    ax.set_xlim(0.9, 5)
+    ax.set_ylim(0.25, 3.7)
 
     # Add colorbar
     cbar = fig.colorbar(heatmap)
     cbar.set_label(r"Volume (nm$^3$)")
-    
 
     # Save the plot
     plt.savefig(output, dpi=300, bbox_inches="tight")
     # Show the plot
     plt.show()
 
-def plot_mean(list_mean_volume,
-              data_x,data_y,
-              output,
-              distance=False, rmsd=False):
+
+def plot_mean(list_mean_volume, data_x, data_y, output, distance=False, rmsd=False):
     """Plot the time average
 
     Parameters
@@ -210,24 +199,24 @@ def plot_mean(list_mean_volume,
         raise Exception("Cannot plot RMSD at the same time as distances")
     if not distance and not rmsd:
         raise Exception("Please select distance or RMSD")
-    
-    #Plot
+
+    # Plot
     size = 15
     if distance:
-        plot_volume_distance_2d(volume=list_mean_volume,
-                                d1=data_x,
-                                d2=data_y,
-                                output=output,
-                                size=size)
+        plot_volume_distance_2d(
+            volume=list_mean_volume, d1=data_x, d2=data_y, output=output, size=size
+        )
     if rmsd:
-        plot_volume_rmsd_2d(volume=list_mean_volume,
-                            rmsd_GS=data_x,
-                            rmsd_ES=data_y,
-                            output=output,
-                            size=size)
+        plot_volume_rmsd_2d(
+            volume=list_mean_volume,
+            rmsd_GS=data_x,
+            rmsd_ES=data_y,
+            output=output,
+            size=size,
+        )
 
 
-def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output,size=2):
+def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output, size=2):
     """Scatter plot the volume and the two rmsd
 
     Parameters
@@ -245,23 +234,19 @@ def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output,size=2):
     """
     fig, ax = plt.subplots()
     # Scatter plot
-    heatmap = ax.scatter(rmsd_GS,
-                         rmsd_ES,
-                         c=volume,
-                         cmap="cool",
-                         s=size,
-                         vmin=20.7, vmax=21)
+    heatmap = ax.scatter(
+        rmsd_GS, rmsd_ES, c=volume, cmap="cool", s=size, vmin=20.7, vmax=21
+    )
 
     # Set axis labels and title
     ax.set_xlabel("RMSD GS")
     ax.set_ylabel("RMSD ES")
-    ax.set_xlim(0.3,1)
-    ax.set_ylim(0.3,1)
+    ax.set_xlim(0.3, 1)
+    ax.set_ylim(0.3, 1)
 
     # Add colorbar
     cbar = fig.colorbar(heatmap)
     cbar.set_label(r"Volume (nm$^3$)")
-    
 
     # Save the plot
     plt.savefig(output, dpi=300, bbox_inches="tight")
@@ -311,16 +296,15 @@ if __name__ == "__main__":
     state = "ES"
     number = 2
     # Load data
-    (volume,
-     d_64_CA_130_CA,
-     d_119_CA_24_CA,
-     time,
-     rmsd_GS,
-     rmsd_ES) = load_volume_distance_RMSD(
-        data_volume=data_volume,
-        data_distance=data_distance,
-        state=state,
-        number=number
+    (
+        volume,
+        d_64_CA_130_CA,
+        d_119_CA_24_CA,
+        time,
+        rmsd_GS,
+        rmsd_ES,
+    ) = load_volume_distance_RMSD(
+        data_volume=data_volume, data_distance=data_distance, state=state, number=number
     )
     # Plot the data
     # Distances
@@ -342,29 +326,31 @@ if __name__ == "__main__":
 
     # RMSD
     output = f"/home/ccattin/Documents/Code/outputs/volume_RMSD_{state}{number}.pdf"
-    plot_volume_rmsd_2d(
-        volume=volume, rmsd_GS=rmsd_GS, rmsd_ES=rmsd_ES, output=output
-    )
+    plot_volume_rmsd_2d(volume=volume, rmsd_GS=rmsd_GS, rmsd_ES=rmsd_ES, output=output)
 
-    #Mean
-    (list_mean_volume,
+    # Mean
+    (
+        list_mean_volume,
         list_mean_d1,
         list_mean_d2,
         list_mean_rmsd_GS,
-        list_mean_rmsd_ES) = mean_volume_distance_RMSD(data_volume,
-                                                       data_distance,
-                                                       state)
+        list_mean_rmsd_ES,
+    ) = mean_volume_distance_RMSD(data_volume, data_distance, state)
     #   Distances
     output = f"/home/ccattin/Documents/Code/outputs/volume_distances_mean_{state}.pdf"
-    plot_mean(list_mean_volume=list_mean_volume,
-              data_x=list_mean_d1,
-              data_y=list_mean_d2,
-              output=output,
-              distance=True)
+    plot_mean(
+        list_mean_volume=list_mean_volume,
+        data_x=list_mean_d1,
+        data_y=list_mean_d2,
+        output=output,
+        distance=True,
+    )
     #   RMSD
     output = f"/home/ccattin/Documents/Code/outputs/volume_RMSD_mean_{state}.pdf"
-    plot_mean(list_mean_volume=list_mean_volume,
-              data_x=list_mean_rmsd_GS,
-              data_y=list_mean_rmsd_ES,
-              output=output,
-              rmsd=True)
+    plot_mean(
+        list_mean_volume=list_mean_volume,
+        data_x=list_mean_rmsd_GS,
+        data_y=list_mean_rmsd_ES,
+        output=output,
+        rmsd=True,
+    )
