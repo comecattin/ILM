@@ -37,6 +37,10 @@ def load_volume_distance_RMSD(data_volume, data_distance, state, number):
         Contain the time evolution of the second distance
     time : np.array
         Contain the time
+    rmsd_GS : np.array
+        Contain the time evolution of the RMSD compared to the GS
+    rmsd_ES : np.array
+        Contain the time evolution of the RMSD compared to the ES
     """
 
     # Init a configuration object
@@ -57,7 +61,7 @@ def load_volume_distance_RMSD(data_volume, data_distance, state, number):
         output_name=path_volume
     )
 
-    # Distance
+    # Distance and RMSD
     file_distance = f"{state}_{number}_distance.txt"
     path_distance = os.path.join(data_distance, file_distance)
     data = np.loadtxt(path_distance)
@@ -71,13 +75,44 @@ def load_volume_distance_RMSD(data_volume, data_distance, state, number):
     return no_water[::10], d1, d2, time, rmsd_GS, rmsd_ES
 
 def mean_volume_distance_RMSD(data_volume,data_distance,state):
+    """Get the mean over all the conformation of a state of :
+          - Volume
+          - Distances
+          - RMSDS
+
+
+    Parameters
+    ----------
+     data_volume : str
+        Path where are the volume files
+    data_distance : str
+        Path where are the distance files
+    state : str
+        State of the configuration
+            'GS' or 'ES'
+
+    Returns
+    -------
+    list_mean_volume : list
+        Contain the time average of the volume at every conformation
+    list_mean_d1 : list
+        Contain the time average of the first distance at every conformation
+    list_mean_d2 : list
+        Contain the time average of the second distance at every conformation
+    list_mean_rmsd_GS : list
+        Contain the time average of the RMSD compared to the reference GS at every conformation
+    list_mean_rmsd_ES : list
+        Contain the time average of the RMSD compared to the reference ES at every conformation
     
+    """
+    #Init
     list_mean_volume = []
     list_mean_d1 = []
     list_mean_d2 = []
     list_mean_rmsd_GS = []
     list_mean_rmsd_ES = []
 
+    #Loop over all the configuration
     for i in range(1,21):
         (volume,
          d1, d2,
@@ -114,6 +149,8 @@ def plot_volume_distance_2d(volume, d1, d2, output,size=2):
         Contain the time evolution of the second distance
     output : str
         Path to save the .pdf output file
+    size : float
+        Size of the scatter points, by default 2
     """
     fig, ax = plt.subplots()
     # Scatter plot
@@ -144,11 +181,37 @@ def plot_mean(list_mean_volume,
               data_x,data_y,
               output,
               distance=False, rmsd=False):
-    
+    """Plot the time average
+
+    Parameters
+    ----------
+    list_mean_volume : list
+        Contain the time average of the volume at every conformation
+    data_x : list
+        Data to plot on the x-axis
+    data_y : list
+        Data to plot on the y-axis
+    output : str
+        Path where to save the .pdf output
+    distance : bool, optional
+        True to plot the distances scatter, by default False
+    rmsd : bool, optional
+        True to plot the RMSD scatter, by default False
+
+    Raises
+    ------
+    Exception
+        If distance and rmsd are set to False
+    Exception
+        If distance and rmsd are set to True
+    """
+    # Errors
     if distance and rmsd:
         raise Exception("Cannot plot RMSD at the same time as distances")
     if not distance and not rmsd:
         raise Exception("Please select distance or RMSD")
+    
+    #Plot
     size = 15
     if distance:
         plot_volume_distance_2d(volume=list_mean_volume,
@@ -177,6 +240,8 @@ def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output,size=2):
         Contain the time evolution of the RMSD of the ES
     output : str
         Path to save the .pdf output file
+    size : float
+        Size of the scatter points, by default 2
     """
     fig, ax = plt.subplots()
     # Scatter plot
@@ -281,6 +346,7 @@ if __name__ == "__main__":
         volume=volume, rmsd_GS=rmsd_GS, rmsd_ES=rmsd_ES, output=output
     )
 
+    #Mean
     (list_mean_volume,
         list_mean_d1,
         list_mean_d2,
@@ -288,13 +354,14 @@ if __name__ == "__main__":
         list_mean_rmsd_ES) = mean_volume_distance_RMSD(data_volume,
                                                        data_distance,
                                                        state)
+    #   Distances
     output = f"/home/ccattin/Documents/Code/outputs/volume_distances_mean_{state}.pdf"
     plot_mean(list_mean_volume=list_mean_volume,
               data_x=list_mean_d1,
               data_y=list_mean_d2,
               output=output,
               distance=True)
-    
+    #   RMSD
     output = f"/home/ccattin/Documents/Code/outputs/volume_RMSD_mean_{state}.pdf"
     plot_mean(list_mean_volume=list_mean_volume,
               data_x=list_mean_rmsd_GS,
