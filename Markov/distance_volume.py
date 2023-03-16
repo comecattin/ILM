@@ -204,6 +204,7 @@ if __name__ == "__main__":
         number=number
     )
     # Plot the data
+    # Distances
     output = f"/home/ccattin/Documents/Code/outputs/volume_distance_{state}{number}.pdf"
     plot_volume_distance_2d(
         volume=volume, d1=d_64_CA_130_CA, d2=d_119_CA_24_CA, output=output
@@ -220,6 +221,7 @@ if __name__ == "__main__":
     #     )
     #     plot_volume_distance_2d(volume=smoothed, d1=d1, d2=d2, output=output)
 
+    # RMSD
     output = f"/home/ccattin/Documents/Code/outputs/volume_RMSD_{state}{number}.pdf"
     plot_volume_rmsd_2d(
         volume=volume, rmsd_GS=rmsd_GS, rmsd_ES=rmsd_ES, output=output

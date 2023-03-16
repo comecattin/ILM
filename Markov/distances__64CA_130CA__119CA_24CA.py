@@ -266,7 +266,8 @@ if __name__ == "__main__":
     # Load the date
     # Warning : this can be really long
     data = load_allxtc(allxtc, feat)
-
+    out = os.path.join(OUTDIR,'data.txt')
+    np.savetxt(out,data)
     #%%
     # Plot the histogramm of the features
     data_concatenated = np.concatenate(data)
