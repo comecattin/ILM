@@ -82,7 +82,7 @@ def mean_volume_distance_RMSD(data_volume,data_distance,state):
         (volume,
          d1, d2,
          time,
-         rsmd_GS, rmsd_ES) = load_volume_distance_RMSD(data_volume=data_volume,
+         rmsd_GS, rmsd_ES) = load_volume_distance_RMSD(data_volume=data_volume,
                                                        data_distance=data_distance,
                                                        state=state,
                                                        number=i)
@@ -101,7 +101,7 @@ def mean_volume_distance_RMSD(data_volume,data_distance,state):
 
 
 
-def plot_volume_distance_2d(volume, d1, d2, output):
+def plot_volume_distance_2d(volume, d1, d2, output,size=2):
     """Scatter plot the volume and the two distances
 
     Parameters
@@ -121,14 +121,14 @@ def plot_volume_distance_2d(volume, d1, d2, output):
                          d2,
                          c=volume,
                          cmap="cool",
-                         s=2,
+                         s=size,
                          vmin=20.7, vmax=21)
 
     # Set axis labels and title
     ax.set_xlabel("64CA-130CA")
     ax.set_ylabel("119CA-24CA")
     ax.set_xlim(0.9,5)
-    ax.set_ylim(0.25,3.2)
+    ax.set_ylim(0.25,3.7)
 
     # Add colorbar
     cbar = fig.colorbar(heatmap)
@@ -140,8 +140,31 @@ def plot_volume_distance_2d(volume, d1, d2, output):
     # Show the plot
     plt.show()
 
+def plot_mean(list_mean_volume,
+              data_x,data_y,
+              output,
+              distance=False, rmsd=False):
+    
+    if distance and rmsd:
+        raise Exception("Cannot plot RMSD at the same time as distances")
+    if not distance and not rmsd:
+        raise Exception("Please select distance or RMSD")
+    size = 15
+    if distance:
+        plot_volume_distance_2d(volume=list_mean_volume,
+                                d1=data_x,
+                                d2=data_y,
+                                output=output,
+                                size=size)
+    if rmsd:
+        plot_volume_rmsd_2d(volume=list_mean_volume,
+                            rmsd_GS=data_x,
+                            rmsd_ES=data_y,
+                            output=output,
+                            size=size)
 
-def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output):
+
+def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output,size=2):
     """Scatter plot the volume and the two rmsd
 
     Parameters
@@ -161,13 +184,13 @@ def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output):
                          rmsd_ES,
                          c=volume,
                          cmap="cool",
-                         s=2,
+                         s=size,
                          vmin=20.7, vmax=21)
 
     # Set axis labels and title
     ax.set_xlabel("RMSD GS")
     ax.set_ylabel("RMSD ES")
-    ax.set_xlim(0.2,0.8)
+    ax.set_xlim(0.3,1)
     ax.set_ylim(0.3,1)
 
     # Add colorbar
@@ -265,3 +288,16 @@ if __name__ == "__main__":
         list_mean_rmsd_ES) = mean_volume_distance_RMSD(data_volume,
                                                        data_distance,
                                                        state)
+    output = f"/home/ccattin/Documents/Code/outputs/volume_distances_mean_{state}.pdf"
+    plot_mean(list_mean_volume=list_mean_volume,
+              data_x=list_mean_d1,
+              data_y=list_mean_d2,
+              output=output,
+              distance=True)
+    
+    output = f"/home/ccattin/Documents/Code/outputs/volume_RMSD_mean_{state}.pdf"
+    plot_mean(list_mean_volume=list_mean_volume,
+              data_x=list_mean_rmsd_GS,
+              data_y=list_mean_rmsd_ES,
+              output=output,
+              rmsd=True)
