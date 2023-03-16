@@ -70,6 +70,36 @@ def load_volume_distance_RMSD(data_volume, data_distance, state, number):
     # only take 1/10 of the data on the volume
     return no_water[::10], d1, d2, time, rmsd_GS, rmsd_ES
 
+def mean_volume_distance_RMSD(data_volume,data_distance,state):
+    
+    list_mean_volume = []
+    list_mean_d1 = []
+    list_mean_d2 = []
+    list_mean_rmsd_GS = []
+    list_mean_rmsd_ES = []
+
+    for i in range(1,21):
+        (volume,
+         d1, d2,
+         time,
+         rsmd_GS, rmsd_ES) = load_volume_distance_RMSD(data_volume=data_volume,
+                                                       data_distance=data_distance,
+                                                       state=state,
+                                                       number=i)
+        list_mean_volume.append(np.mean(volume))
+        list_mean_d1.append(np.mean(d1))
+        list_mean_d2.append(np.mean(d2))
+        list_mean_rmsd_GS.append(np.mean(rmsd_GS))
+        list_mean_rmsd_ES.append(np.mean(rmsd_ES))
+    
+    return (list_mean_volume,
+            list_mean_d1,
+            list_mean_d2,
+            list_mean_rmsd_GS,
+            list_mean_rmsd_ES)
+
+
+
 
 def plot_volume_distance_2d(volume, d1, d2, output):
     """Scatter plot the volume and the two distances
@@ -109,6 +139,7 @@ def plot_volume_distance_2d(volume, d1, d2, output):
     plt.savefig(output, dpi=300, bbox_inches="tight")
     # Show the plot
     plt.show()
+
 
 def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output):
     """Scatter plot the volume and the two rmsd
@@ -226,3 +257,11 @@ if __name__ == "__main__":
     plot_volume_rmsd_2d(
         volume=volume, rmsd_GS=rmsd_GS, rmsd_ES=rmsd_ES, output=output
     )
+
+    (list_mean_volume,
+        list_mean_d1,
+        list_mean_d2,
+        list_mean_rmsd_GS,
+        list_mean_rmsd_ES) = mean_volume_distance_RMSD(data_volume,
+                                                       data_distance,
+                                                       state)
