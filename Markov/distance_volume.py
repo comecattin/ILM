@@ -12,8 +12,8 @@ sys.path.append("/home/ccattin/Documents/Code/water/")
 import protein_volume
 
 
-def load_volume_distance(data_volume, data_distance, state, number):
-    """Load the volume and distances from their .txt
+def load_volume_distance_RMSD(data_volume, data_distance, state, number):
+    """Load the volume, distances and RMSD from their .txt
 
     Parameters
     ----------
@@ -61,12 +61,14 @@ def load_volume_distance(data_volume, data_distance, state, number):
     file_distance = f"{state}_{number}_distance.txt"
     path_distance = os.path.join(data_distance, file_distance)
     data = np.loadtxt(path_distance)
-    d_64_CA_130_CA = data[:, 0]
-    d_119_CA_24_CA = data[:, 1]
+    d1 = data[:, 0]
+    d2 = data[:, 1]
+    rmsd_GS = data[:,2]
+    rmsd_ES = data[:,3]
 
     # Seems that all the .xtc files have been saved less regularly
     # only take 1/10 of the data on the volume
-    return no_water[::10], d_64_CA_130_CA, d_119_CA_24_CA, time
+    return no_water[::10], d1, d2, time, rmsd_GS, rmsd_ES
 
 
 def plot_volume_distance_2d(volume, d1, d2, output):
@@ -85,15 +87,62 @@ def plot_volume_distance_2d(volume, d1, d2, output):
     """
     fig, ax = plt.subplots()
     # Scatter plot
-    heatmap = ax.scatter(d1, d2, c=volume, cmap="cool", s=5)
+    heatmap = ax.scatter(d1,
+                         d2,
+                         c=volume,
+                         cmap="cool",
+                         s=2,
+                         vmin=20.7, vmax=21)
 
     # Set axis labels and title
     ax.set_xlabel("64CA-130CA")
     ax.set_ylabel("119CA-24CA")
+    ax.set_xlim(0.9,5)
+    ax.set_ylim(0.25,3.2)
 
     # Add colorbar
     cbar = fig.colorbar(heatmap)
     cbar.set_label(r"Volume (nm$^3$)")
+    
+
+    # Save the plot
+    plt.savefig(output, dpi=300, bbox_inches="tight")
+    # Show the plot
+    plt.show()
+
+def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output):
+    """Scatter plot the volume and the two rmsd
+
+    Parameters
+    ----------
+    volume : np.array
+        Contain the volume of the protein without water
+    rmsd_GS : np.array
+        Contain the time evolution of the RMSD of the GS
+    rmsd_ES : np.array
+        Contain the time evolution of the RMSD of the ES
+    output : str
+        Path to save the .pdf output file
+    """
+    fig, ax = plt.subplots()
+    # Scatter plot
+    heatmap = ax.scatter(rmsd_GS,
+                         rmsd_ES,
+                         c=volume,
+                         cmap="cool",
+                         s=2,
+                         vmin=20.7, vmax=21)
+
+    # Set axis labels and title
+    ax.set_xlabel("RMSD GS")
+    ax.set_ylabel("RMSD ES")
+    ax.set_xlim(0.2,0.8)
+    ax.set_ylim(0.3,1)
+
+    # Add colorbar
+    cbar = fig.colorbar(heatmap)
+    cbar.set_label(r"Volume (nm$^3$)")
+    
 
     # Save the plot
     plt.savefig(output, dpi=300, bbox_inches="tight")
@@ -140,25 +189,38 @@ if __name__ == "__main__":
     DATA = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC"
     data_volume = "/home/ccattin/Documents/EAU/HSP90_simulation"
     data_distance = "/home/ccattin/Documents/Markov/volume_pressure/Output_distances_64CA-130CA_119CA-24CA"
-    state = "GS"
-    number = 1
+    state = "ES"
+    number = 2
     # Load data
-    (volume, d_64_CA_130_CA, d_119_CA_24_CA, time) = load_volume_distance(
-        data_volume=data_volume, data_distance=data_distance, state=state, number=number
+    (volume,
+     d_64_CA_130_CA,
+     d_119_CA_24_CA,
+     time,
+     rmsd_GS,
+     rmsd_ES) = load_volume_distance_RMSD(
+        data_volume=data_volume,
+        data_distance=data_distance,
+        state=state,
+        number=number
     )
     # Plot the data
-    output = f"/home/ccattin/Documents/Code/outputs/volume_distance.pdf"
+    output = f"/home/ccattin/Documents/Code/outputs/volume_distance_{state}{number}.pdf"
     plot_volume_distance_2d(
         volume=volume, d1=d_64_CA_130_CA, d2=d_119_CA_24_CA, output=output
     )
 
     # Plot for different window sizes
-    window_size = [100, 1000, 3000]
-    for window in window_size:
-        smoothed, d1, d2 = smoothing(
-            volume, d_64_CA_130_CA, d_119_CA_24_CA, time, window
-        )
-        output = (
-            f"/home/ccattin/Documents/Code/outputs/volume_distance_smooth_{window}.pdf"
-        )
-        plot_volume_distance_2d(volume=smoothed, d1=d1, d2=d2, output=output)
+    # window_size = [100, 1000, 3000]
+    # for window in window_size:
+    #     smoothed, d1, d2 = smoothing(
+    #         volume, d_64_CA_130_CA, d_119_CA_24_CA, time, window
+    #     )
+    #     output = (
+    #         f"/home/ccattin/Documents/Code/outputs/volume_distance_smooth_{state}{number}_{window}.pdf"
+    #     )
+    #     plot_volume_distance_2d(volume=smoothed, d1=d1, d2=d2, output=output)
+
+    output = f"/home/ccattin/Documents/Code/outputs/volume_RMSD_{state}{number}.pdf"
+    plot_volume_rmsd_2d(
+        volume=volume, rmsd_GS=rmsd_GS, rmsd_ES=rmsd_ES, output=output
+    )
