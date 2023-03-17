@@ -2,15 +2,12 @@
 """Extract and write distance"""
 import matplotlib.pyplot as plt
 import numpy as np
-import pyemma
 import os
 import sys
 
-import distances__64CA_130CA__119CA_24CA as distances
-
 sys.path.append("/home/ccattin/Documents/Code/water/")
 import protein_volume
-
+import seaborn as sns
 
 def load_volume_distance_RMSD(data_volume, data_distance, state, number):
     """Load the volume, distances and RMSD from their .txt
@@ -332,6 +329,16 @@ def plot_global_vision(state, output, distance=False, rmsd=False):
 
     plt.show()
 
+def plot_volume_properties_time(volume,property,property_title,output):
+    fig, ax = plt.subplots()
+    color = sns.color_palette('cool',12)[6]
+    ax.scatter(property,volume,color=color)
+    ax.set_xlabel(property_title)
+    ax.set_ylabel(r'Volume (nm$^3$)')
+    ax.grid()
+    plt.savefig(output, dpi=300, bbox_inches="tight")
+    plt.show()
+
 
 def smoothing(volume, d_1, d_2, time, window_size):
     """Smooth the volume
@@ -441,3 +448,12 @@ if __name__ == "__main__":
     #   Distances
     output = f"/home/ccattin/Documents/Code/outputs/global_distances_{state}.pdf"
     plot_global_vision(state, output, distance=True)
+
+    #Vizualise precise properties
+    prop = rmsd_ES
+    property_title = 'RMSD ES'
+    output = f"/home/ccattin/Documents/Code/outputs/volume_{property_title}_{state}{number}.pdf"
+    plot_volume_properties_time(volume=volume,
+                                property=prop,
+                                property_title=property_title,
+                                output=output)
