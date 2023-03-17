@@ -16,3 +16,6 @@ Repository of the different codes developed during my M2 insternship at the ILM
   
 ## Outputs
   Test outputs of the various script done.
+
+## Markov
+  Various codes that use MSM or PyEmma
