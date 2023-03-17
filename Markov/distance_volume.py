@@ -166,7 +166,46 @@ def plot_volume_distance_2d(volume, d1, d2, output, size=2):
     # Save the plot
     plt.savefig(output, dpi=300, bbox_inches="tight")
     # Show the plot
-    plt.show()
+    #plt.show()
+    return ax
+
+def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output, size=2):
+    """Scatter plot the volume and the two rmsd
+
+    Parameters
+    ----------
+    volume : np.array
+        Contain the volume of the protein without water
+    rmsd_GS : np.array
+        Contain the time evolution of the RMSD of the GS
+    rmsd_ES : np.array
+        Contain the time evolution of the RMSD of the ES
+    output : str
+        Path to save the .pdf output file
+    size : float
+        Size of the scatter points, by default 2
+    """
+    fig, ax = plt.subplots()
+    # Scatter plot
+    heatmap = ax.scatter(
+        rmsd_GS, rmsd_ES, c=volume, cmap="cool", s=size, vmin=20.7, vmax=21
+    )
+
+    # Set axis labels and title
+    ax.set_xlabel("RMSD GS")
+    ax.set_ylabel("RMSD ES")
+    ax.set_xlim(0.3, 1)
+    ax.set_ylim(0.3, 1)
+
+    # Add colorbar
+    cbar = fig.colorbar(heatmap)
+    cbar.set_label(r"Volume (nm$^3$)")
+
+    # Save the plot
+    #plt.savefig(output, dpi=300, bbox_inches="tight")
+    # Show the plot
+    #plt.show()
+    return fig, ax
 
 
 def plot_mean(list_mean_volume, data_x, data_y, output, distance=False, rmsd=False):
@@ -216,43 +255,33 @@ def plot_mean(list_mean_volume, data_x, data_y, output, distance=False, rmsd=Fal
         )
 
 
-def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output, size=2):
-    """Scatter plot the volume and the two rmsd
 
-    Parameters
-    ----------
-    volume : np.array
-        Contain the volume of the protein without water
-    rmsd_GS : np.array
-        Contain the time evolution of the RMSD of the GS
-    rmsd_ES : np.array
-        Contain the time evolution of the RMSD of the ES
-    output : str
-        Path to save the .pdf output file
-    size : float
-        Size of the scatter points, by default 2
-    """
-    fig, ax = plt.subplots()
-    # Scatter plot
-    heatmap = ax.scatter(
-        rmsd_GS, rmsd_ES, c=volume, cmap="cool", s=size, vmin=20.7, vmax=21
-    )
+def plot_global_vision(state,output):
+    fig,ax = plt.subplots(5,4,
+                          figsize=(10,10),
+                          sharex=True,sharey=True)
+    for conf in range(ax.size):
+        i,j = np.unravel_index(conf,ax.shape)
+        conf +=1
+        (volume,
+         d1, d2,
+         time,
+         rmsd_GS,
+         rmsd_ES) = load_volume_distance_RMSD(
+            data_volume=data_volume, data_distance=data_distance, state=state, number=conf
+        )
+        heatmap = ax[i,j].scatter(
+            rmsd_GS,rmsd_ES,c=volume,cmap='cool',s=2,vmin=20.7,vmax=21
+        )
+        ax[i,j].set_xlabel("RMSD GS")
+        ax[i,j].set_ylabel("RMSD ES")
+        ax[i,j].set_xlim(0.3, 1)
+        ax[i,j].set_ylim(0.3, 1)
 
-    # Set axis labels and title
-    ax.set_xlabel("RMSD GS")
-    ax.set_ylabel("RMSD ES")
-    ax.set_xlim(0.3, 1)
-    ax.set_ylim(0.3, 1)
-
-    # Add colorbar
-    cbar = fig.colorbar(heatmap)
+    cbar_ax = fig.add_axes([0.95, 0.1, 0.02, 0.8])
+    cbar = fig.colorbar(heatmap, cax=cbar_ax)
     cbar.set_label(r"Volume (nm$^3$)")
-
-    # Save the plot
-    plt.savefig(output, dpi=300, bbox_inches="tight")
-    # Show the plot
     plt.show()
-
 
 def smoothing(volume, d_1, d_2, time, window_size):
     """Smooth the volume
@@ -288,12 +317,18 @@ def smoothing(volume, d_1, d_2, time, window_size):
     )
 
 
+
+
+
+
+
+
 if __name__ == "__main__":
     # Define paths
     DATA = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC"
     data_volume = "/home/ccattin/Documents/EAU/HSP90_simulation"
     data_distance = "/home/ccattin/Documents/Markov/volume_pressure/Output_distances_64CA-130CA_119CA-24CA"
-    state = "ES"
+    state = "GS"
     number = 2
     # Load data
     (
@@ -354,3 +389,5 @@ if __name__ == "__main__":
         output=output,
         rmsd=True,
     )
+
+    plot_global_vision(state,output)
