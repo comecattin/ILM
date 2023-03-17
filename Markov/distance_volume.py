@@ -202,10 +202,9 @@ def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output, size=2):
     cbar.set_label(r"Volume (nm$^3$)")
 
     # Save the plot
-    #plt.savefig(output, dpi=300, bbox_inches="tight")
+    plt.savefig(output, dpi=300, bbox_inches="tight")
     # Show the plot
-    #plt.show()
-    return fig, ax
+    plt.show()
 
 
 def plot_mean(list_mean_volume, data_x, data_y, output, distance=False, rmsd=False):
@@ -256,7 +255,12 @@ def plot_mean(list_mean_volume, data_x, data_y, output, distance=False, rmsd=Fal
 
 
 
-def plot_global_vision(state,output):
+def plot_global_vision(state,output,distance=False,rmsd=False):
+
+    error = distance and rmsd or not distance and not rmsd
+    if error:
+        raise Exception("Please select only one distance or rmsd to True")
+
     fig,ax = plt.subplots(5,4,
                           figsize=(10,10),
                           sharex=True,sharey=True)
@@ -273,14 +277,19 @@ def plot_global_vision(state,output):
         heatmap = ax[i,j].scatter(
             rmsd_GS,rmsd_ES,c=volume,cmap='cool',s=2,vmin=20.7,vmax=21
         )
-        ax[i,j].set_xlabel("RMSD GS")
-        ax[i,j].set_ylabel("RMSD ES")
-        ax[i,j].set_xlim(0.3, 1)
+        ax[i,j].set_xlim(0.2, 1)
         ax[i,j].set_ylim(0.3, 1)
+        ax[i,j].set_xticks((0.2,0.4,0.6,0.8))
 
     cbar_ax = fig.add_axes([0.95, 0.1, 0.02, 0.8])
     cbar = fig.colorbar(heatmap, cax=cbar_ax)
     cbar.set_label(r"Volume (nm$^3$)")
+    fig.text(0.5, 0.04, "RMSD GS", ha="center", va="center")
+    fig.text(0.06, 0.5, "RMSD ES", ha="center", va="center", rotation="vertical")
+    fig.subplots_adjust(wspace=0, hspace=0)
+
+    plt.savefig(output, dpi=300, bbox_inches="tight")
+
     plt.show()
 
 def smoothing(volume, d_1, d_2, time, window_size):
@@ -390,4 +399,6 @@ if __name__ == "__main__":
         rmsd=True,
     )
 
+    # Global vision
+    output = f"/home/ccattin/Documents/Code/outputs/global_RMSD_{state}.pdf"
     plot_global_vision(state,output)
