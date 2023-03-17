@@ -251,7 +251,7 @@ class configuration:
 
         # If only one value of window size
         if type(window_size) == int:
-            weights = np.repeat(1.0, window_size) / window_size
+            weights = np.ones(window_size) / window_size
             smoothing = np.convolve(no_water, weights, "valid")
 
             return smoothing

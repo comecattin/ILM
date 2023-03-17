@@ -166,8 +166,7 @@ def plot_volume_distance_2d(volume, d1, d2, output, size=2):
     # Save the plot
     plt.savefig(output, dpi=300, bbox_inches="tight")
     # Show the plot
-    # plt.show()
-    return ax
+    plt.show()
 
 
 def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output, size=2):
@@ -373,7 +372,7 @@ if __name__ == "__main__":
     DATA = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC"
     data_volume = "/home/ccattin/Documents/EAU/HSP90_simulation"
     data_distance = "/home/ccattin/Documents/Markov/volume_pressure/Output_distances_64CA-130CA_119CA-24CA"
-    state = "GS"
+    state = "ES"
     number = 2
     # Load data
     (
