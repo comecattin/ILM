@@ -166,8 +166,9 @@ def plot_volume_distance_2d(volume, d1, d2, output, size=2):
     # Save the plot
     plt.savefig(output, dpi=300, bbox_inches="tight")
     # Show the plot
-    #plt.show()
+    # plt.show()
     return ax
+
 
 def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output, size=2):
     """Scatter plot the volume and the two rmsd
@@ -254,8 +255,7 @@ def plot_mean(list_mean_volume, data_x, data_y, output, distance=False, rmsd=Fal
         )
 
 
-
-def plot_global_vision(state,output,distance=False,rmsd=False):
+def plot_global_vision(state, output, distance=False, rmsd=False):
     """Plot all the conformation in one state
 
     Parameters
@@ -273,57 +273,54 @@ def plot_global_vision(state,output,distance=False,rmsd=False):
     Raises
     ------
     Exception
-        Exception is raised if both RMSD and distances are selected 
+        Exception is raised if both RMSD and distances are selected
         or if none of them are
     """
-    #Error handling
+    # Error handling
     error = distance and rmsd or not distance and not rmsd
     if error:
         raise Exception("Please select only one distance or rmsd to True")
 
-    #Init
-    fig,ax = plt.subplots(5,4,
-                          figsize=(10,10),
-                          sharex=True,sharey=True)
-    #Loop over all the conformation
+    # Init
+    fig, ax = plt.subplots(5, 4, figsize=(10, 10), sharex=True, sharey=True)
+    # Loop over all the conformation
     for conf in range(ax.size):
-        i,j = np.unravel_index(conf,ax.shape)
-        conf +=1
-        (volume,
-         d1, d2,
-         time,
-         rmsd_GS,
-         rmsd_ES) = load_volume_distance_RMSD(
-            data_volume=data_volume, data_distance=data_distance, state=state, number=conf
+        i, j = np.unravel_index(conf, ax.shape)
+        conf += 1
+        (volume, d1, d2, time, rmsd_GS, rmsd_ES) = load_volume_distance_RMSD(
+            data_volume=data_volume,
+            data_distance=data_distance,
+            state=state,
+            number=conf,
         )
-        
-        #Plot the RMSD
+
+        # Plot the RMSD
         if rmsd:
-            heatmap = ax[i,j].scatter(
-                rmsd_GS,rmsd_ES,c=volume,cmap='cool',s=2,vmin=20.7,vmax=21
+            heatmap = ax[i, j].scatter(
+                rmsd_GS, rmsd_ES, c=volume, cmap="cool", s=2, vmin=20.7, vmax=21
             )
 
-            xlim = (0.2,1)
-            ylim = (0.3,1)
+            xlim = (0.2, 1)
+            ylim = (0.3, 1)
             xlabel = "RMSD GS"
             ylabel = "RMSD ES"
-            xticks = (0.2,0.4,0.6,0.8)
-        
-        #Plot the distance
+            xticks = (0.2, 0.4, 0.6, 0.8)
+
+        # Plot the distance
         if distance:
-            heatmap = ax[i,j].scatter(
-                d1,d2,c=volume,cmap='cool',s=2,vmin=20.7,vmax=21
+            heatmap = ax[i, j].scatter(
+                d1, d2, c=volume, cmap="cool", s=2, vmin=20.7, vmax=21
             )
-            
+
             xlim = (0.9, 5)
             ylim = (0.25, 3.7)
             xlabel = "64CA-130CA"
             ylabel = "119CA-24CA"
-            xticks = (2,4)
-            
-        ax[i,j].set_xlim(xlim)
-        ax[i,j].set_ylim(ylim)
-        ax[i,j].set_xticks(xticks)
+            xticks = (2, 4)
+
+        ax[i, j].set_xlim(xlim)
+        ax[i, j].set_ylim(ylim)
+        ax[i, j].set_xticks(xticks)
 
     cbar_ax = fig.add_axes([0.95, 0.1, 0.02, 0.8])
     cbar = fig.colorbar(heatmap, cax=cbar_ax)
@@ -335,6 +332,7 @@ def plot_global_vision(state,output,distance=False,rmsd=False):
     plt.savefig(output, dpi=300, bbox_inches="tight")
 
     plt.show()
+
 
 def smoothing(volume, d_1, d_2, time, window_size):
     """Smooth the volume
@@ -368,12 +366,6 @@ def smoothing(volume, d_1, d_2, time, window_size):
         d_1[window_size // 2 : -window_size // 2 + 1],
         d_2[window_size // 2 : -window_size // 2 + 1],
     )
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
@@ -446,7 +438,7 @@ if __name__ == "__main__":
     # Global vision
     output = f"/home/ccattin/Documents/Code/outputs/global_RMSD_{state}.pdf"
     #   RMSD
-    plot_global_vision(state,output,rmsd=True)
+    plot_global_vision(state, output, rmsd=True)
     #   Distances
     output = f"/home/ccattin/Documents/Code/outputs/global_distances_{state}.pdf"
-    plot_global_vision(state,output,distance=True)
+    plot_global_vision(state, output, distance=True)
