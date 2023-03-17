@@ -12,8 +12,8 @@ sys.path.append("/home/ccattin/Documents/Code/water/")
 import protein_volume
 
 
-def load_volume_distance(data_volume, data_distance, state, number):
-    """Load the volume and distances from their .txt
+def load_volume_distance_RMSD(data_volume, data_distance, state, number):
+    """Load the volume, distances and RMSD from their .txt
 
     Parameters
     ----------
@@ -37,6 +37,10 @@ def load_volume_distance(data_volume, data_distance, state, number):
         Contain the time evolution of the second distance
     time : np.array
         Contain the time
+    rmsd_GS : np.array
+        Contain the time evolution of the RMSD compared to the GS
+    rmsd_ES : np.array
+        Contain the time evolution of the RMSD compared to the ES
     """
 
     # Init a configuration object
@@ -57,19 +61,79 @@ def load_volume_distance(data_volume, data_distance, state, number):
         output_name=path_volume
     )
 
-    # Distance
+    # Distance and RMSD
     file_distance = f"{state}_{number}_distance.txt"
     path_distance = os.path.join(data_distance, file_distance)
     data = np.loadtxt(path_distance)
-    d_64_CA_130_CA = data[:, 0]
-    d_119_CA_24_CA = data[:, 1]
+    d1 = data[:, 0]
+    d2 = data[:, 1]
+    rmsd_GS = data[:, 2]
+    rmsd_ES = data[:, 3]
 
     # Seems that all the .xtc files have been saved less regularly
     # only take 1/10 of the data on the volume
-    return no_water[::10], d_64_CA_130_CA, d_119_CA_24_CA, time
+    return no_water[::10], d1, d2, time, rmsd_GS, rmsd_ES
 
 
-def plot_volume_distance_2d(volume, d1, d2, output):
+def mean_volume_distance_RMSD(data_volume, data_distance, state):
+    """Get the mean over all the conformation of a state of :
+          - Volume
+          - Distances
+          - RMSDS
+
+
+    Parameters
+    ----------
+     data_volume : str
+        Path where are the volume files
+    data_distance : str
+        Path where are the distance files
+    state : str
+        State of the configuration
+            'GS' or 'ES'
+
+    Returns
+    -------
+    list_mean_volume : list
+        Contain the time average of the volume at every conformation
+    list_mean_d1 : list
+        Contain the time average of the first distance at every conformation
+    list_mean_d2 : list
+        Contain the time average of the second distance at every conformation
+    list_mean_rmsd_GS : list
+        Contain the time average of the RMSD compared to the reference GS at every conformation
+    list_mean_rmsd_ES : list
+        Contain the time average of the RMSD compared to the reference ES at every conformation
+
+    """
+    # Init
+    list_mean_volume = []
+    list_mean_d1 = []
+    list_mean_d2 = []
+    list_mean_rmsd_GS = []
+    list_mean_rmsd_ES = []
+
+    # Loop over all the configuration
+    for i in range(1, 21):
+        (volume, d1, d2, time, rmsd_GS, rmsd_ES) = load_volume_distance_RMSD(
+            data_volume=data_volume, data_distance=data_distance, state=state, number=i
+        )
+        list_mean_volume.append(np.mean(volume))
+        list_mean_d1.append(np.mean(d1))
+        list_mean_d2.append(np.mean(d2))
+        list_mean_rmsd_GS.append(np.mean(rmsd_GS))
+        list_mean_rmsd_ES.append(np.mean(rmsd_ES))
+
+    return (
+        list_mean_volume,
+        list_mean_d1,
+        list_mean_d2,
+        list_mean_rmsd_GS,
+        list_mean_rmsd_ES,
+    )
+
+
+def plot_volume_distance_2d(volume, d1, d2, output, size=2):
     """Scatter plot the volume and the two distances
 
     Parameters
@@ -82,14 +146,18 @@ def plot_volume_distance_2d(volume, d1, d2, output):
         Contain the time evolution of the second distance
     output : str
         Path to save the .pdf output file
+    size : float
+        Size of the scatter points, by default 2
     """
     fig, ax = plt.subplots()
     # Scatter plot
-    heatmap = ax.scatter(d1, d2, c=volume, cmap="cool", s=5)
+    heatmap = ax.scatter(d1, d2, c=volume, cmap="cool", s=size, vmin=20.7, vmax=21)
 
     # Set axis labels and title
     ax.set_xlabel("64CA-130CA")
     ax.set_ylabel("119CA-24CA")
+    ax.set_xlim(0.9, 5)
+    ax.set_ylim(0.25, 3.7)
 
     # Add colorbar
     cbar = fig.colorbar(heatmap)
@@ -98,6 +166,170 @@ def plot_volume_distance_2d(volume, d1, d2, output):
     # Save the plot
     plt.savefig(output, dpi=300, bbox_inches="tight")
     # Show the plot
+    plt.show()
+
+
+def plot_volume_rmsd_2d(volume, rmsd_GS, rmsd_ES, output, size=2):
+    """Scatter plot the volume and the two rmsd
+
+    Parameters
+    ----------
+    volume : np.array
+        Contain the volume of the protein without water
+    rmsd_GS : np.array
+        Contain the time evolution of the RMSD of the GS
+    rmsd_ES : np.array
+        Contain the time evolution of the RMSD of the ES
+    output : str
+        Path to save the .pdf output file
+    size : float
+        Size of the scatter points, by default 2
+    """
+    fig, ax = plt.subplots()
+    # Scatter plot
+    heatmap = ax.scatter(
+        rmsd_GS, rmsd_ES, c=volume, cmap="cool", s=size, vmin=20.7, vmax=21
+    )
+
+    # Set axis labels and title
+    ax.set_xlabel("RMSD GS")
+    ax.set_ylabel("RMSD ES")
+    ax.set_xlim(0.3, 1)
+    ax.set_ylim(0.3, 1)
+
+    # Add colorbar
+    cbar = fig.colorbar(heatmap)
+    cbar.set_label(r"Volume (nm$^3$)")
+
+    # Save the plot
+    plt.savefig(output, dpi=300, bbox_inches="tight")
+    # Show the plot
+    plt.show()
+
+
+def plot_mean(list_mean_volume, data_x, data_y, output, distance=False, rmsd=False):
+    """Plot the time average
+
+    Parameters
+    ----------
+    list_mean_volume : list
+        Contain the time average of the volume at every conformation
+    data_x : list
+        Data to plot on the x-axis
+    data_y : list
+        Data to plot on the y-axis
+    output : str
+        Path where to save the .pdf output
+    distance : bool, optional
+        True to plot the distances scatter, by default False
+    rmsd : bool, optional
+        True to plot the RMSD scatter, by default False
+
+    Raises
+    ------
+    Exception
+        If distance and rmsd are set to False
+    Exception
+        If distance and rmsd are set to True
+    """
+    # Errors
+    if distance and rmsd:
+        raise Exception("Cannot plot RMSD at the same time as distances")
+    if not distance and not rmsd:
+        raise Exception("Please select distance or RMSD")
+
+    # Plot
+    size = 15
+    if distance:
+        plot_volume_distance_2d(
+            volume=list_mean_volume, d1=data_x, d2=data_y, output=output, size=size
+        )
+    if rmsd:
+        plot_volume_rmsd_2d(
+            volume=list_mean_volume,
+            rmsd_GS=data_x,
+            rmsd_ES=data_y,
+            output=output,
+            size=size,
+        )
+
+
+def plot_global_vision(state, output, distance=False, rmsd=False):
+    """Plot all the conformation in one state
+
+    Parameters
+    ----------
+    state : str
+        State of the configuration
+            'GS' or 'ES'
+    output : str
+        Path where to save the output .pdf
+    distance : bool, optional
+        Plot the distance, by default False
+    rmsd : bool, optional
+        Plot the RMSD, by default False
+
+    Raises
+    ------
+    Exception
+        Exception is raised if both RMSD and distances are selected
+        or if none of them are
+    """
+    # Error handling
+    error = distance and rmsd or not distance and not rmsd
+    if error:
+        raise Exception("Please select only one distance or rmsd to True")
+
+    # Init
+    fig, ax = plt.subplots(5, 4, figsize=(10, 10), sharex=True, sharey=True)
+    # Loop over all the conformation
+    for conf in range(ax.size):
+        i, j = np.unravel_index(conf, ax.shape)
+        conf += 1
+        (volume, d1, d2, time, rmsd_GS, rmsd_ES) = load_volume_distance_RMSD(
+            data_volume=data_volume,
+            data_distance=data_distance,
+            state=state,
+            number=conf,
+        )
+
+        # Plot the RMSD
+        if rmsd:
+            heatmap = ax[i, j].scatter(
+                rmsd_GS, rmsd_ES, c=volume, cmap="cool", s=2, vmin=20.7, vmax=21
+            )
+
+            xlim = (0.2, 1)
+            ylim = (0.3, 1)
+            xlabel = "RMSD GS"
+            ylabel = "RMSD ES"
+            xticks = (0.2, 0.4, 0.6, 0.8)
+
+        # Plot the distance
+        if distance:
+            heatmap = ax[i, j].scatter(
+                d1, d2, c=volume, cmap="cool", s=2, vmin=20.7, vmax=21
+            )
+
+            xlim = (0.9, 5)
+            ylim = (0.25, 3.7)
+            xlabel = "64CA-130CA"
+            ylabel = "119CA-24CA"
+            xticks = (2, 4)
+
+        ax[i, j].set_xlim(xlim)
+        ax[i, j].set_ylim(ylim)
+        ax[i, j].set_xticks(xticks)
+
+    cbar_ax = fig.add_axes([0.95, 0.1, 0.02, 0.8])
+    cbar = fig.colorbar(heatmap, cax=cbar_ax)
+    cbar.set_label(r"Volume (nm$^3$)")
+    fig.text(0.5, 0.04, xlabel, ha="center", va="center")
+    fig.text(0.06, 0.5, ylabel, ha="center", va="center", rotation="vertical")
+    fig.subplots_adjust(wspace=0, hspace=0)
+
+    plt.savefig(output, dpi=300, bbox_inches="tight")
+
     plt.show()
 
 
@@ -140,25 +372,72 @@ if __name__ == "__main__":
     DATA = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC"
     data_volume = "/home/ccattin/Documents/EAU/HSP90_simulation"
     data_distance = "/home/ccattin/Documents/Markov/volume_pressure/Output_distances_64CA-130CA_119CA-24CA"
-    state = "GS"
-    number = 1
+    state = "ES"
+    number = 2
     # Load data
-    (volume, d_64_CA_130_CA, d_119_CA_24_CA, time) = load_volume_distance(
+    (
+        volume,
+        d_64_CA_130_CA,
+        d_119_CA_24_CA,
+        time,
+        rmsd_GS,
+        rmsd_ES,
+    ) = load_volume_distance_RMSD(
         data_volume=data_volume, data_distance=data_distance, state=state, number=number
     )
     # Plot the data
-    output = f"/home/ccattin/Documents/Code/outputs/volume_distance.pdf"
+    # Distances
+    output = f"/home/ccattin/Documents/Code/outputs/volume_distance_{state}{number}.pdf"
     plot_volume_distance_2d(
         volume=volume, d1=d_64_CA_130_CA, d2=d_119_CA_24_CA, output=output
     )
 
     # Plot for different window sizes
-    window_size = [100, 1000, 3000]
-    for window in window_size:
-        smoothed, d1, d2 = smoothing(
-            volume, d_64_CA_130_CA, d_119_CA_24_CA, time, window
-        )
-        output = (
-            f"/home/ccattin/Documents/Code/outputs/volume_distance_smooth_{window}.pdf"
-        )
-        plot_volume_distance_2d(volume=smoothed, d1=d1, d2=d2, output=output)
+    # window_size = [100, 1000, 3000]
+    # for window in window_size:
+    #     smoothed, d1, d2 = smoothing(
+    #         volume, d_64_CA_130_CA, d_119_CA_24_CA, time, window
+    #     )
+    #     output = (
+    #         f"/home/ccattin/Documents/Code/outputs/volume_distance_smooth_{state}{number}_{window}.pdf"
+    #     )
+    #     plot_volume_distance_2d(volume=smoothed, d1=d1, d2=d2, output=output)
+
+    # RMSD
+    output = f"/home/ccattin/Documents/Code/outputs/volume_RMSD_{state}{number}.pdf"
+    plot_volume_rmsd_2d(volume=volume, rmsd_GS=rmsd_GS, rmsd_ES=rmsd_ES, output=output)
+
+    # Mean
+    (
+        list_mean_volume,
+        list_mean_d1,
+        list_mean_d2,
+        list_mean_rmsd_GS,
+        list_mean_rmsd_ES,
+    ) = mean_volume_distance_RMSD(data_volume, data_distance, state)
+    #   Distances
+    output = f"/home/ccattin/Documents/Code/outputs/volume_distances_mean_{state}.pdf"
+    plot_mean(
+        list_mean_volume=list_mean_volume,
+        data_x=list_mean_d1,
+        data_y=list_mean_d2,
+        output=output,
+        distance=True,
+    )
+    #   RMSD
+    output = f"/home/ccattin/Documents/Code/outputs/volume_RMSD_mean_{state}.pdf"
+    plot_mean(
+        list_mean_volume=list_mean_volume,
+        data_x=list_mean_rmsd_GS,
+        data_y=list_mean_rmsd_ES,
+        output=output,
+        rmsd=True,
+    )
+
+    # Global vision
+    output = f"/home/ccattin/Documents/Code/outputs/global_RMSD_{state}.pdf"
+    #   RMSD
+    plot_global_vision(state, output, rmsd=True)
+    #   Distances
+    output = f"/home/ccattin/Documents/Code/outputs/global_distances_{state}.pdf"
+    plot_global_vision(state, output, distance=True)

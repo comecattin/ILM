@@ -110,7 +110,7 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
     return pairsListIndices
 
 
-def pyemma_feat(pdb, pairNames, refGS):
+def pyemma_feat(pdb, pairNames, refGS, refES):
     """Get the features
 
     Parameters
@@ -135,6 +135,8 @@ def pyemma_feat(pdb, pairNames, refGS):
     )
     # Add the feature
     feat.add_distances(indices=pair_indices, periodic=True, indices2=None)
+    feat.add_minrmsd_to_ref(refGS)
+    feat.add_minrmsd_to_ref(refES)
 
     return feat
 
@@ -207,8 +209,9 @@ def plot_density_free_energy(
     fig.savefig(f"{OUTDIR}/data_free_energy_direct_from_density.png")
 
 
-def write_distance(allxtc, OUTDIR, data):
-    """Write for every time step and every trajectories the value of the distance
+def write_distance_RMSD(allxtc, OUTDIR, data):
+    """Write for every time step and every trajectories
+    the value of the distance and of the RMSD
 
     Parameters
     ----------
@@ -257,13 +260,14 @@ if __name__ == "__main__":
     #       and the features
     pdb, refGS, refES, allxtc = get_dir(DATA, OUTDIR)
     indices = create_pairIndices_from_pairNames(pdbfilename=refGS, pairNames=pairNames)
-    feat = pyemma_feat(pdb, pairNames, refGS)
+    feat = pyemma_feat(pdb, pairNames, refGS, refES)
 
     #%%
     # Load the date
     # Warning : this can be really long
     data = load_allxtc(allxtc, feat)
-
+    out = os.path.join(OUTDIR,'data.txt')
+    np.savetxt(out,data)
     #%%
     # Plot the histogramm of the features
     data_concatenated = np.concatenate(data)
@@ -275,5 +279,5 @@ if __name__ == "__main__":
     plot_density_free_energy(data_concatenated, allxtc, 0.1, pairNames, OUTDIR, kT)
     #%%
     # Write the results
-    write_distance(allxtc, OUTDIR, data)
+    write_distance_RMSD(allxtc, OUTDIR, data)
 # %%

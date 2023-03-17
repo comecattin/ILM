@@ -15,15 +15,18 @@ import seaborn as sns
 class protein:
     """Class of a protein"""
 
-    def __init__(self, path, water_file, water_volume, water_volume_error):
+    def __init__(self, path = '',
+                 water_file = ['',''],
+                 water_volume = None,
+                 water_volume_error = None):
         """Init function of the protein class
 
         Parameters
         ----------
         path : str
             Path where the simulation output are
-        water_file : str
-            Name of the water file
+        water_file : list of str
+            Name of the water files
         water_volume : float
             Volume of a water molecule in Angstrom**3
         water_volume : float
@@ -248,7 +251,7 @@ class configuration:
 
         # If only one value of window size
         if type(window_size) == int:
-            weights = np.repeat(1.0, window_size) / window_size
+            weights = np.ones(window_size) / window_size
             smoothing = np.convolve(no_water, weights, "valid")
 
             return smoothing
