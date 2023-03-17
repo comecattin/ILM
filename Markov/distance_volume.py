@@ -274,18 +274,35 @@ def plot_global_vision(state,output,distance=False,rmsd=False):
          rmsd_ES) = load_volume_distance_RMSD(
             data_volume=data_volume, data_distance=data_distance, state=state, number=conf
         )
-        heatmap = ax[i,j].scatter(
-            rmsd_GS,rmsd_ES,c=volume,cmap='cool',s=2,vmin=20.7,vmax=21
-        )
-        ax[i,j].set_xlim(0.2, 1)
-        ax[i,j].set_ylim(0.3, 1)
+        if rmsd:
+            heatmap = ax[i,j].scatter(
+                rmsd_GS,rmsd_ES,c=volume,cmap='cool',s=2,vmin=20.7,vmax=21
+            )
+
+            xlim = (0.2,1)
+            ylim = (0.3,1)
+            xlabel = "RMSD GS"
+            ylabel = "RMSD ES"
+        
+        if distance:
+            heatmap = ax[i,j].scatter(
+                d1,d2,c=volume,cmap='cool',s=2,vmin=20.7,vmax=21
+            )
+            
+            xlim = (0.9, 5)
+            ylim = (0.25, 3.7)
+            xlabel = "64CA-130CA"
+            ylabel = "119CA-24CA"
+            
+        ax[i,j].set_xlim(xlim)
+        ax[i,j].set_ylim(ylim)
         ax[i,j].set_xticks((0.2,0.4,0.6,0.8))
 
     cbar_ax = fig.add_axes([0.95, 0.1, 0.02, 0.8])
     cbar = fig.colorbar(heatmap, cax=cbar_ax)
     cbar.set_label(r"Volume (nm$^3$)")
-    fig.text(0.5, 0.04, "RMSD GS", ha="center", va="center")
-    fig.text(0.06, 0.5, "RMSD ES", ha="center", va="center", rotation="vertical")
+    fig.text(0.5, 0.04, xlabel, ha="center", va="center")
+    fig.text(0.06, 0.5, ylabel, ha="center", va="center", rotation="vertical")
     fig.subplots_adjust(wspace=0, hspace=0)
 
     plt.savefig(output, dpi=300, bbox_inches="tight")
@@ -401,4 +418,4 @@ if __name__ == "__main__":
 
     # Global vision
     output = f"/home/ccattin/Documents/Code/outputs/global_RMSD_{state}.pdf"
-    plot_global_vision(state,output)
+    plot_global_vision(state,output,rmsd=True)
