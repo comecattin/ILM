@@ -301,6 +301,7 @@ def plot_global_vision(state, output, distance=False, rmsd=False):
             xlabel = "RMSD GS"
             ylabel = "RMSD ES"
             xticks = (0.2, 0.4, 0.6, 0.8)
+            ax[i,j].text(xlim[-1]-0.1,ylim[-1]-0.1,str(conf))
 
         # Plot the distance
         if distance:
@@ -313,10 +314,12 @@ def plot_global_vision(state, output, distance=False, rmsd=False):
             xlabel = "64CA-130CA"
             ylabel = "119CA-24CA"
             xticks = (2, 4)
+            ax[i,j].text(xlim[-1]-0.5,ylim[-1]-0.5,str(conf))
 
         ax[i, j].set_xlim(xlim)
         ax[i, j].set_ylim(ylim)
         ax[i, j].set_xticks(xticks)
+        
 
     cbar_ax = fig.add_axes([0.95, 0.1, 0.02, 0.8])
     cbar = fig.colorbar(heatmap, cax=cbar_ax)
@@ -379,7 +382,7 @@ if __name__ == "__main__":
     DATA = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC"
     data_volume = "/home/ccattin/Documents/EAU/HSP90_simulation"
     data_distance = "/home/ccattin/Documents/Markov/volume_pressure/Output_distances_64CA-130CA_119CA-24CA"
-    state = "ES"
+    state = "GS"
     number = 2
     # Load data
     (
