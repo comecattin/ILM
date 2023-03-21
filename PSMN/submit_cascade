@@ -5,12 +5,13 @@
 #
 #SBATCH -p Cascade
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=64
-#SBATCH --cpus-per-task=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=64
 #SBATCH --time=2-00:00:00           # day-hours:minutes:seconds
-#SBATCH --mem=1G
+#SBATCH --mem=64G
 #
 shopt -s extglob
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 code_dir=/home/ccattin/Stage/Code
 echo "The job ${SLURM_JOB_ID} is running on these nodes:"
 echo ${SLURM_NODELIST}
@@ -27,7 +28,7 @@ mkdir -p $SCRATCH
 cp -r !(*.err|*.out) $SCRATCH/
 cd $SCRATCH/
 #Script to run
-$code_dir/PSMN/runGMX_PSMN $SLURM_NTASKS
+$code_dir/PSMN/runGMX_PSMN $SLURM_CPUS_PER_TASK
 
 cd $SCRATCH/
 mv $SCRATCH/* $SLURM_SUBMIT_DIR
