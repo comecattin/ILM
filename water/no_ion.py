@@ -46,7 +46,21 @@ class no_ion:
                 t_Vprot_mean_error = config.load_txt(concatenated)
                 self.state_dict[name[5:9]].append(t_Vprot_mean_error)
 
+    def no_water(self):
+        self.waterless = {}
+        for state in self.state_dict:
 
+            #in nm^3
+            water_volume = self.state_dict[state][0]
+            water_error = self.state_dict[state][1]
+
+            time = self.state_dict[state][-1][0]
+            protein_volume = self.state_dict[state][-1][1]
+            
+            waterless = protein_volume - water_volume
+
+            self.waterless[state] = [time,waterless]
+        
 
 
 
@@ -65,3 +79,4 @@ if __name__ == '__main__':
     NoIon = no_ion(path_water,path_protein)
     NoIon.mean_volume()
     NoIon.get_total_volume_simulation()
+    NoIon.no_water()
