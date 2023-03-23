@@ -230,7 +230,34 @@ class configuration:
         """
         self.num = number
         self.state = state
-
+    
+    def concatenate(self,path):
+        for name in os.listdir(path):
+            if self.state+"{:02d}".format(self.num) in name:
+                traj_data = []
+                for traj in range(1,11):
+                    # File names
+                    volume_file = os.path.join(
+                        path, name, "volume_md_" + str(traj) + ".xvg"
+                    )
+                    error_file = os.path.join(
+                        path, name, "errest_md_" + str(traj) + ".xvg"
+                    )
+                    # Extract the volume
+                    volume = xtract.gromacs_output(
+                        file_name=volume_file, error_file=error_file
+                    )
+                    time, volume_array = volume.extract()
+                    # Append the trajectory data to the list
+                    traj_data.append(np.array([time, volume_array]))
+                # Concatenate the trajectory data
+                output_concatenated = os.path.join(
+                    path, name, "md_concatenated.txt"
+                )
+                self.save_txt(
+                    traj_data=traj_data, error=0, output_name=output_concatenated
+                )
+                    
     def smoothing(self, time, no_water, window_size):
         """Do a rolling average
 
