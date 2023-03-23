@@ -8,7 +8,7 @@ python_water_code_dir=$code_dir/water/eau_CLI.py
 #            Analysis             #
 ###################################
 cd $run_dir
-for dir in *JeanZay
+for dir in *JeanZay*
 do
     cd $dir
     for edr_file in md_*.edr
