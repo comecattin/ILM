@@ -3,9 +3,11 @@
 Extract the volume of the water + ions and get the protein volume
 """
 import numpy as np
+import matplotlib.pyplot as plt
 import extract_gmx_energy as xtract
 import os
 import protein_volume
+import seaborn as sns
 
 class no_ion:
 
@@ -61,7 +63,29 @@ class no_ion:
 
             self.waterless[state] = [time,waterless]
         
+    def plot_volume_state(self,output):
+        fig, axs = plt.subplots(len(self.waterless),
+                                sharex=True,
+                                figsize=(5,7))
+        color = sns.color_palette('cool',12)
+        for i, state in enumerate(self.waterless):
+            x = self.waterless[state][0]
+            y = self.waterless[state][1]
+            
+            config = protein_volume.configuration(None,None)
+            smooth = config.smoothing(x,y,100)
 
+            axs[i].plot(x,y,color[6])
+            axs[i].plot(smooth,label='Smoothed')
+            axs[i].text(0,32.5,state)
+            axs[i].set_ylim(24,34)
+            axs[i].set_xlim(0,100000)
+        axs[0].legend()
+        fig.subplots_adjust(wspace=0, hspace=0)
+        fig.text(0.5, 0.04, 'Time (ps)', ha="center", va="center")
+        fig.text(0.03, 0.5, r'Volume (nm$^3$)', ha="center", va="center", rotation="vertical")
+        plt.savefig(output, dpi=300, bbox_inches="tight")
+        plt.show()  
 
 
 
@@ -76,7 +100,9 @@ class no_ion:
 if __name__ == '__main__':
     path_water = '/home/ccattin/Documents/EAU/NO_COUNTERIONS'
     path_protein = '/home/ccattin/Documents/EAU/HSP90_simulation'
+    output = '/home/ccattin/Documents/Code/outputs/no_ion.pdf'
     NoIon = no_ion(path_water,path_protein)
     NoIon.mean_volume()
     NoIon.get_total_volume_simulation()
     NoIon.no_water()
+    NoIon.plot_volume_state(output=output)
