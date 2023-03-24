@@ -9,10 +9,11 @@ import os
 import protein_volume
 import seaborn as sns
 
+
 class no_ion:
     """Class for the extraction of volume without ions"""
 
-    def __init__(self,path_water,path_protein):
+    def __init__(self, path_water, path_protein):
         """Init function of the class
 
         Parameters
@@ -24,7 +25,7 @@ class no_ion:
         """
         self.path_water = path_water
         self.path_protein = path_protein
-        #Initialyze a dictionnary that will contain all the properties
+        # Initialyze a dictionnary that will contain all the properties
         self.state_dict = {}
 
     def mean_volume(self):
@@ -32,28 +33,21 @@ class no_ion:
 
         Update the state_dict with the mean and the error on the volume
         """
-        #Init
+        # Init
         state_dict = {}
-        #Every directory in the data path
+        # Every directory in the data path
         for name in os.listdir(self.path_water):
             state = name[5:9]
             # File path
-            volume_file = os.path.join(
-                self.path_water,name,'volume_md_11.xvg'
-            )
-            error_file = os.path.join(
-                self.path_water,name,'errest_md_11.xvg'
-            )
-            ouput = xtract.gromacs_output(
-                file_name=volume_file,
-                error_file=error_file
-            )
-            #Get the mean and error and append
+            volume_file = os.path.join(self.path_water, name, "volume_md_11.xvg")
+            error_file = os.path.join(self.path_water, name, "errest_md_11.xvg")
+            ouput = xtract.gromacs_output(file_name=volume_file, error_file=error_file)
+            # Get the mean and error and append
             mean_error = ouput.analyze()
             state_dict[state] = list(mean_error)
         self.state_dict = state_dict
-        
-    def get_total_volume_simulation(self,concatenate=False):
+
+    def get_total_volume_simulation(self, concatenate=False):
         """Get the total volume of the protein simulation (protein + water + ions)
 
         Parameters
@@ -61,7 +55,7 @@ class no_ion:
         concatenate : bool, optional
             Concatenate or not the simulation results in a .txt file,
                 by default False
-        
+
         Update the state_dict with a tupple containig :
         time : np.array
             Contain the time of the simulation
@@ -72,17 +66,17 @@ class no_ion:
         error : float
             Error on the time average of the volume
         """
-        #Every directories in the data path
+        # Every directories in the data path
         for name in os.listdir(path_protein):
             if name[5:9] in self.state_dict:
-                config = protein_volume.configuration(int(name[7:9]),name[5:7])
-                #Concatenate the result
+                config = protein_volume.configuration(int(name[7:9]), name[5:7])
+                # Concatenate the result
                 if concatenate:
                     config.concatenate(self.path_protein)
                 concatenated = os.path.join(
-                    self.path_protein,name,'md_concatenated.txt'
-                    )
-                #Extract the result
+                    self.path_protein, name, "md_concatenated.txt"
+                )
+                # Extract the result
                 t_Vprot_mean_error = config.load_txt(concatenated)
                 self.state_dict[name[5:9]].append(t_Vprot_mean_error)
 
@@ -96,24 +90,24 @@ class no_ion:
             Volume of the protein
         """
         self.waterless = {}
-        #Every configuration in the state_dict
+        # Every configuration in the state_dict
         for state in self.state_dict:
             # Extract data
-            #in nm^3
+            # in nm^3
             water_volume = self.state_dict[state][0]
             water_error = self.state_dict[state][1]
 
             time = self.state_dict[state][-1][0]
             protein_volume = self.state_dict[state][-1][1]
-            
-            #Remove the water
+
+            # Remove the water
             waterless = protein_volume - water_volume
-            #Append to the dictionnary
-            self.waterless[state] = [time,waterless]
-        
-    def plot_volume_state(self,output):
+            # Append to the dictionnary
+            self.waterless[state] = [time, waterless]
+
+    def plot_volume_state(self, output):
         """Plot the results from the no_water function
-        
+
         Volume of the protein as a function of time
 
         Parameters
@@ -122,70 +116,68 @@ class no_ion:
             Path to the output .pdf file
         """
         # Init
-        fig, axs = plt.subplots(len(self.waterless),
-                                sharex=True,
-                                figsize=(5,7))
-        color = sns.color_palette('cool',12)
-        
+        fig, axs = plt.subplots(len(self.waterless), sharex=True, figsize=(5, 7))
+        color = sns.color_palette("cool", 12)
+
         # Do a plot per state
         for i, state in enumerate(self.waterless):
-            #Time
+            # Time
             x = self.waterless[state][0]
-            #Volume
+            # Volume
             y = self.waterless[state][1]
-            
-            #Smooth the result
-            config = protein_volume.configuration(None,None)
-            smooth = config.smoothing(x,y,100)
 
-            #Volume vs time
-            axs[i].plot(x,y,color=color[6])
-            #Smoothed vs time
-            axs[i].plot(smooth,label='Smoothed')
-            
-            #Put the state name in the plot
-            axs[i].text(0,32.5,state)
-            axs[i].set_ylim(24,34)
-            axs[i].set_xlim(0,100000)
+            # Smooth the result
+            config = protein_volume.configuration(None, None)
+            smooth = config.smoothing(x, y, 100)
+
+            # Volume vs time
+            axs[i].plot(x, y, color=color[6])
+            # Smoothed vs time
+            axs[i].plot(smooth, label="Smoothed")
+
+            # Put the state name in the plot
+            axs[i].text(0, 32.5, state)
+            axs[i].set_ylim(24, 34)
+            axs[i].set_xlim(0, 100000)
         axs[0].legend()
         fig.subplots_adjust(wspace=0, hspace=0)
-        fig.text(0.5, 0.04, 'Time (ps)', ha="center", va="center")
-        fig.text(0.03, 0.5, r'Volume (nm$^3$)', ha="center", va="center", rotation="vertical")
+        fig.text(0.5, 0.04, "Time (ps)", ha="center", va="center")
+        fig.text(
+            0.03, 0.5, r"Volume (nm$^3$)", ha="center", va="center", rotation="vertical"
+        )
         plt.savefig(output, dpi=300, bbox_inches="tight")
-        plt.show()  
+        plt.show()
 
     def results(self):
-        """Print the results
-        """
-        #Header
-        print("State    Water    Error Water    Total    Total error    Protein    Protein error")
+        """Print the results"""
+        # Header
+        print(
+            "State    Water    Error Water    Total    Total error    Protein    Protein error"
+        )
         for state in self.state_dict:
-            #Everything in nm^3
-            #Water volume
+            # Everything in nm^3
+            # Water volume
             water = self.state_dict[state][0]
-            #Error on the water volume
+            # Error on the water volume
             water_error = self.state_dict[state][1]
-            #Total volume of the system (protein + water + ions)
+            # Total volume of the system (protein + water + ions)
             total = self.state_dict[state][-1][2]
-            #Error on the total system volume
+            # Error on the total system volume
             total_error = self.state_dict[state][-1][3]
-            #Protein only volume
+            # Protein only volume
             protein = total - water
-            #Associated error
+            # Associated error
             protein_error = total_error + water_error
-            print(f"{state}: {water} {water_error} {total} {total_error} {protein} {protein_error}")
+            print(
+                f"{state}: {water} {water_error} {total} {total_error} {protein} {protein_error}"
+            )
 
 
-
-
-
-
-
-if __name__ == '__main__':
-    path_water = '/home/ccattin/Documents/EAU/NO_COUNTERIONS'
-    path_protein = '/home/ccattin/Documents/EAU/HSP90_simulation'
-    output = '/home/ccattin/Documents/Code/outputs/no_ion.pdf'
-    NoIon = no_ion(path_water,path_protein)
+if __name__ == "__main__":
+    path_water = "/home/ccattin/Documents/EAU/NO_COUNTERIONS"
+    path_protein = "/home/ccattin/Documents/EAU/HSP90_simulation"
+    output = "/home/ccattin/Documents/Code/outputs/no_ion.pdf"
+    NoIon = no_ion(path_water, path_protein)
     NoIon.mean_volume()
     NoIon.get_total_volume_simulation()
     NoIon.no_water()
