@@ -75,7 +75,7 @@ class no_ion:
             config = protein_volume.configuration(None,None)
             smooth = config.smoothing(x,y,100)
 
-            axs[i].plot(x,y,color[6])
+            axs[i].plot(x,y,color=color[6])
             axs[i].plot(smooth,label='Smoothed')
             axs[i].text(0,32.5,state)
             axs[i].set_ylim(24,34)
@@ -87,9 +87,16 @@ class no_ion:
         plt.savefig(output, dpi=300, bbox_inches="tight")
         plt.show()  
 
-
-
-
+    def results(self):
+        print("State    Water    Error Water    Total    Total error    Protein    Protein error")
+        for state in self.state_dict:
+            water = self.state_dict[state][0]
+            water_error = self.state_dict[state][1]
+            total = self.state_dict[state][-1][2]
+            total_error = self.state_dict[state][-1][3]
+            protein = total - water
+            protein_error = total_error + water_error
+            print(f"{state}: {water} {water_error} {total} {total_error} {protein} {protein_error}")
 
 
 
@@ -105,4 +112,5 @@ if __name__ == '__main__':
     NoIon.mean_volume()
     NoIon.get_total_volume_simulation()
     NoIon.no_water()
-    NoIon.plot_volume_state(output=output)
+    #NoIon.plot_volume_state(output=output)
+    NoIon.results()
