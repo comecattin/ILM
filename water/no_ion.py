@@ -35,6 +35,7 @@ class no_ion:
         """
         # Init
         state_dict = {}
+        water = {}
         # Every directory in the data path
         for name in os.listdir(self.path_water):
             state = name[5:9]
@@ -45,7 +46,9 @@ class no_ion:
             # Get the mean and error and append
             mean_error = ouput.analyze()
             state_dict[state] = list(mean_error)
+            water[state] = ouput.extract()
         self.state_dict = state_dict
+        self.water = water
 
     def get_total_volume_simulation(self, concatenate=False):
         """Get the total volume of the protein simulation (protein + water + ions)
@@ -172,6 +175,50 @@ class no_ion:
                 f"{state}: {water} {water_error} {total} {total_error} {protein} {protein_error}"
             )
 
+    def confidence_intervals(self, n1, s1, n2, s2):
+        
+        sp2 = ((n1 - 1) * s1**2 + (n2 - 1) * s2**2) / (n1 + n2 - 2)
+        error = np.sqrt(sp2 * (1/n1 + 1/n2))
+
+        return error
+
+
+    def error_using_variance(self):
+        self.error = {}
+        self.error_state = {}
+        excited = []
+        ground = []
+        for state in self.state_dict:
+
+            water = self.water[state][1]
+            n_water = len(water)
+            var_water = np.var(water)
+
+            total = self.state_dict[state][-1][1]
+            n_total = len(total)
+            var_total = np.var(total)
+
+            error  = self.confidence_intervals(n_total,var_total,n_water,var_water)
+            self.error[state] = error
+
+            water_mean = self.state_dict[state][0]
+            total_mean = total = self.state_dict[state][-1][2]
+            protein = total_mean - water_mean
+            if 'ES' in state:
+                excited.append(protein)
+            if 'GS' in state:
+                ground.append(protein)
+            
+        mean_ES = np.mean(excited)
+        mean_GS = np.mean(ground)
+        n_ES = len(excited)
+        n_GS = len(ground)
+        var_ES = np.var(excited)
+        var_GS = np.var(ground)
+        diff = mean_ES - mean_GS
+        error_diff = self.confidence_intervals(n_ES,var_ES,n_GS,var_GS)
+        self.error_state = [diff, error_diff]
+
 
 if __name__ == "__main__":
     path_water = "/home/ccattin/Documents/EAU/NO_COUNTERIONS"
@@ -181,5 +228,6 @@ if __name__ == "__main__":
     NoIon.mean_volume()
     NoIon.get_total_volume_simulation()
     NoIon.no_water()
-    NoIon.plot_volume_state(output=output)
+    #NoIon.plot_volume_state(output=output)
     NoIon.results()
+    NoIon.error_using_variance()
