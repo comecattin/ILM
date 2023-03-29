@@ -174,6 +174,8 @@ class no_ion:
             print(
                 f"{state}: {water} {water_error} {total} {total_error} {protein} {protein_error}"
             )
+        diff, error_diff = self.error_state
+        print(f"ES - GS = {diff} +/- {error_diff}")
 
     def confidence_intervals(self, n1, s1, n2, s2):
         
@@ -229,5 +231,5 @@ if __name__ == "__main__":
     NoIon.get_total_volume_simulation()
     NoIon.no_water()
     #NoIon.plot_volume_state(output=output)
-    NoIon.results()
     NoIon.error_using_variance()
+    NoIon.results()
