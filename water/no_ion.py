@@ -32,6 +32,7 @@ class no_ion:
         """Compute the mean volume of the water + ions
 
         Update the state_dict with the mean and the error on the volume
+        Update the water dictionnary with all the data on the volume of the system
         """
         # Init
         state_dict = {}
@@ -46,6 +47,7 @@ class no_ion:
             # Get the mean and error and append
             mean_error = ouput.analyze()
             state_dict[state] = list(mean_error)
+            #Get all the data
             water[state] = ouput.extract()
         self.state_dict = state_dict
         self.water = water
@@ -174,10 +176,29 @@ class no_ion:
             print(
                 f"{state}: {water} {water_error} {total} {total_error} {protein} {protein_error}"
             )
+        #Difference between the ES and GS
         diff, error_diff = self.error_state
         print(f"ES - GS = {diff} +/- {error_diff}")
 
     def confidence_intervals(self, n1, s1, n2, s2):
+        """Compute the confidence interval of the difference
+
+        Parameters
+        ----------
+        n1 : int
+            Number of data points for the first object
+        s1 : float
+            Variance of the first object
+        n2 : int
+            Number of data points for the second object
+        s2 : float
+            Variance of the second object
+        
+        Returns
+        -------
+        error : float
+            Associated error to the difference
+        """
         
         sp2 = ((n1 - 1) * s1**2 + (n2 - 1) * s2**2) / (n1 + n2 - 2)
         error = np.sqrt(sp2 * (1/n1 + 1/n2))
@@ -186,39 +207,54 @@ class no_ion:
 
 
     def error_using_variance(self):
+        """Compute the error using the variance
+
+        Create and update the error and error_state dictionnary
+        """
+        # Init
         self.error = {}
         self.error_state = {}
         excited = []
         ground = []
+
+        # Loop over all the state
         for state in self.state_dict:
 
+            # Get data on the solvent
             water = self.water[state][1]
             n_water = len(water)
             var_water = np.var(water)
 
+            # Get data on the total system
             total = self.state_dict[state][-1][1]
             n_total = len(total)
             var_total = np.var(total)
 
+            #Compute the error and append
             error  = self.confidence_intervals(n_total,var_total,n_water,var_water)
             self.error[state] = error
 
+            #Get the protein-only volume
             water_mean = self.state_dict[state][0]
             total_mean = total = self.state_dict[state][-1][2]
             protein = total_mean - water_mean
+            # Append to the correct list
             if 'ES' in state:
                 excited.append(protein)
             if 'GS' in state:
                 ground.append(protein)
-            
+        
+        # Gather data for all the GS and ES
         mean_ES = np.mean(excited)
         mean_GS = np.mean(ground)
         n_ES = len(excited)
         n_GS = len(ground)
         var_ES = np.var(excited)
         var_GS = np.var(ground)
+        #Compute the difference of the mean and the associated error
         diff = mean_ES - mean_GS
         error_diff = self.confidence_intervals(n_ES,var_ES,n_GS,var_GS)
+        # Append
         self.error_state = [diff, error_diff]
 
 
@@ -233,3 +269,4 @@ if __name__ == "__main__":
     #NoIon.plot_volume_state(output=output)
     NoIon.error_using_variance()
     NoIon.results()
+    
