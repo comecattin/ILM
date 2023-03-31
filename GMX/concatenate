@@ -5,7 +5,7 @@ run_dir=$(pwd)
 #Concatenate all for one state
 for state in *
 do
-    gmx trjcat -cat -f $state/step_*/production/*.xtc -dt 1000 -o $state/concatenated.xtc
+    gmx trjcat -cat -f $state/step_{1..10}/production/prod.xtc -dt 1000 -o $state/concatenated.xtc
 done
 
 #Concatenated for GS and ES
