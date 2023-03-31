@@ -200,8 +200,8 @@ class no_ion:
             Associated error to the difference
         """
 
-        sp2 = ((n1 - 1) * s1**2 + (n2 - 1) * s2**2) / (n1 + n2 - 2)
-        error = np.sqrt(sp2 * (1 / n1 + 1 / n2))
+        sp2 = ((n1 - 1) * s1 + (n2 - 1) * s2) / (n1 + n2 - 2)
+        error = np.sqrt(sp2 * (1 / n1 + 1 / n2)) * 3.182
 
         return error
 
