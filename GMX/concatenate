@@ -44,8 +44,9 @@ do
     mkdir -p $ana_dir
     for step in step_*
     do
-        remove_solv $run_dir $state $step    
+        remove_solv $run_dir $state $step &   
     done
+    wait
 
     cd $run_dir/$state
     gmx trjcat -cat -f step_{1..10}/analysis/prod_prot_fit.xtc -dt 1000 -o $ana_dir/concatenated.xtc
