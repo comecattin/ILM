@@ -1,0 +1,16 @@
+#! /bin/bash
+
+run_dir=$(pwd)
+
+#Concatenate all for one state
+for state in *
+do
+    gmx trjcat -cat -f $state/step_*/production/*.xtc -dt 1000 -o $state/concatenated.xtc
+done
+
+#Concatenated for GS and ES
+gmx trjcat -cat -f GS*/concatenated.xtc -o GS.xtc
+gmx trjcat -cat -f ES*/concatenated.xtc -o ES.xtc
+
+#Concatenate all the trajectories
+gmx trjcat -cat -f GS.xtc ES.xtc -o all.xtc
