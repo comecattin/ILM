@@ -42,14 +42,21 @@ do
     cd $state
     ana_dir=$run_dir/$state/analysis
     mkdir -p $ana_dir
-    for step in step_*
-    do
-        remove_solv $run_dir $state $step &   
-    done
+    # for step in step_*
+    # do
+    #     remove_solv $run_dir $state $step &   
+    # done
     wait
 
     cd $run_dir/$state
-    gmx trjcat -cat -f step_{1..10}/analysis/prod_prot_fit.xtc -dt 1000 -o $ana_dir/concatenated.xtc
+
+    #Create a file filled with 'c'
+    for i in {1..10}
+    do
+        echo c >> $ana_dir/input_trajcat.txt
+    done
+
+    gmx trjcat -overwrite -f step_{1..10}/analysis/prod_prot_fit.xtc -dt 10000 -o $ana_dir/concatenated.xtc -settime < $ana_dir/input_trajcat.txt
     cd $run_dir
 done
 
@@ -59,8 +66,14 @@ ana_dir_total=$run_dir/analysis
 mkdir -p $ana_dir_total
 
 #Concatenated for GS and ES
-gmx trjcat -cat -f GS*/analysis/concatenated.xtc -o $ana_dir_total/GS.xtc
-gmx trjcat -cat -f ES*/analysis/concatenated.xtc -o $ana_dir_total/ES.xtc
+
+for i in {1..20}
+do
+    echo c >> $ana_dir_total/input_trajcat_state.txt
+done
+
+gmx trjcat -overwrite -f GS*/analysis/concatenated.xtc -o $ana_dir_total/GS.xtc -settime < $ana_dir_total/input_trajcat_state.txt
+gmx trjcat -overwrite -f ES*/analysis/concatenated.xtc -o $ana_dir_total/ES.xtc -settime < $ana_dir_total/input_trajcat_state.txt
 
 #Concatenate all the trajectories
-gmx trjcat -cat -f $ana_dir_total/GS.xtc $ana_dir_total/ES.xtc -o $ana_dir_total/all.xtc
+printf 'c\nc\n' | gmx trjcat -overwrite -f $ana_dir_total/GS.xtc $ana_dir_total/ES.xtc -o $ana_dir_total/all.xtc -settime
