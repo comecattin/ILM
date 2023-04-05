@@ -13,23 +13,23 @@ remove_solv () {
     ana_step=$run_dir/$state/$step/analysis
     mkdir -p $ana_step
     cd $ana_step
-    ln -s $run_dir/$state/step_0/minimization/em.gro .
+    ln -s $run_dir/$state/$step/production/prod.tpr .
     ln -s $run_dir/$state/$step/production/prod.xtc .
     ln -s $run_dir/$state/$step/production/prod.gro .
 
     #Compact system
         #XTC
-    echo 'Protein' 'System' | gmx trjconv -s em.gro -f prod.xtc -pbc mol -ur compact -center -o prod_compact.xtc
+    echo 'Protein' 'System' | gmx trjconv -s prod.tpr -f prod.xtc -pbc mol -ur compact -center -o prod_compact.xtc
         #GRO
-    echo 'Protein' 'System' | gmx trjconv -s em.gro -f prod.gro -pbc mol -ur compact -center -o prod_compact.gro
+    echo 'Protein' 'System' | gmx trjconv -s prod.tpr -f prod.gro -pbc mol -ur compact -center -o prod_compact.gro
     #Protein center
         #XTC
-    echo 'Protein' 'Protein' | gmx trjconv -s em.gro -f prod_compact.xtc -pbc mol -ur compact -center -o prod_prot_center.xtc
+    echo 'Protein' 'Protein' | gmx trjconv -s prod.tpr -f prod_compact.xtc -pbc mol -ur compact -center -o prod_prot_center.xtc
     #Remove rotation
         #XTC
-    echo 'Backbone' 'Protein' | gmx trjconv -s em.gro -f prod_prot_center.xtc -fit rot+trans -o prod_prot_fit.xtc
+    echo 'Backbone' 'Protein' | gmx trjconv -s prod.tpr -f prod_prot_center.xtc -fit rot+trans -o prod_prot_fit.xtc
         #GRO
-    echo 'Backbone' 'Protein' | gmx trjconv -s em.gro -f prod_compact.gro -fit rot+trans -o prod_prot_fit.gro
+    echo 'Backbone' 'Protein' | gmx trjconv -s prod.tpr -f prod_compact.gro -fit rot+trans -o prod_prot_fit.gro
 }
 
 
@@ -42,10 +42,10 @@ do
     cd $state
     ana_dir=$run_dir/$state/analysis
     mkdir -p $ana_dir
-    # for step in step_*
-    # do
-    #     remove_solv $run_dir $state $step &   
-    # done
+    for step in step_*
+    do
+        remove_solv $run_dir $state $step &   
+    done
     wait
 
     cd $run_dir/$state
