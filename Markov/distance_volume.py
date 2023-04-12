@@ -278,7 +278,7 @@ def plot_global_vision(state, output, distance=False, rmsd=False):
         raise Exception("Please select only one distance or rmsd to True")
 
     # Init
-    fig, ax = plt.subplots(5, 4, figsize=(10, 10), sharex=True, sharey=True)
+    fig, ax = plt.subplots(5, 4, figsize=(5, 5), sharex=True, sharey=True)
     # Loop over all the conformation
     for conf in range(ax.size):
         i, j = np.unravel_index(conf, ax.shape)
@@ -300,8 +300,8 @@ def plot_global_vision(state, output, distance=False, rmsd=False):
             ylim = (0.3, 1)
             xlabel = "RMSD GS"
             ylabel = "RMSD ES"
-            xticks = (0.2, 0.4, 0.6, 0.8)
-            ax[i,j].text(xlim[-1]-0.1,ylim[-1]-0.1,str(conf))
+            xticks = (0.4, 0.8)
+            ax[i,j].text(xlim[-1]-0.2,ylim[-1]-0.1,str(conf))
 
         # Plot the distance
         if distance:
@@ -314,7 +314,7 @@ def plot_global_vision(state, output, distance=False, rmsd=False):
             xlabel = "64CA-130CA"
             ylabel = "119CA-24CA"
             xticks = (2, 4)
-            ax[i,j].text(xlim[-1]-0.5,ylim[-1]-0.5,str(conf))
+            ax[i,j].text(xlim[-1]-1,ylim[-1]-0.5,str(conf))
 
         ax[i, j].set_xlim(xlim)
         ax[i, j].set_ylim(ylim)
@@ -325,7 +325,7 @@ def plot_global_vision(state, output, distance=False, rmsd=False):
     cbar = fig.colorbar(heatmap, cax=cbar_ax)
     cbar.set_label(r"Volume (nm$^3$)")
     fig.text(0.5, 0.04, xlabel, ha="center", va="center")
-    fig.text(0.06, 0.5, ylabel, ha="center", va="center", rotation="vertical")
+    fig.text(0.03, 0.5, ylabel, ha="center", va="center", rotation="vertical")
     fig.subplots_adjust(wspace=0, hspace=0)
 
     plt.savefig(output, dpi=300, bbox_inches="tight")
@@ -382,7 +382,7 @@ if __name__ == "__main__":
     DATA = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC"
     data_volume = "/home/ccattin/Documents/EAU/HSP90_simulation"
     data_distance = "/home/ccattin/Documents/Markov/volume_pressure/Output_distances_64CA-130CA_119CA-24CA"
-    state = "GS"
+    state = "ES"
     number = 2
     # Load data
     (
