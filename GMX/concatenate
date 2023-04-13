@@ -13,7 +13,7 @@ remove_solv () {
     ana_step=$run_dir/$state/$step/analysis
     mkdir -p $ana_step
     cd $ana_step
-    ln -s $run_dir/$state/$step/production/prod.tpr .
+    ln -s $run_dir/$state/step_1/production/prod.tpr .
     ln -s $run_dir/$state/$step/production/prod.xtc .
     ln -s $run_dir/$state/$step/production/prod.gro .
 
@@ -42,11 +42,11 @@ do
     cd $state
     ana_dir=$run_dir/$state/analysis
     mkdir -p $ana_dir
-    # for step in step_*
-    # do
-    #     remove_solv $run_dir $state $step &   
-    # done
-    # wait
+    for step in step_*
+    do
+        remove_solv $run_dir $state $step & 
+    done
+    wait
 
     cd $run_dir/$state
 
@@ -72,8 +72,15 @@ do
     echo c >> $ana_dir_total/input_trajcat_state.txt
 done
 
-gmx trjcat -overwrite -f GS*/analysis/concatenated.xtc -o $ana_dir_total/GS.xtc -settime < $ana_dir_total/input_trajcat_state.txt
+gmx trjcat -overwrite -f GS*/analysis/concatenated.xtc -o $ana_dir_total/GS.xtc -settime < $ana_dir_total/input_trajcat_state.txt &
 gmx trjcat -overwrite -f ES*/analysis/concatenated.xtc -o $ana_dir_total/ES.xtc -settime < $ana_dir_total/input_trajcat_state.txt
 
+# Remove translation
+echo 'Protein' 'Protein' | gmx trjconv -s GS01/step_1/analysis/prod.tpr -f $ana_dir_total/GS.xtc -pbc mol -ur compact -center -o $ana_dir_total/GS_center.xtc &
+
+echo 'Protein' 'Protein' | gmx trjconv -s ES01/step_1/analysis/prod.tpr -f $ana_dir_total/ES.xtc -pbc mol -ur compact -center -o $ana_dir_total/ES_center.xtc
+
+rm $ana_dir_total/ES.xtc $ana_dir_total/GS.xtc
+
 #Concatenate all the trajectories
-printf 'c\nc\n' | gmx trjcat -overwrite -f $ana_dir_total/GS.xtc $ana_dir_total/ES.xtc -o $ana_dir_total/all.xtc -settime -dt 10000
+printf 'c\nc\n' | gmx trjcat -overwrite -f $ana_dir_total/GS_center.xtc $ana_dir_total/ES_center.xtc -o $ana_dir_total/all.xtc -settime -dt 10000
