@@ -19,3 +19,6 @@ Repository of the different codes developed during my M2 insternship at the ILM
 
 ## Markov
   Various codes that use MSM or PyEmma
+
+## Cluster
+  Codes that rely on TTClust and extract its result
