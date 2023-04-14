@@ -29,6 +29,9 @@ def get_number_frames(dict_cluster):
     cluster_number = np.array(cluster_number).reshape((2,5))
     return cluster_number
 
+def normalize(cluster_number):
+    cluster_number_normalized = cluster_number/np.sum(cluster_number,axis=1).reshape((2,1))
+    return cluster_number_normalized
 
 def plot_barplot(cluster_number):
     fig, ax = plt.subplots()
@@ -53,5 +56,5 @@ if __name__ == '__main__':
                             trajectory_lim=trajectory_lim)
     
     cluster_number = get_number_frames(dict_cluster=dict_cluster)
-
-    plot_barplot(cluster_number=cluster_number)
+    cluster_number_normalized = normalize(cluster_number=cluster_number)
+    plot_barplot(cluster_number=cluster_number_normalized)
