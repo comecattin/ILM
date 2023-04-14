@@ -23,19 +23,19 @@ def get_dict(clusters, temperatures, trajectory_lim):
     return dict_cluster
 
 def get_number_frames(dict_cluster):
-    dict_cluster_number = {}
+    cluster_number = []
     for key, list_of_frame in dict_cluster.items():
-        dict_cluster_number[key] = len(list_of_frame)
-    return dict_cluster_number
+        cluster_number.append(len(list_of_frame))
+    cluster_number = np.array(cluster_number).reshape((2,5))
+    return cluster_number
 
 
-def plot_barplot(dict_cluster):
+def plot_barplot(cluster_number):
     fig, ax = plt.subplots()
     cluster_id = np.arange(5)
 
-    cluster_temperature = [frame for key, frame in dict_cluster.items() if key[1] == 278]
-
-    ax.plot(cluster_id,cluster_temperature)
+    for i, number in enumerate(cluster_number):
+        ax.bar(cluster_id + i*0.25,number,width=0.25)
 
 
 
@@ -52,6 +52,6 @@ if __name__ == '__main__':
                             temperatures=temperatures, 
                             trajectory_lim=trajectory_lim)
     
-    dict_cluster_number = get_number_frames(dict_cluster=dict_cluster)
+    cluster_number = get_number_frames(dict_cluster=dict_cluster)
 
-    #plot_barplot(dict_cluster=dict_cluster)
+    plot_barplot(cluster_number=cluster_number)
