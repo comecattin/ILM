@@ -11,19 +11,25 @@ def load_log(log_file):
                 clusters.append(list_frame)
     return clusters
 
-def get_dict(clusters, trajectory_lim):
+def get_dict(clusters, temperatures, trajectory_lim):
     dict_cluster = {}
-    for temperature in (278,300):
+    for temperature in temperatures:
         for id_cluster, cluster in enumerate(clusters):
-            if temperature == 278:
+            if temperature == temperatures[0]:
                 dict_cluster[(id_cluster,temperature)] = [frame for frame in cluster if frame <= trajectory_lim]
-            if temperature == 300:
+            if temperature == temperatures[1]:
                 dict_cluster[(id_cluster,temperature)] = [frame for frame in cluster if frame >= trajectory_lim]
     return dict_cluster
+
+def plot_barplot(dict_cluster):
+    pass
 
 if __name__ == '__main__':
     log_file = '/home/ccattin/Documents/Cluster/total/clustering/clustering.log'
     trajectory_lim = 4001
+    temperatures = (278,300)
     clusters = load_log(log_file)
 
-    dict_cluster = get_dict(clusters, trajectory_lim)
+    dict_cluster = get_dict(clusters=clusters,
+                            temperatures=temperatures, 
+                            trajectory_lim=trajectory_lim)
