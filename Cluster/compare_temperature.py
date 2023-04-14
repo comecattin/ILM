@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 def load_log(log_file):
     clusters = []
@@ -35,12 +36,23 @@ def normalize(cluster_number):
 
 def plot_barplot(cluster_number):
     fig, ax = plt.subplots()
+    color_palette = sns.color_palette('cool',12)
+    color = [color_palette[6],color_palette[2]]
     cluster_id = np.arange(5)
+    temperatures=(278,300)
 
     for i, number in enumerate(cluster_number):
-        ax.bar(cluster_id + i*0.25,number,width=0.25)
+        ax.bar(cluster_id + i*0.25,
+               number,
+               width=0.25,
+               color=color[i],
+               label=f"{temperatures[i]}K")
 
-
+    ax.set_xlabel("Cluster number")
+    ax.set_ylabel("Normalized population")
+    ax.set_xticks(cluster_id+0.125)
+    ax.set_xticklabels(cluster_id+1)
+    ax.legend()
 
 
     plt.show()
