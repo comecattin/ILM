@@ -1,42 +1,42 @@
-# # Load trajectory and reference structure
-# mol addfile <path/to/trajectory/and/reference> type {xtc gro} first 0 last -1 step 1 waitfor all
 
-# # Create new molecule representation for protein
-# mol new 1
-# mol modselect 1 0 protein
-# mol modstyle 1 0 Licorice
-# mol modcolor 1 0 ColorID 0
 
-# Disable automatic centering and orientation
-# mol modauto 0 1
+# Load trajectory and reference structure
+mol new /home/ccattin/Documents/Cluster/278K/ES/clustering/C1-f12652-s4327.pdb type pdb
 
-# Select atoms to align to z-axis
-set sel [atomselect top "residue 32 to 53"]
+# Create new molecule representation for protein
+mol delrep 0 top
+mol representation NewCartoon 0.300000 10.000000 4.100000 0
+mol color ColorID 2
+mol addrep top
 
-# Calculate RMSD to reference structure and rotate protein
-set ref [atomselect 1 "residue 32 to 53"]
-set rmsd [measure rmsd $sel $ref]
-set angle [expr {(-acos(1-$rmsd/2.0))*180.0/3.14159}]
-rotate x $angle axis {1 0 0}
-rotate y $angle axis {0 1 0}
+lappend auto_path /home/ccattin/Documents/Code/VMD/la1.0
+lappend auto_path /home/ccattin/Documents/Code/VMD/orient
 
-# Save current orientation as reference structure
-molinfo top set reference [atomselect top "protein and name CA"]
+package require Orient
+namespace import Orient::orient
 
-# Define function to align protein to reference structure
-proc align_protein {} {
-    # Load next frame of trajectory
-    animate goto next
+set sel [atomselect top "all"]
+set I [draw principalaxes $sel]
+set A [orient $sel [lindex $I 2] {0 0 1}]
+$sel move $A
+set I [draw principalaxes $sel]
+set A [orient $sel [lindex $I 1] {0 1 0}]
+$sel move $A
+set I [draw principalaxes $sel]
 
-    # Align protein to reference structure
-    rmsd_traj fit [atomselect top "protein"] [atomselect top "protein" frame 0] [atomselect top "reference"]
 
-    # Rotate protein to align selected atoms with z-axis
-    set rmsd [measure rmsd $sel [atomselect top "protein"]]
-    set angle [expr {(-acos(1-$rmsd/2.0))*180.0/3.14159}]
-    rotate x $angle axis {1 0 0}
-    rotate y $angle axis {0 1 0}
+
+proc rotate_axis {vec deg {molid top}} {
+    # get the current matrix
+    lassign [molinfo $molid get rotate_matrix] curr
+    # the transformation matrix
+    set r [trans axis $vec $deg]
+    # get the new matrix
+    set m [transmult $r $curr]
+    # and apply it to the molecule
+    molinfo $molid set rotate_matrix "{ $m }"
 }
 
-# Call align_protein function every time a new trajectory frame is loaded
-molinfo top set molinfoframecallback align_protein
+graphics top delete all
+
+#rotate_axis {0 1 0} 90
