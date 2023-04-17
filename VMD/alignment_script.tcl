@@ -3,7 +3,7 @@ display projection orthographic
 display depthcue off
 
 # Load trajectory and reference structure
-mol new /home/ccattin/Documents/Cluster/278K/ES/clustering/C1-f12652-s4327.pdb type pdb
+#mol new /home/ccattin/Documents/Cluster/278K/ES/clustering/C1-f12652-s4327.pdb type pdb
 
 # Create new molecule representation for protein
 # Remove previous projection and add a new one
@@ -42,4 +42,6 @@ proc rotate_axis {vec deg {molid top}} {
 
 graphics top delete all
 
-#rotate_axis {0 1 0} 90
+rotate_axis {1 0 0} 90
+rotate_axis {0 1 0} -90
+rotate_axis {0 0 1} -20
