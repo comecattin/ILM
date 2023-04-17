@@ -1,12 +1,15 @@
-
+# Global
+display projection orthographic
+display depthcue off
 
 # Load trajectory and reference structure
 mol new /home/ccattin/Documents/Cluster/278K/ES/clustering/C1-f12652-s4327.pdb type pdb
 
 # Create new molecule representation for protein
+# Remove previous projection and add a new one
 mol delrep 0 top
 mol representation NewCartoon 0.300000 10.000000 4.100000 0
-mol color ColorID 2
+mol color ColorID 3
 mol addrep top
 
 lappend auto_path /home/ccattin/Documents/Code/VMD/la1.0
