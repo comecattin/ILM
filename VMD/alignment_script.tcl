@@ -16,11 +16,12 @@ set sel [atomselect top "residue 32 to 53"]
 # Calculate RMSD to reference structure and rotate protein
 set ref [atomselect 1 "residue 32 to 53"]
 set rmsd [measure rmsd $sel $ref]
-rotate x [expr(-acos(1-$rmsd/2.0))*180.0/3.14159]
-rotate y [expr(-acos(1-$rmsd/2.0))*180.0/3.14159]
+set angle [expr {(-acos(1-$rmsd/2.0))*180.0/3.14159}]
+rotate x $angle axis {1 0 0}
+rotate y $angle axis {0 1 0}
 
 # Save current orientation as reference structure
-molinfo top set {reference $sel}
+molinfo top set reference [atomselect top "protein and name CA"]
 
 # Define function to align protein to reference structure
 proc align_protein {} {
@@ -32,9 +33,10 @@ proc align_protein {} {
 
     # Rotate protein to align selected atoms with z-axis
     set rmsd [measure rmsd $sel [atomselect top "protein"]]
-    rotate x [expr(-acos(1-$rmsd/2.0))*180.0/3.14159]
-    rotate y [expr(-acos(1-$rmsd/2.0))*180.0/3.14159]
+    set angle [expr {(-acos(1-$rmsd/2.0))*180.0/3.14159}]
+    rotate x $angle axis {1 0 0}
+    rotate y $angle axis {0 1 0}
 }
 
 # Call align_protein function every time a new trajectory frame is loaded
-molinfo top set {molinfoframecallback align_protein}
+molinfo top set molinfoframecallback align_protein
