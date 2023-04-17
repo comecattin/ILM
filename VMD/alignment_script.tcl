@@ -8,13 +8,13 @@
 # mol modcolor 1 0 ColorID 0
 
 # Disable automatic centering and orientation
-mol modauto 0 1
+# mol modauto 0 1
 
 # Select atoms to align to z-axis
-set sel [atomselect top "protein and name CA"]
+set sel [atomselect top "residue 32 to 53"]
 
 # Calculate RMSD to reference structure and rotate protein
-set ref [atomselect 1 "protein and name CA"]
+set ref [atomselect 1 "residue 32 to 53"]
 set rmsd [measure rmsd $sel $ref]
 rotate x [expr(-acos(1-$rmsd/2.0))*180.0/3.14159]
 rotate y [expr(-acos(1-$rmsd/2.0))*180.0/3.14159]
