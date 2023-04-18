@@ -150,7 +150,7 @@ def plot_barplot(cluster_number, temperatures, output, color):
     # Aesthetic
     ax.set_xlabel("Cluster number")
     ax.set_ylabel("Normalized population")
-    ax.set_xticks(cluster_id + 0.125)
+    ax.set_xticks(cluster_id + 0.25)
     ax.set_xticklabels(cluster_id + 1)
     ax.legend()
 
