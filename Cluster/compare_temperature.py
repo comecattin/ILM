@@ -65,10 +65,10 @@ def get_dict(clusters, temperatures, trajectory_lim):
         # Loop over all the cluster
         for id_cluster, cluster in enumerate(clusters):
             # Get the upper part of the cluster or the lower part
-            lower, higher = trajectory_lim[i_temp::2]
+            lower, higher = trajectory_lim[i_temp*2:(i_temp+1)*2]
             # Append to the dict
             dict_cluster[(id_cluster, temperature)] = [
-                frame for frame in cluster if frame > lower and frame <= higher
+                frame for frame in cluster if (frame > lower and frame <= higher)
             ]
 
     return dict_cluster
@@ -120,7 +120,7 @@ def normalize(cluster_number, number_temperature):
     return cluster_number_normalized
 
 
-def plot_barplot(cluster_number, temperatures, output):
+def plot_barplot(cluster_number, temperatures, output, color):
     """Plot the result as barplot
 
     Parameters
@@ -135,9 +135,7 @@ def plot_barplot(cluster_number, temperatures, output):
     # Init
     fig, ax = plt.subplots()
     # Color, cluster numbers and temperatures
-    color_palette = sns.color_palette("cool", 12)
-    color = [color_palette[6], color_palette[2]]
-    cluster_id = np.arange(5)
+    cluster_id = np.arange(len(cluster_number[0]))
 
     # Loop over the different temperatures
     for i, number in enumerate(cluster_number):
@@ -146,7 +144,7 @@ def plot_barplot(cluster_number, temperatures, output):
             number,
             width=0.25,
             color=color[i],
-            label=f"{temperatures[i]}K",
+            label=temperatures[i],
         )
 
     # Aesthetic
@@ -163,14 +161,21 @@ def plot_barplot(cluster_number, temperatures, output):
 
 
 if __name__ == "__main__":
-    log_file = "/home/ccattin/Documents/Cluster/total/clustering/clustering.log"
+
+    log_file = "/home/ccattin/Documents/Cluster/total_and_data/clustering/clustering.log"
     output = "/home/ccattin/Documents/Code/outputs/clustering_temperature.pdf"
-    trajectory_lim = (0,4001,4001,8021)
-    temperatures = (278, 300)
+    
+    trajectory_lim = (0,4001,4001,8021,8021,12022)
+    
+    temperatures = ("278K", "300 Amber 14", "300K Amber 19")
+    
     number_temperature = len(temperatures)
     number_cluster = 5
-
-    # Get the cluster from thye log
+    
+    color_palette = sns.color_palette("cool", 12)
+    color = [color_palette[6], color_palette[2],color_palette[10]]
+    
+    # Get the cluster from the log
     clusters = load_log(log_file)
 
     # Convert to dict
@@ -192,4 +197,5 @@ if __name__ == "__main__":
         cluster_number=cluster_number_normalized,
         temperatures=temperatures,
         output=output,
+        color=color
     )
