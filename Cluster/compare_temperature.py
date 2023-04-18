@@ -65,7 +65,7 @@ def get_dict(clusters, temperatures, trajectory_lim):
         # Loop over all the cluster
         for id_cluster, cluster in enumerate(clusters):
             # Get the upper part of the cluster or the lower part
-            lower, higher = trajectory_lim[i_temp*2:(i_temp+1)*2]
+            lower, higher = trajectory_lim[i_temp * 2 : (i_temp + 1) * 2]
             # Append to the dict
             dict_cluster[(id_cluster, temperature)] = [
                 frame for frame in cluster if (frame > lower and frame <= higher)
@@ -99,7 +99,7 @@ def get_number_frames(dict_cluster, number_temperature, number_cluster):
     # Convert and reshape in the correct shape
     cluster_number = np.array(cluster_number).reshape(
         (number_temperature, number_cluster)
-        )
+    )
 
     return cluster_number
 
@@ -171,20 +171,22 @@ def plot_barplot(cluster_number, temperatures, output, color):
 if __name__ == "__main__":
 
     # Path definition
-    log_file = "/home/ccattin/Documents/Cluster/total_and_data/clustering/clustering.log"
+    log_file = (
+        "/home/ccattin/Documents/Cluster/total_and_data/clustering/clustering.log"
+    )
     output = "/home/ccattin/Documents/Code/outputs/clustering_temperature.pdf"
     # Trajectories limit
-    trajectory_lim = (0,4001,4001,8021,8021,12022)
+    trajectory_lim = (0, 4001, 4001, 8021, 8021, 12022)
     # Definition of the different temperatures
     temperatures = ("278K", "300 Amber 14", "300K Amber 19")
-    #Number of temperature tested and number of cluster
+    # Number of temperature tested and number of cluster
     number_temperature = len(temperatures)
     number_cluster = 5
-    
+
     # Definition of the palette
     color_palette = sns.color_palette("cool", 12)
-    color = [color_palette[6], color_palette[2],color_palette[10]]
-    
+    color = [color_palette[6], color_palette[2], color_palette[10]]
+
     # Get the cluster from the log
     clusters = load_log(log_file)
 
@@ -194,18 +196,21 @@ if __name__ == "__main__":
     )
 
     # Get the population of each cluster
-    cluster_number = get_number_frames(dict_cluster=dict_cluster,
-                                       number_temperature=number_temperature,
-                                       number_cluster=number_cluster)
+    cluster_number = get_number_frames(
+        dict_cluster=dict_cluster,
+        number_temperature=number_temperature,
+        number_cluster=number_cluster,
+    )
 
     # Get the normalized population
-    cluster_number_normalized = normalize(cluster_number=cluster_number,
-                                          number_temperature=number_temperature)
+    cluster_number_normalized = normalize(
+        cluster_number=cluster_number, number_temperature=number_temperature
+    )
 
     # Plot and save the result
     plot_barplot(
         cluster_number=cluster_number_normalized,
         temperatures=temperatures,
         output=output,
-        color=color
+        color=color,
     )
