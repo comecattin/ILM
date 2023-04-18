@@ -100,7 +100,7 @@ def get_number_frames(dict_cluster, number_temperature, number_cluster):
     return cluster_number
 
 
-def normalize(cluster_number):
+def normalize(cluster_number, number_temperature):
     """Get the relative population in each cluster
 
     Parameters
@@ -114,7 +114,7 @@ def normalize(cluster_number):
         Array containing the relative population of each cluster at different temperature.
     """
     cluster_number_normalized = cluster_number / np.sum(cluster_number, axis=1).reshape(
-        (2, 1)
+        (number_temperature, 1)
     )
 
     return cluster_number_normalized
@@ -184,7 +184,8 @@ if __name__ == "__main__":
                                        number_cluster=number_cluster)
 
     # Get the normalized population
-    cluster_number_normalized = normalize(cluster_number=cluster_number)
+    cluster_number_normalized = normalize(cluster_number=cluster_number,
+                                          number_temperature=number_temperature)
 
     # Plot and save the result
     plot_barplot(
