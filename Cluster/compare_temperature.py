@@ -66,24 +66,15 @@ def get_dict(clusters, temperatures, trajectory_lim):
         for id_cluster, cluster in enumerate(clusters):
             # Get the upper part of the cluster or the lower part
             lower, higher = trajectory_lim[i_temp::2]
+            # Append to the dict
             dict_cluster[(id_cluster, temperature)] = [
                 frame for frame in cluster if frame > lower and frame <= higher
             ]
 
-
-            # if temperature == temperatures[0]:
-            #     dict_cluster[(id_cluster, temperature)] = [
-            #         frame for frame in cluster if frame <= trajectory_lim
-            #     ]
-            # if temperature == temperatures[1]:
-            #     dict_cluster[(id_cluster, temperature)] = [
-            #         frame for frame in cluster if frame >= trajectory_lim
-            #     ]
-
     return dict_cluster
 
 
-def get_number_frames(dict_cluster):
+def get_number_frames(dict_cluster, number_temperature, number_cluster):
     """Get the number of frame in each cluster
 
     Parameters
@@ -102,7 +93,9 @@ def get_number_frames(dict_cluster):
     for key, list_of_frame in dict_cluster.items():
         cluster_number.append(len(list_of_frame))
     # Convert and reshape in the correct shape
-    cluster_number = np.array(cluster_number).reshape((2, 5))
+    cluster_number = np.array(cluster_number).reshape(
+        (number_temperature, number_cluster)
+        )
 
     return cluster_number
 
@@ -174,6 +167,8 @@ if __name__ == "__main__":
     output = "/home/ccattin/Documents/Code/outputs/clustering_temperature.pdf"
     trajectory_lim = (0,4001,4001,8021)
     temperatures = (278, 300)
+    number_temperature = len(temperatures)
+    number_cluster = 5
 
     # Get the cluster from thye log
     clusters = load_log(log_file)
@@ -184,7 +179,9 @@ if __name__ == "__main__":
     )
 
     # Get the population of each cluster
-    cluster_number = get_number_frames(dict_cluster=dict_cluster)
+    cluster_number = get_number_frames(dict_cluster=dict_cluster,
+                                       number_temperature=number_temperature,
+                                       number_cluster=number_cluster)
 
     # Get the normalized population
     cluster_number_normalized = normalize(cluster_number=cluster_number)
