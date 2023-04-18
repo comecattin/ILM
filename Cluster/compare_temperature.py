@@ -61,18 +61,24 @@ def get_dict(clusters, temperatures, trajectory_lim):
     dict_cluster = {}
 
     # Loop over all the temperature
-    for temperature in temperatures:
+    for i_temp, temperature in enumerate(temperatures):
         # Loop over all the cluster
         for id_cluster, cluster in enumerate(clusters):
             # Get the upper part of the cluster or the lower part
-            if temperature == temperatures[0]:
-                dict_cluster[(id_cluster, temperature)] = [
-                    frame for frame in cluster if frame <= trajectory_lim
-                ]
-            if temperature == temperatures[1]:
-                dict_cluster[(id_cluster, temperature)] = [
-                    frame for frame in cluster if frame >= trajectory_lim
-                ]
+            lower, higher = trajectory_lim[i_temp::2]
+            dict_cluster[(id_cluster, temperature)] = [
+                frame for frame in cluster if frame > lower and frame <= higher
+            ]
+
+
+            # if temperature == temperatures[0]:
+            #     dict_cluster[(id_cluster, temperature)] = [
+            #         frame for frame in cluster if frame <= trajectory_lim
+            #     ]
+            # if temperature == temperatures[1]:
+            #     dict_cluster[(id_cluster, temperature)] = [
+            #         frame for frame in cluster if frame >= trajectory_lim
+            #     ]
 
     return dict_cluster
 
@@ -166,7 +172,7 @@ def plot_barplot(cluster_number, temperatures, output):
 if __name__ == "__main__":
     log_file = "/home/ccattin/Documents/Cluster/total/clustering/clustering.log"
     output = "/home/ccattin/Documents/Code/outputs/clustering_temperature.pdf"
-    trajectory_lim = 4001
+    trajectory_lim = (0,4001,4001,8021)
     temperatures = (278, 300)
 
     # Get the cluster from thye log
