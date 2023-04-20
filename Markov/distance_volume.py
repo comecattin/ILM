@@ -251,7 +251,7 @@ def plot_mean(list_mean_volume, data_x, data_y, output, distance=False, rmsd=Fal
         )
 
 
-def plot_global_vision(state, output, distance=False, rmsd=False):
+def plot_global_vision(state, output, distance=False, rmsd=False, smooth=False, window=100):
     """Plot all the conformation in one state
 
     Parameters
@@ -292,6 +292,10 @@ def plot_global_vision(state, output, distance=False, rmsd=False):
 
         # Plot the RMSD
         if rmsd:
+
+            if smooth:
+                volume, rmsd_GS, rmsd_ES = smoothing(volume,rmsd_GS,rmsd_ES,time,window)
+
             heatmap = ax[i, j].scatter(
                 rmsd_GS, rmsd_ES, c=volume, cmap="cool", s=2, vmin=20.7, vmax=21
             )
@@ -305,6 +309,10 @@ def plot_global_vision(state, output, distance=False, rmsd=False):
 
         # Plot the distance
         if distance:
+
+            if smooth:
+                volume, d1, d2 = smoothing(volume,d1,d2,time,window
+                                           )
             heatmap = ax[i, j].scatter(
                 d1, d2, c=volume, cmap="cool", s=2, vmin=20.7, vmax=21
             )
@@ -382,7 +390,7 @@ if __name__ == "__main__":
     DATA = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC"
     data_volume = "/home/ccattin/Documents/EAU/HSP90_simulation"
     data_distance = "/home/ccattin/Documents/Markov/volume_pressure/Output_distances_64CA-130CA_119CA-24CA"
-    state = "ES"
+    state = "GS"
     number = 2
     # Load data
     (
@@ -447,10 +455,10 @@ if __name__ == "__main__":
     # Global vision
     output = f"/home/ccattin/Documents/Code/outputs/global_RMSD_{state}.pdf"
     #   RMSD
-    plot_global_vision(state, output, rmsd=True)
+    plot_global_vision(state, output, rmsd=True,smooth=True)
     #   Distances
     output = f"/home/ccattin/Documents/Code/outputs/global_distances_{state}.pdf"
-    plot_global_vision(state, output, distance=True)
+    plot_global_vision(state, output, distance=True,smooth=True)
 
     #Vizualise precise properties
     prop = rmsd_ES
