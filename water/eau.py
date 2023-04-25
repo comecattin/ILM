@@ -309,6 +309,7 @@ class eau(xtract.gromacs_output):
         devided_color='r',
     ):
         """Plot the volume as a function of the used nsteps.
+        Confidence interval 95%
 
         Parameters
         ----------
@@ -333,6 +334,9 @@ class eau(xtract.gromacs_output):
             volume_error_list,
         ) = self.simulation_length_extract_volume(simulation_length_dir)
         
+        #95% confidence interval
+        volume_error_list = volume_error_list*2
+
         fig, ax = plt.subplots()
         ax.errorbar(
             simulation_length_list,
