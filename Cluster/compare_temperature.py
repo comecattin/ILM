@@ -178,7 +178,7 @@ if __name__ == "__main__":
     # Trajectories limit
     trajectory_lim = (0, 4001, 4001, 8021, 8021, 12022)
     # Definition of the different temperatures
-    temperatures = ("278K", "300 Amber 14", "300K Amber 19")
+    temperatures = ("278K Amber19", "300K Amber14", "300K Amber19")
     # Number of temperature tested and number of cluster
     number_temperature = len(temperatures)
     number_cluster = 5
