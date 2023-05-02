@@ -6,8 +6,19 @@ def main():
     """
     CLI main function
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--files', nargs='+', help='List of files')
+    
+    parser = argparse.ArgumentParser(
+        "CLI LETHE program",
+        description="Automatize MSM building using PyEmma.",
+    )
+    # List of files
+    parser.add_argument(
+        '-f',
+        '--files',
+        nargs='+',
+        help='List of files'
+        )
+    
     args = parser.parse_args()
 
     file_list = args.files
