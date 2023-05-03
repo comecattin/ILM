@@ -34,6 +34,12 @@ def main():
         required=True,
         help='Reference .pdb file'
     )
+    parser.add_argument(
+        '-p',
+        '--plot',
+        nargs='+',
+        help='Plot wanted (feat_hist)'
+    )
     
     args = parser.parse_args()
 
@@ -51,7 +57,11 @@ def main():
 
     feat = markov.create_feat(pdb,pair_indices)
 
-    markov.load_data(traj=file_list,feat=feat)
+    data = markov.load_data(traj=file_list,feat=feat)
+
+    if args.plot:
+        if 'feat_hist' in args.plot:
+            markov.plot_feat_hist(data,feat)
 
 if __name__ == '__main__':
     main()
