@@ -4,6 +4,7 @@ Tools used in LETHE
 """
 
 import MDAnalysis as mda
+import scipy
 
 
 def create_pairIndices_from_pairNames(pdbfilename, pairNames):
@@ -33,6 +34,9 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
     print(f'Found indices: {pairsListIndices}')    
     
     return pairsListIndices
+
+def get_kT(T):
+    return scipy.constants.R *T/1000
 
 if __name__ == '__main__':
 
