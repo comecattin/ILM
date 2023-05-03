@@ -2,6 +2,8 @@
 """LETHE automatizes the MSM analysis"""
 
 import argparse
+import markov
+import tools
 
 def main():
     """
@@ -26,6 +28,12 @@ def main():
         nargs='+',
         help='List of the pair names'
     )
+    parser.add_argument(
+        '-t',
+        '--topology',
+        required=True,
+        help='Reference .pdb file'
+    )
     
     args = parser.parse_args()
 
@@ -37,8 +45,11 @@ def main():
 
     file_list = args.files
     pairNames = args.distances
-    print(file_list)
-    print(pairNames)
+    pdb = args.topology
+    
+    pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
+
+    markov.create_feat(pdb,pair_indices)
 
 if __name__ == '__main__':
     main()
