@@ -81,15 +81,15 @@ def plot_feat_hist(data, feat,display=False,save=False,outdir=''):
     if display:
         plt.show()
 
-def plot_density_energy(data, kT, pairNames, save=False, display=False, outdir=''):
+def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''):
     """Plot the density map and the energy map
 
     Parameters
     ----------
     data : List
         List of all the value of the feat for each snapshot
-    kT : float
-        Temperature multiplied by the boltzmann's constant
+    T : float
+        Temperature
     pairNames : list
         List containing the name of the pairs
     save : bool, optional
@@ -119,7 +119,7 @@ def plot_density_energy(data, kT, pairNames, save=False, display=False, outdir='
 
     # Energy plot
     fig, axes = plt.subplots(1, 1, figsize=(6, 4), sharex=True, sharey=True)
-
+    kT = tools.get_kT(T)
     fig,axes = pyemma.plots.plot_free_energy(*data_concatenated.T[0:2],
                                             ax=axes,
                                             kT=kT,
@@ -153,7 +153,6 @@ if __name__ == '__main__' :
     save = True
     display = True
     T = 300
-    kT = tools.get_kT(T)
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
@@ -164,7 +163,7 @@ if __name__ == '__main__' :
                    save=save,
                    outdir=outdir)
     plot_density_energy(data=data,
-                        kT=kT,
+                        T=T,
                         pairNames=pairNames,
                         display=display,
                         save=save,

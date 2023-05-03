@@ -40,6 +40,20 @@ def main():
         nargs='+',
         help='Plot wanted (feat_hist)'
     )
+    parser.add_argument(
+        '--no-plot',
+        action='store_true',
+        help='Do not display plots'
+    )
+    parser.add_argument(
+        '-o',
+        '--outdir',
+        help='Path to save the plots'
+    )
+    parser.add_argument(
+        '--T',
+        help='Temperature of the system'
+    )
     
     args = parser.parse_args()
 
@@ -59,9 +73,33 @@ def main():
 
     data = markov.load_data(traj=file_list,feat=feat)
 
+    #Handle plots
     if args.plot:
+        # Parameters
+        display = not args.no_plot
+        if args.outdir:
+            save=True
+            outdir = args.outdir
+        if not args.outdir:
+            save=False
+            outdir=''
+        
+        #Plots
         if 'feat_hist' in args.plot:
-            markov.plot_feat_hist(data,feat)
+            markov.plot_feat_hist(data,feat,
+                                  display=display,
+                                  save=save,
+                                  outdir=outdir)
+        if 'density_energy' in args.plot:
+            if not args.T:
+                parser.error('Please provide a temperature')
+            T = float(args.T)
+            markov.plot_density_energy(data=data,
+                                       T=T,
+                                       pairNames=pairNames,
+                                       save=save,
+                                       display=display,
+                                       outdir=outdir)
 
 if __name__ == '__main__':
     main()
