@@ -49,7 +49,9 @@ def main():
     
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
 
-    markov.create_feat(pdb,pair_indices)
+    feat = markov.create_feat(pdb,pair_indices)
+
+    markov.load_data(traj=file_list,feat=feat)
 
 if __name__ == '__main__':
     main()
