@@ -38,7 +38,7 @@ def main():
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist)'
+        help='Plot wanted (feat_hist, density_energy)'
     )
     parser.add_argument(
         '--no-plot',

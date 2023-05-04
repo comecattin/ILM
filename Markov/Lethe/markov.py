@@ -136,6 +136,36 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''
     if display:
         plt.show()
 
+def pca_reduction(data,T,save=False,display=False,outdir=''):
+    pca = pyemma.coordinates.pca(data,dim=2)
+    pca_concatenated = np.concatenate(pca.get_output())
+    fig,ax  =pyemma.plots.plot_feature_histograms(pca_concatenated,ignore_dim_warning=True)
+    if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/pca_histogram.pdf', dpi=300,bbox_inches="tight")
+    if display:
+        plt.show()
+    
+
+    fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+    kT = tools.get_kT(T)
+    pyemma.plots.plot_free_energy(*pca_concatenated.T[0:2],
+                                            ax=axes,
+                                            kT=kT,
+                                            cbar_label='free energy / kJ.mol-1') 
+    axes.set_xlabel('PC 1')
+    axes.set_ylabel('PC 2')
+    if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/pca_free_energy_direct_from_density.pdf', dpi=300,bbox_inches="tight")
+    if display:
+        plt.show()
+    
+    return pca
 
 
 
@@ -169,3 +199,9 @@ if __name__ == '__main__' :
                         save=save,
                         outdir=outdir
                         )
+    pca = pca_reduction(data=data,
+                        T=T,
+                        save=save,
+                        display=display,
+                        outdir=outdir)
+    
