@@ -183,6 +183,8 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
             raise Exception('Please provide a directory to save the file')
         else:
             plt.savefig(f'{outdir}/tica_histogram.pdf',dpi=300,bbox_inches='tight')
+    if display:
+        plt.show()
 
 
     fig, axes = plt.subplots(1, 1, figsize=(5, 4))
@@ -197,6 +199,8 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
             raise Exception('Please provide a directory to save the file')
         else:
             plt.savefig(f'{outdir}/tica_free_energy_direct_from_density.pdf',dpi=300,bbox_inches='tight')
+    if display:
+        plt.show()
     
     return tica
 

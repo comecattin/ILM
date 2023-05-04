@@ -59,6 +59,16 @@ def main():
         help='Do a PCA dimension reduction',
         action='store_true'
     )
+    parser.add_argument(
+        '--tica',
+        help='Do a TICA dimension reduction',
+        action='store_true'
+    )
+    parser.add_argument(
+        '--lag',
+        help='Lag time for the MSM',
+        type=int
+    )
     
     args = parser.parse_args()
 
@@ -109,12 +119,25 @@ def main():
     # Dimension reduction
     if args.pca:
         if args.no_plot:
-            raise NotImplementedError('Please use the plot option')
+            parser.error('Please use the plot option')
         pca = markov.pca_reduction(data=data,
                                    T=T,
                                    save=save,
                                    display=display,
                                    outdir=outdir)
+    
+    if args.tica:
+        if args.no_plot:
+            parser.error('Please use the plot option')
+        if not args.lag:
+            parser.error('Please provide a lag time')
+        lag = args.lag
+        tica = markov.tica_reduction(data=data,
+                                     T=T,
+                                     lag=lag,
+                                     save=save,
+                                     display=display,
+                                     outdir=outdir)
 
 if __name__ == '__main__':
     main()

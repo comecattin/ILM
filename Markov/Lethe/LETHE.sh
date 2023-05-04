@@ -6,4 +6,6 @@
 --T 300 \
 -p feat_hist density_energy \
 --pca \
+--tica \
+--lag 1000 \
 -o /home/ccattin/Documents/Code/outputs
