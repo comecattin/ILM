@@ -54,6 +54,11 @@ def main():
         '--T',
         help='Temperature of the system'
     )
+    parser.add_argument(
+        '--pca',
+        help='Do a PCA dimension reduction',
+        action='store_true'
+    )
     
     args = parser.parse_args()
 
@@ -100,6 +105,16 @@ def main():
                                        save=save,
                                        display=display,
                                        outdir=outdir)
+            
+    # Dimension reduction
+    if args.pca:
+        if args.no_plot:
+            raise NotImplementedError('Please use the plot option')
+        pca = markov.pca_reduction(data=data,
+                                   T=T,
+                                   save=save,
+                                   display=display,
+                                   outdir=outdir)
 
 if __name__ == '__main__':
     main()
