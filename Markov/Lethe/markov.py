@@ -167,6 +167,39 @@ def pca_reduction(data,T,save=False,display=False,outdir=''):
     
     return pca
 
+def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
+
+    tica = pyemma.coordinates.tica(data, dim=2, lag=lag)
+    tica_concatenated = np.concatenate(tica.get_output())
+
+    fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+    pyemma.plots.plot_feature_histograms(
+        tica_concatenated,
+        ['TICA {}'.format(i + 1) for i in range(tica.dimension())],
+        ax=axes,
+        ignore_dim_warning=True)
+    if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/tica_histogram.pdf',dpi=300,bbox_inches='tight')
+
+
+    fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+    kT=tools.get_kT(T)
+    pyemma.plots.plot_free_energy(*tica_concatenated.T[0:2],
+                                            ax=axes,
+                                            kT=kT,cbar_label='free energy / kJ.mol-1') 
+    axes.set_xlabel('TIC 1')
+    axes.set_ylabel('TIC 2')
+    if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/tica_free_energy_direct_from_density.pdf',dpi=300,bbox_inches='tight')
+    
+    return tica
+
 
 
 
@@ -183,6 +216,7 @@ if __name__ == '__main__' :
     save = True
     display = True
     T = 300
+    lag=1000
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
@@ -204,4 +238,10 @@ if __name__ == '__main__' :
                         save=save,
                         display=display,
                         outdir=outdir)
+    tica = tica_reduction(data=data,
+                          lag=lag,
+                          T=T,
+                          save=save,
+                          display=display,
+                          outdir=outdir)
     
