@@ -61,7 +61,7 @@ def main():
     if args.pca:
         if args.no_plot:
             parser.error('Please use the plot option')
-        pca = markov.pca_reduction(data=data,
+        red = markov.pca_reduction(data=data,
                                    T=T,
                                    save=save,
                                    display=display,
@@ -73,7 +73,7 @@ def main():
         if not args.lag:
             parser.error('Please provide a lag time')
         lag = args.lag
-        tica = markov.tica_reduction(data=data,
+        red = markov.tica_reduction(data=data,
                                      T=T,
                                      lag=lag,
                                      save=save,

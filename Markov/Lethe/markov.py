@@ -204,8 +204,32 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
     
     return tica
 
+def clustering(reduction,method,k,stride,save=False,display=False,outdir=''):
+    if method == 'kmeans':
+        cluster = pyemma.coordinates.cluster_kmeans(reduction, k=k, stride=stride)
+    if method == 'regspace':
+        cluster = pyemma.coordinates.cluster_regspace(reduction,k=k,stride=stride)
+    
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    reduction_concatenated = np.concatenate(reduction)
+    pyemma.plots.plot_feature_histograms(
+        reduction_concatenated,
+        ['IC {}'.format(i + 1) for i in range(reduction.dimension())],
+        ax=axes[0])
+    pyemma.plots.plot_density(*reduction_concatenated.T, ax=axes[1], cbar=False, alpha=0.1, logscale=True)
+    axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
+    axes[1].set_xlabel('IC 1')
+    axes[1].set_ylabel('IC 2')
+    
+    if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/cluster.pdf',dpi=300,bbox_inches='tight')
+    if display:
+        plt.show()
 
-
+    return cluster
 
 
 if __name__ == '__main__' :
@@ -248,4 +272,11 @@ if __name__ == '__main__' :
                           save=save,
                           display=display,
                           outdir=outdir)
+    cluster = clustering(reduction=tica,
+                         method='kmeans',
+                         k=200,
+                         stride=1,
+                         save=save,
+                         display=display,
+                         outdir=outdir)
     
