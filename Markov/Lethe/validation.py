@@ -27,6 +27,38 @@ def plot_its(its,data, cluster, save=False, display=False,outdir=''):
         plt.show()
 
 
+def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
+
+    data_concatenated = np.concatenate(data.get_output())
+    fig, axes = plt.subplots(2, len(k_list))
+    for i, k in enumerate(k_list):
+        
+        cluster = pyemma.coordinates.cluster_kmeans(data, k=k, max_iter=50, stride=10)
+        
+        pyemma.plots.plot_density(*data_concatenated.T, ax=axes[0, i], cbar=False, alpha=0.1)
+        
+        axes[0, i].scatter(*cluster.clustercenters.T, s=15, c='C1')
+        axes[0, i].set_xlabel('Feat 1')
+        axes[0, i].set_ylabel('Feat 2')
+        axes[0, i].set_title('k = {} centers'.format(k))
+        
+        pyemma.plots.plot_implied_timescales(
+            pyemma.msm.its(cluster.dtrajs, lags=lags, nits=nits, errors='bayes'),
+            ax=axes[1, i], units='ps')
+        
+        axes[1, i].set_ylim(1, 2000)
+    
+    if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/its_cluster.pdf',dpi=300,bbox='tight')
+
+    if display:
+        plt.show()  
+
+
+
 
 if __name__ == '__main__':
 
@@ -43,27 +75,12 @@ if __name__ == '__main__':
     lag=1000
     nits = 4
     lags=[1, 2, 5, 10, 20, 50]
+    k_list=[20,50,100]
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
     data = load_data(traj,feat)
 
-    plot_feat_hist(data,feat,
-                   display=display,
-                   save=save,
-                   outdir=outdir)
-    plot_density_energy(data=data,
-                        T=T,
-                        pairNames=pairNames,
-                        display=display,
-                        save=save,
-                        outdir=outdir
-                        )
-    pca = pca_reduction(data=data,
-                        T=T,
-                        save=save,
-                        display=display,
-                        outdir=outdir)
     tica = tica_reduction(data=data,
                           lag=lag,
                           T=T,
@@ -82,10 +99,18 @@ if __name__ == '__main__':
                              lags=lags,
                              nits=nits)
     
-
     plot_its(its=its,
              data=tica,
              cluster=cluster,
              save=save,
              display=display,
              outdir=outdir)
+    
+
+    cluster_its(data=tica,
+                lags=lags,
+                nits=nits,
+                k_list=k_list,
+                save=save,
+                display=display,
+                outdir=outdir)
