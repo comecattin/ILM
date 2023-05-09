@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 """LETHE automatizes the MSM analysis"""
 
-import markov
+import load_feat
+import dimension_reduction
 import tools
 import LETHEparser
 
@@ -21,9 +22,9 @@ def main():
     
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
 
-    feat = markov.create_feat(pdb,pair_indices)
+    feat = load_feat.create_feat(pdb,pair_indices)
 
-    data = markov.load_data(traj=file_list,feat=feat)
+    data = load_feat.load_data(traj=file_list,feat=feat)
 
     #Handle plots
     if args.plot:
@@ -38,13 +39,13 @@ def main():
         
         #Plots
         if 'feat_hist' in args.plot:
-            markov.plot_feat_hist(data,feat,
+            load_feat.plot_feat_hist(data,feat,
                                   display=display,
                                   save=save,
                                   outdir=outdir)
         if 'density_energy' in args.plot:
             T = float(args.T)
-            markov.plot_density_energy(data=data,
+            load_feat.plot_density_energy(data=data,
                                        T=T,
                                        pairNames=pairNames,
                                        save=save,
@@ -53,7 +54,7 @@ def main():
             
     # Dimension reduction
     if args.pca:
-        red = markov.pca_reduction(data=data,
+        red = dimension_reduction.pca_reduction(data=data,
                                    T=T,
                                    save=save,
                                    display=display,
@@ -61,7 +62,7 @@ def main():
     
     if args.tica:
         lag = args.lag
-        red = markov.tica_reduction(data=data,
+        red = dimension_reduction.tica_reduction(data=data,
                                      T=T,
                                      lag=lag,
                                      save=save,
@@ -75,7 +76,7 @@ def main():
         elif not args.stride:
             stride = 1
         
-        cluster = markov.clustering(reduction=red,
+        cluster = dimension_reduction.clustering(reduction=red,
                                     method=args.cluster,
                                     k=args.cluster_number,
                                     stride=stride,
