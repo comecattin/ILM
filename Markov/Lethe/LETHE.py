@@ -5,6 +5,7 @@ import load_feat
 import dimension_reduction
 import tools
 import LETHEparser
+import validation
 
 def main():
     """
@@ -83,6 +84,20 @@ def main():
                                     save=save,
                                     display=display,
                                     outdir=outdir)
+    # Validation
+    if args.its:
+        its = validation.implied_time_scale(cluster=cluster,
+                                            lags=args.its,
+                                            nits=args.nits)
+        print(args.plot)
+        if 'its' in args.plot:
+            print(args.plot)
+            validation.plot_its(its=its,
+                                data=red,
+                                cluster=cluster,
+                                save=save,
+                                display=display,
+                                outdir=outdir)
 
 
 if __name__ == '__main__':

@@ -35,7 +35,7 @@ def parsing():
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist, density_energy)'
+        help='Plot wanted (feat_hist, density_energy, its)'
     )
     # Do not display the plot 
     parser.add_argument(
@@ -88,6 +88,17 @@ def parsing():
         help='Number of stride',
         type=int
     )
+    parser.add_argument(
+        '--its',
+        nargs='+',
+        type=int,
+        help='Perform ITS analysis on the following lags',
+    )
+    parser.add_argument(
+        '--nits',
+        type=int,
+        help='Number of iteration for the ITS validation'
+    )
 
     args = parser.parse_args()
 
@@ -120,3 +131,7 @@ def LETHE_handle_error(parser, args):
 
         if not args.cluster_number:
             parser.error("Please provide a number of cluster")
+
+    if args.its:
+        if not args.nits:
+            parser.error("Please provide a number of iteration")
