@@ -206,12 +206,12 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
 
 def clustering(reduction,method,k,stride,save=False,display=False,outdir=''):
     if method == 'kmeans':
-        cluster = pyemma.coordinates.cluster_kmeans(reduction, k=k, stride=stride)
+        cluster = pyemma.coordinates.cluster_kmeans(reduction, k=k, stride=stride,max_iter=200)
     if method == 'regspace':
         cluster = pyemma.coordinates.cluster_regspace(reduction,k=k,stride=stride)
     
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-    reduction_concatenated = np.concatenate(reduction)
+    reduction_concatenated = np.concatenate(reduction.get_output())
     pyemma.plots.plot_feature_histograms(
         reduction_concatenated,
         ['IC {}'.format(i + 1) for i in range(reduction.dimension())],

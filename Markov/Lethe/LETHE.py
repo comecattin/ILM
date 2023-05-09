@@ -13,11 +13,7 @@ def main():
     # Parsing
     parser, args = LETHEparser.parsing()
 
-    #Handles error
-    if not args.files:
-        parser.error("No trajectories file given")
-    if not args.distances:
-        parser.error("No distances given")
+    LETHEparser.LETHE_handle_error(parser,args)
 
     file_list = args.files
     pairNames = args.distances
@@ -47,8 +43,6 @@ def main():
                                   save=save,
                                   outdir=outdir)
         if 'density_energy' in args.plot:
-            if not args.T:
-                parser.error('Please provide a temperature')
             T = float(args.T)
             markov.plot_density_energy(data=data,
                                        T=T,
@@ -59,8 +53,6 @@ def main():
             
     # Dimension reduction
     if args.pca:
-        if args.no_plot:
-            parser.error('Please use the plot option')
         red = markov.pca_reduction(data=data,
                                    T=T,
                                    save=save,
@@ -68,10 +60,6 @@ def main():
                                    outdir=outdir)
     
     if args.tica:
-        if args.no_plot:
-            parser.error('Please use the plot option')
-        if not args.lag:
-            parser.error('Please provide a lag time')
         lag = args.lag
         red = markov.tica_reduction(data=data,
                                      T=T,
@@ -79,6 +67,22 @@ def main():
                                      save=save,
                                      display=display,
                                      outdir=outdir)
+    # Clustering
+    if args.cluster:
+
+        if args.stride:
+            stride = args.stride
+        elif not args.stride:
+            stride = 1
+        
+        cluster = markov.clustering(reduction=red,
+                                    method=args.cluster,
+                                    k=args.cluster_number,
+                                    stride=stride,
+                                    save=save,
+                                    display=display,
+                                    outdir=outdir)
+
 
 if __name__ == '__main__':
     main()

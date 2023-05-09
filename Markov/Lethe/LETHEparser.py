@@ -72,7 +72,51 @@ def parsing():
         help='Lag time for the MSM',
         type=int
     )
+    parser.add_argument(
+        '--cluster',
+        help='Clustering method (kmeans or regspace)',
+        type=str
+    )
+    parser.add_argument(
+        '-k',
+        '--cluster-number',
+        help='Number of cluster wanted',
+        type=int
+    )
+    parser.add_argument(
+        '--stride',
+        help='Number of stride',
+        type=int
+    )
 
     args = parser.parse_args()
 
     return parser, args
+
+def LETHE_handle_error(parser, args):
+    if not args.files:
+        parser.error("No trajectories file given")
+    if not args.distances:
+        parser.error("No distances given")
+
+    if 'density_energy' in args.plot:
+            if not args.T:
+                parser.error('Please provide a temperature')
+    
+    if args.pca:
+        if args.no_plot:
+            parser.error('Please use the plot option')
+    
+    if args.tica:
+        if args.no_plot:
+            parser.error('Please use the plot option')
+        if not args.lag:
+            parser.error('Please provide a lag time')
+
+    if args.cluster:
+
+        if args.no_plot:
+            parser.error('Please use the plot option')
+
+        if not args.cluster_number:
+            parser.error("Please provide a number of cluster")

@@ -8,4 +8,7 @@
 --pca \
 --tica \
 --lag 1000 \
+--cluster kmeans \
+-k 100 \
+--stride 1 \
 -o /home/ccattin/Documents/Code/outputs
