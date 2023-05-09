@@ -13,4 +13,5 @@
 --stride 1 \
 --its 1 2 5 10 20 50 \
 --nits 4 \
+--its-cluster 20 50 100 \
 -o /home/ccattin/Documents/Code/outputs

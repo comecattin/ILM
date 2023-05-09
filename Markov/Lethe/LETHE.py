@@ -98,6 +98,15 @@ def main():
                                 save=save,
                                 display=display,
                                 outdir=outdir)
+    
+    if args.its_cluster:
+        validation.cluster_its(data=red,
+                               lags=args.its,
+                               nits=args.nits,
+                               k_list=args.its_cluster,
+                               save=save,
+                               display=display,
+                               outdir=outdir)
 
 
 if __name__ == '__main__':

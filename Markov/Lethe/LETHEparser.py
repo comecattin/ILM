@@ -99,6 +99,12 @@ def parsing():
         type=int,
         help='Number of iteration for the ITS validation'
     )
+    parser.add_argument(
+        '--its-cluster',
+        nargs='+',
+        type=int,
+        help='Performed a cluster size analysis using the ITS analysis'
+    )
 
     args = parser.parse_args()
 
