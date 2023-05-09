@@ -150,7 +150,7 @@ if __name__ == '__main__':
     
     msm = cktest(cluster=cluster,
            lag=lag,
-           stable_state=3,
+           stable_state=4,
            error=True,
            display=display,
            outdir=outdir,

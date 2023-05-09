@@ -14,4 +14,6 @@
 --its 1 2 5 10 20 50 \
 --nits 4 \
 --its-cluster 20 50 100 \
+--cktest True \
+--state 4 \
 -o /home/ccattin/Documents/Code/outputs

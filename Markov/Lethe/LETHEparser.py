@@ -105,6 +105,16 @@ def parsing():
         type=int,
         help='Performed a cluster size analysis using the ITS analysis'
     )
+    parser.add_argument(
+        '--cktest',
+        type=bool,
+        help='Perform a CK test on the MSM builded given the number of metastable states. True for having the error, False for not'
+    )
+    parser.add_argument(
+        '--state',
+        type=int,
+        help='Number of state to consider in the MSM'
+    )
 
     args = parser.parse_args()
 

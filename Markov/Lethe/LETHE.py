@@ -89,9 +89,8 @@ def main():
         its = validation.implied_time_scale(cluster=cluster,
                                             lags=args.its,
                                             nits=args.nits)
-        print(args.plot)
+        
         if 'its' in args.plot:
-            print(args.plot)
             validation.plot_its(its=its,
                                 data=red,
                                 cluster=cluster,
@@ -108,6 +107,14 @@ def main():
                                display=display,
                                outdir=outdir)
 
+    if args.cktest:
+        msm = validation.cktest(cluster=cluster,
+                                lag=args.lag,
+                                stable_state=args.state,
+                                error=args.cktest,
+                                display=display,
+                                outdir=outdir,
+                                save=save)
 
 if __name__ == '__main__':
     main()
