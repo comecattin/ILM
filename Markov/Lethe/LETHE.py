@@ -178,6 +178,16 @@ def main():
             outdir=outdir
             )
     
+    if 'eigenvectors' in args.plot:
+        markov_analysis.plot_eigenvect(
+            msm=msm,
+            cluster=cluster,
+            data=red,
+            display=display,
+            save=save,
+            outdir=outdir
+        )
+    
 
 if __name__ == '__main__':
     main()

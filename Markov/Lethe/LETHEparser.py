@@ -35,7 +35,7 @@ def parsing():
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary)'
+        help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary, eigenvectors)'
     )
     # Do not display the plot 
     parser.add_argument(

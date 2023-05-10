@@ -89,14 +89,14 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False,outdir=''):
         ax.set_xlabel('Feat 1')
         ax.set_ylabel('Feat 2')
 
-        if save:
-            if outdir=='':
-                raise Exception('Please provide a directory to save the file')
-            else:
-                plt.savefig(f'{outdir}/stationary_distribution.pdf',dpi=300,bbox_inches='tight')
+    if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/stationary_distribution.pdf',dpi=300,bbox_inches='tight')
 
-        if display:
-            plt.show()
+    if display:
+        plt.show()
 
 
 if __name__ == '__main__':
