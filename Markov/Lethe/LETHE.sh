@@ -4,7 +4,7 @@
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 -d 64_CA-130_CA 119_CA-24_CA \
 --T 300 \
--p feat_hist density_energy its \
+-p feat_hist density_energy its cluster\
 --pca \
 --tica \
 --lag 1000 \

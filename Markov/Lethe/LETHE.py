@@ -69,6 +69,10 @@ def main():
                                      save=save,
                                      display=display,
                                      outdir=outdir)
+        
+    if not args.tica and not args.pca :
+        red = data
+
     # Clustering
     if args.cluster:
 
@@ -80,10 +84,15 @@ def main():
         cluster = dimension_reduction.clustering(reduction=red,
                                     method=args.cluster,
                                     k=args.cluster_number,
-                                    stride=stride,
-                                    save=save,
-                                    display=display,
-                                    outdir=outdir)
+                                    stride=stride)
+        if 'cluster' in args.plot:
+            dimension_reduction.clustering_plot(reduction=red,
+                                                cluster=cluster,
+                                                save=save,
+                                                outdir=outdir,
+                                                display=display)
+
+
     # Validation
     if args.its:
         its = validation.implied_time_scale(cluster=cluster,

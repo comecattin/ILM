@@ -10,7 +10,10 @@ def implied_time_scale(cluster,lags,nits):
 
 def plot_its(its,data, cluster, save=False, display=False,outdir=''):
     fig, axes = plt.subplots(1, 3, figsize=(12, 3))
-    data_concatenated = np.concatenate(data.get_output())
+    if type(data) == list:
+        data_concatenated = np.concatenate(data)
+    else:
+        data_concatenated = np.concatenate(data.get_output())
     pyemma.plots.plot_feature_histograms(data_concatenated, feature_labels=['Feat 1', 'Feat 2'], ax=axes[0])
     pyemma.plots.plot_density(*data_concatenated.T, ax=axes[1], cbar=False, alpha=0.1)
     axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
@@ -29,7 +32,11 @@ def plot_its(its,data, cluster, save=False, display=False,outdir=''):
 
 def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
 
-    data_concatenated = np.concatenate(data.get_output())
+    if type(data) == list:
+        data_concatenated = np.concatenate(data)
+    else:
+        data_concatenated = np.concatenate(data.get_output())
+    
     fig, axes = plt.subplots(2, len(k_list))
     for i, k in enumerate(k_list):
         
