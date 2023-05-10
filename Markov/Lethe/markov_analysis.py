@@ -54,8 +54,49 @@ def plot_stationary(msm,
 
     if display:
         plt.show()
+
     
 
+def plot_eigenvect(msm, data, cluster, display=False, save=False,outdir=''):
+    
+    if type(data) == list:
+        data_concatenated = np.concatenate(data)
+    else:
+        data_concatenated = np.concatenate(data.get_output())
+
+    dtrajs_concatenated = np.concatenate(cluster.dtrajs)
+
+    eigvec = msm.eigenvectors_right()
+    print(
+        'first eigenvector is one: {} (min={}, max={})'.format(
+        np.allclose(eigvec[:, 0], 1, atol=1e-15),
+        eigvec[:, 0].min(),
+        eigvec[:, 0].max()
+        )
+        )
+
+    fig, axes = plt.subplots(2, 3, figsize=(12, 6))
+
+    for i, ax in enumerate(axes.flat):
+        pyemma.plots.plot_contour(
+            *data_concatenated.T,
+            eigvec[dtrajs_concatenated, i + 1],
+            ax=ax,
+            cmap='PiYG',
+            cbar_label='{}. right eigenvector'.format(i + 2),
+            mask=True)
+        ax.scatter(*cluster.clustercenters.T, s=15, c='C1')
+        ax.set_xlabel('Feat 1')
+        ax.set_ylabel('Feat 2')
+
+        if save:
+            if outdir=='':
+                raise Exception('Please provide a directory to save the file')
+            else:
+                plt.savefig(f'{outdir}/stationary_distribution.pdf',dpi=300,bbox_inches='tight')
+
+        if display:
+            plt.show()
 
 
 if __name__ == '__main__':
@@ -104,3 +145,10 @@ if __name__ == '__main__':
                     display=display,
                     save=save,
                     outdir=outdir)
+    
+    plot_eigenvect(msm=msm,
+                   data=tica,
+                   cluster=cluster,
+                   display=display,
+                   outdir=outdir,
+                   save=save)
