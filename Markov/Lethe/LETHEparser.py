@@ -35,7 +35,7 @@ def parsing():
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist, density_energy, its)'
+        help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary)'
     )
     # Do not display the plot 
     parser.add_argument(
@@ -52,6 +52,8 @@ def parsing():
     # Temperature in K of the system
     parser.add_argument(
         '--T',
+        '--temperature',
+        type=float,
         help='Temperature of the system'
     )
     # PCA dimension reduction

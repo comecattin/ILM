@@ -83,8 +83,6 @@ def cktest(msm,
     if display:
         plt.show()
 
-    return msm
-
 
 
 if __name__ == '__main__':

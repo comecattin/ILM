@@ -22,6 +22,39 @@ def create_msm(cluster,lag,dt_traj='1 ps',error=False):
 
     return msm
 
+def plot_stationary(msm,
+                    cluster,
+                    data,
+                    display=False,
+                    save=False,
+                    outdir=''):
+    
+    if type(data) == list:
+        data_concatenated = np.concatenate(data)
+    else:
+        data_concatenated = np.concatenate(data.get_output())
+    
+    dtrajs_concatenated = np.concatenate(cluster.dtrajs)
+
+    fig, ax, misc = pyemma.plots.plot_contour(
+        *data_concatenated.T, 
+        msm.pi[dtrajs_concatenated],
+        cbar_label='Stationary distribution',
+        method='nearest',
+        mask=True)
+    ax.scatter(*cluster.clustercenters.T, s=15, c='C1')
+    ax.set_xlabel('Feat 1')
+    ax.set_ylabel('Feat 2')
+
+    if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/stationary_distribution.pdf',dpi=300,bbox_inches='tight')
+
+    if display:
+        plt.show()
+    
 
 
 
@@ -64,3 +97,10 @@ if __name__ == '__main__':
     msm = create_msm(cluster=cluster,
            lag=lag,
            error=True)
+    
+    plot_stationary(msm=msm,
+                    data=tica,
+                    cluster=cluster,
+                    display=display,
+                    save=save,
+                    outdir=outdir)
