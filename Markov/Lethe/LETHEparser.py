@@ -56,6 +56,13 @@ def parsing():
         type=float,
         help='Temperature of the system'
     )
+    # Dimension reduction
+    parser.add_argument(
+        '--reduction',
+        type=str,
+        help='Do a PCA or TICA dimension reduction. Select PCA, TICA or none',
+        default='none'
+    )
     # PCA dimension reduction
     parser.add_argument(
         '--pca',

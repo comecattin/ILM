@@ -65,7 +65,7 @@ def main():
                 )
             
     # Dimension reduction
-    if args.pca:
+    if args.reduction == 'pca':
         red = dimension_reduction.pca_reduction(
             data=data,
             T=args.T,
@@ -74,7 +74,7 @@ def main():
             outdir=outdir
             )
     
-    if args.tica:
+    if args.reduction == 'tica':
         lag = args.lag
         red = dimension_reduction.tica_reduction(
             data=data,
@@ -85,7 +85,7 @@ def main():
             outdir=outdir
             )
         
-    if not args.tica and not args.pca :
+    if args.reduction == 'none' :
         red = data
 
     # Clustering
