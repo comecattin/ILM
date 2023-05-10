@@ -72,23 +72,36 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
     
     return tica
 
-def clustering(reduction,method,k,stride,save=False,display=False,outdir=''):
+def clustering(reduction,method,k,stride):
     if method == 'kmeans':
         cluster = pyemma.coordinates.cluster_kmeans(reduction, k=k, stride=stride,max_iter=200)
     if method == 'regspace':
         cluster = pyemma.coordinates.cluster_regspace(reduction,k=k,stride=stride)
     
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-    reduction_concatenated = np.concatenate(reduction.get_output())
-    pyemma.plots.plot_feature_histograms(
-        reduction_concatenated,
-        ['IC {}'.format(i + 1) for i in range(reduction.dimension())],
-        ax=axes[0])
-    pyemma.plots.plot_density(*reduction_concatenated.T, ax=axes[1], cbar=False, alpha=0.1, logscale=True)
-    axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
-    axes[1].set_xlabel('IC 1')
-    axes[1].set_ylabel('IC 2')
+    return cluster
+
+def clustering_plot(reduction,cluster,save=False,outdir='',display=False):
+
+    if type(reduction) == list:
+        fig, axe = plt.subplots(1,1,figsize=(10, 4))
+        reduction_concatenated = np.concatenate(reduction)
+        pyemma.plots.plot_density(*reduction_concatenated.T, cbar=False, alpha=0.1, logscale=True,ax=axe)
+        axe.scatter(*cluster.clustercenters.T, s=15, c='C1')
+        axe.set_xlabel('IC 1')
+        axe.set_ylabel('IC 2')
     
+    else:
+        fig, axes = plt.subplots(1,2,figsize=(10, 4))
+        reduction_concatenated = np.concatenate(reduction.get_output())
+        pyemma.plots.plot_feature_histograms(
+            reduction_concatenated,
+            ['IC {}'.format(i + 1) for i in range(reduction.dimension())],
+            ax=axes[0])
+        pyemma.plots.plot_density(*reduction_concatenated.T, ax=axes[1], cbar=False, alpha=0.1, logscale=True)
+        axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
+        axes[1].set_xlabel('IC 1')
+        axes[1].set_ylabel('IC 2')
+        
     if save:
         if outdir=='':
             raise Exception('Please provide a directory to save the file')
@@ -96,8 +109,6 @@ def clustering(reduction,method,k,stride,save=False,display=False,outdir=''):
             plt.savefig(f'{outdir}/cluster.pdf',dpi=300,bbox_inches='tight')
     if display:
         plt.show()
-
-    return cluster
 
 
 if __name__ == '__main__' :
