@@ -188,6 +188,18 @@ def main():
             outdir=outdir
         )
     
+    if args.save:
+        # Save the model
+        markov_analysis.save_model(
+            cluster=cluster,
+            msm=msm,
+            outdir=outdir,
+            filename=args.save[0],
+            model_name=args.save[1]
+        )
+
+
+
 
 if __name__ == '__main__':
     main()

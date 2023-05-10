@@ -38,6 +38,31 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
 def get_kT(T):
     return scipy.constants.R *T/1000
 
+def save_model(cluster,msm,outdir,filename,model_name):
+    
+    cluster.save(
+        f'{outdir}/{filename}',
+        model_name=f'{model_name}_cluster',
+        overwrite=True
+        )
+    msm.save(
+        f'{outdir}/{filename}',
+        model_name=f'{model_name}_msm',
+        overwrite=True
+    )
+
+def load_model(outdir,filename,model_name):
+    msm = pyemma.load(
+        f'{outdir}/{filename}',
+        model_name=f'{model_name}_msm'
+        )
+    cluster = pyemma.load(
+        f'{outdir}/{filename}',
+        model_name=f'{model_name}_cluster'
+        )
+    
+    return msm, cluster
+
 if __name__ == '__main__':
 
     refGS = '/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb'

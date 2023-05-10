@@ -8,7 +8,10 @@ from dimension_reduction import *
 from validation import *
 from markov_analysis import *
 
-
+def stationary_prob(msm,nstate):
+     msm.pca(nstate)
+     for i, s in enumerate(msm.metastable_sets):
+          print('π_{} = {:f}'.format(i + 1, msm.pi[s].sum()))
 
 
 
@@ -63,12 +66,12 @@ if __name__ == '__main__':
     cluster = clustering(reduction=tica,
                          method='kmeans',
                          k=200,
-                         stride=1,
-                         save=save,
-                         display=display,
-                         outdir=outdir)
+                         stride=1)
     
 
     msm = create_msm(cluster=cluster,
            lag=lag,
-           error=True)
+           error=False)
+    
+    stationary_prob(msm=msm,
+                    nstate=stable_state)

@@ -129,6 +129,12 @@ def parsing():
         action='store_true',
         help='Create the MSM with a Bayesian estimation of the error. This is presented in a 95% confidence interval'
     )
+    parser.add_argument(
+        '--save',
+        nargs=2,
+        type=str,
+        help='File name and model name to save the clustering and MSM'
+    )
 
     args = parser.parse_args()
 

@@ -116,6 +116,10 @@ if __name__ == '__main__':
     lags=[1, 2, 5, 10, 20, 50]
     stable_state = 4
 
+    # Save
+    filename = 'test.pyemma'
+    model_name = 'GS01_GS02'
+
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
     data = load_data(traj,feat)
@@ -129,10 +133,8 @@ if __name__ == '__main__':
     cluster = clustering(reduction=tica,
                          method='kmeans',
                          k=200,
-                         stride=1,
-                         save=save,
-                         display=display,
-                         outdir=outdir)
+                         stride=1
+                         )
     
 
     msm = create_msm(cluster=cluster,
@@ -152,3 +154,11 @@ if __name__ == '__main__':
                    display=display,
                    outdir=outdir,
                    save=save)
+    
+    tools.save_model(
+        cluster=cluster,
+        msm=msm,
+        outdir=outdir,
+        filename=filename,
+        model_name=model_name
+        )
