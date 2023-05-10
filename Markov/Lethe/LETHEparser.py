@@ -115,6 +115,11 @@ def parsing():
         type=int,
         help='Number of state to consider in the MSM'
     )
+    parser.add_argument(
+        '--confidence',
+        action='store_true',
+        help='Create the MSM with a Bayesian estimation of the error. This is presented in a 95% confidence interval'
+    )
 
     args = parser.parse_args()
 

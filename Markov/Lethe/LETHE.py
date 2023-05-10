@@ -5,6 +5,7 @@ import load_feat
 import dimension_reduction
 import tools
 import LETHEparser
+import markov_analysis
 import validation
 
 def main():
@@ -91,8 +92,11 @@ def main():
                                                 save=save,
                                                 outdir=outdir,
                                                 display=display)
-
-
+            
+    # Creation of the MSM
+    msm = markov_analysis.create_msm(cluster=cluster,
+                                         lag=args.lag,
+                                         error=args.confidence)
     # Validation
     if args.its:
         its = validation.implied_time_scale(cluster=cluster,
@@ -115,15 +119,14 @@ def main():
                                save=save,
                                display=display,
                                outdir=outdir)
-
-    if args.cktest:
-        msm = validation.cktest(cluster=cluster,
-                                lag=args.lag,
-                                stable_state=args.state,
-                                error=args.cktest,
-                                display=display,
-                                outdir=outdir,
-                                save=save)
+    
+    if 'cktest' in args.plot:
+        
+        validation.cktest(msm=msm,
+                          stable_state=args.state,
+                          display=display,
+                          outdir=outdir,
+                          save=save)
 
 if __name__ == '__main__':
     main()
