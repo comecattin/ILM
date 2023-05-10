@@ -35,7 +35,7 @@ def parsing():
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist, density_energy, its)'
+        help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary, eigenvectors)'
     )
     # Do not display the plot 
     parser.add_argument(
@@ -52,7 +52,16 @@ def parsing():
     # Temperature in K of the system
     parser.add_argument(
         '--T',
+        '--temperature',
+        type=float,
         help='Temperature of the system'
+    )
+    # Dimension reduction
+    parser.add_argument(
+        '--reduction',
+        type=str,
+        help='Do a PCA or TICA dimension reduction. Select PCA, TICA or none',
+        default='none'
     )
     # PCA dimension reduction
     parser.add_argument(
@@ -114,6 +123,11 @@ def parsing():
         '--state',
         type=int,
         help='Number of state to consider in the MSM'
+    )
+    parser.add_argument(
+        '--confidence',
+        action='store_true',
+        help='Create the MSM with a Bayesian estimation of the error. This is presented in a 95% confidence interval'
     )
 
     args = parser.parse_args()

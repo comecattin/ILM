@@ -1,6 +1,7 @@
 import pyemma
 from dimension_reduction import *
 from load_feat import *
+from markov_analysis import *
 
 def implied_time_scale(cluster,lags,nits):
 
@@ -65,25 +66,11 @@ def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
         plt.show()
 
     
-def cktest(cluster,
-           lag,
+def cktest(msm,
            stable_state,
-           dt_traj='1 ps',
-           error=False,
            save=False,
            display=False,
            outdir=''):
-     
-    if error:
-        msm = pyemma.msm.bayesian_markov_model(cluster.dtrajs,
-                                               lag=lag,
-                                               dt_traj=dt_traj,
-                                               conf=0.95)
-        
-    else:
-        msm = pyemma.msm.estimate_markov_model(cluster.dtrajs,
-                                           lag=lag,
-                                           dt_traj=dt_traj)
     
     pyemma.plots.plot_cktest(msm.cktest(stable_state), units='ps')
 
@@ -95,8 +82,6 @@ def cktest(cluster,
 
     if display:
         plt.show()
-
-    return msm
 
 
 
@@ -116,6 +101,7 @@ if __name__ == '__main__':
     nits = 4
     lags=[1, 2, 5, 10, 20, 50]
     k_list=[20,50,100]
+    stable_state = 4
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
@@ -155,10 +141,12 @@ if __name__ == '__main__':
                 display=display,
                 outdir=outdir)
     
-    msm = cktest(cluster=cluster,
-           lag=lag,
-           stable_state=4,
-           error=True,
+    msm = create_msm(cluster=cluster,
+                     lag=lag,
+                     error=True)
+    
+    cktest(msm=msm,
+           stable_state=stable_state,
            display=display,
            outdir=outdir,
            save=save)
