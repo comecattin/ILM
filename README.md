@@ -19,6 +19,8 @@ Repository of the different codes developed during my M2 insternship at the ILM
 
 ## Markov
   Various codes that use MSM or PyEmma
+  
+  Lethe is an implementation of automatize PyEmma MSM pipeline. Manual available using `./LETHE.py -h/--help`
 
 ## Cluster
   Codes that rely on TTClust and extract its result
