@@ -141,6 +141,11 @@ def parsing():
         type=str,
         help='Load previous model. File name (.pyemma) and then model name.'
     )
+    parser.add_argument(
+        '--stationary-prob',
+        action='store_true',
+        help='Display the stationary probabilities'
+    )
 
     args = parser.parse_args()
 

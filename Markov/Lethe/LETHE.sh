@@ -14,7 +14,8 @@
 --nits 4 \
 `#--its-cluster 20 50 100` \
 --confidence \
---state 4 \
+--state 2 \
+--stationary-prob \
 -o /home/ccattin/Documents/Code/outputs \
 --save test.pyemma GS01_GS02 \
 --load test.pyemma GS01_GS02

@@ -7,6 +7,7 @@ import tools
 import LETHEparser
 import markov_analysis
 import validation
+import pcca
 
 def main():
     """
@@ -199,6 +200,13 @@ def main():
             save=save,
             outdir=outdir
         )
+
+    #====PCCA AND TPT====#
+    if args.stationary_prob:
+        pcca.stationary_prob(
+            msm=msm,
+            nstate=args.state
+            )
     
     #====SAVE MSM====#
     if args.save:
