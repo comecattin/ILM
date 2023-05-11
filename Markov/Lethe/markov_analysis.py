@@ -8,6 +8,24 @@ from dimension_reduction import *
 from validation import *
 
 def create_msm(cluster,lag,dt_traj='1 ps',error=False):
+    """Create a MSM
+
+    Parameters
+    ----------
+    cluster : pyemma.cluster
+        Cluster to make the analysis
+    lag : int
+        Lag time for the MSM
+    dt_traj : str, optional
+        Axe legend, by default '1 ps'
+    error : bool, optional
+        Bayesian MSM or not, by default False
+
+    Returns
+    -------
+    msm : pyemma.msm
+        MSM or bayesian MSM
+    """
 
     if error:
         msm = pyemma.msm.bayesian_markov_model(cluster.dtrajs,
@@ -28,9 +46,33 @@ def plot_stationary(msm,
                     display=False,
                     save=False,
                     outdir=''):
+    """Stationary plot
+
+    Parameters
+    ----------
+    msm : pyemma.msm
+        MSM or bayesian MSM
+    cluster : pyemma.cluster
+        Cluster to make the analysis
+    data : pyemma.load
+        Data loaded from pyemma loader
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
     
+    # Data without dimension reduction
     if type(data) == list:
         data_concatenated = np.concatenate(data)
+    # Dimension reduction
     else:
         data_concatenated = np.concatenate(data.get_output())
     
@@ -58,15 +100,41 @@ def plot_stationary(msm,
     
 
 def plot_eigenvect(msm, data, cluster, display=False, save=False,outdir=''):
+    """Plot the first 6 eigen vectors
+
+    Parameters
+    ----------
+    msm : pyemma.msm
+        MSM or bayesian MSM
+    cluster : pyemma.cluster
+        Cluster to make the analysis
+    data : pyemma.load
+        Data loaded from pyemma loader
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
     
+    # Data without dimension reduction
     if type(data) == list:
         data_concatenated = np.concatenate(data)
+    # Dimension reduced
     else:
         data_concatenated = np.concatenate(data.get_output())
 
     dtrajs_concatenated = np.concatenate(cluster.dtrajs)
 
     eigvec = msm.eigenvectors_right()
+
+    # Confirmation print
     print(
         'first eigenvector is one: {} (min={}, max={})'.format(
         np.allclose(eigvec[:, 0], 1, atol=1e-15),
