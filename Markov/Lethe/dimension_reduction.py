@@ -1,3 +1,6 @@
+#! /usr/bin/env python3
+"""Dimension reduction for faster analysis MSM"""
+
 import pyemma
 import tools
 from load_feat import *
@@ -5,9 +8,39 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def pca_reduction(data,T,save=False,display=False,outdir=''):
+    """Do a PCA dimension reduction and plot it
+
+    Parameters
+    ----------
+    data : pyemma.load
+        Data loaded from pyemma loader
+    T : float
+        Temperature
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Returns
+    -------
+    pca : pyemma.pca
+        Data reduced using PCA
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+    # Dimension reduction
     pca = pyemma.coordinates.pca(data,dim=2)
+    # Concatenate
     pca_concatenated = np.concatenate(pca.get_output())
+    
+    # Histogramm plot of the new dimension
     fig,ax  =pyemma.plots.plot_feature_histograms(pca_concatenated,ignore_dim_warning=True)
+    
     if save:
         if outdir=='':
             raise Exception('Please provide a directory to save the file')
@@ -16,7 +49,7 @@ def pca_reduction(data,T,save=False,display=False,outdir=''):
     if display:
         plt.show()
     
-
+    # Free energy plot of the new dimension
     fig, axes = plt.subplots(1, 1, figsize=(5, 4))
     kT = tools.get_kT(T)
     pyemma.plots.plot_free_energy(*pca_concatenated.T[0:2],
@@ -36,10 +69,39 @@ def pca_reduction(data,T,save=False,display=False,outdir=''):
     return pca
 
 def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
+    """Do a TICA dimension reduction and plot it
 
+    Parameters
+    ----------
+    data : pyemma.load
+        Data loaded from pyemma loader
+    lag : int
+        Lag time
+    T : float
+        Temperature of the system
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Returns
+    -------
+    pca : pyemma.tica
+        Data reduced using TICA
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+
+    # TICA reduction
     tica = pyemma.coordinates.tica(data, dim=2, lag=lag)
     tica_concatenated = np.concatenate(tica.get_output())
 
+    # Histogramm plot
     fig, axes = plt.subplots(1, 1, figsize=(5, 4))
     pyemma.plots.plot_feature_histograms(
         tica_concatenated,
@@ -54,7 +116,7 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
     if display:
         plt.show()
 
-
+    # Free energy plot
     fig, axes = plt.subplots(1, 1, figsize=(5, 4))
     kT=tools.get_kT(T)
     pyemma.plots.plot_free_energy(*tica_concatenated.T[0:2],
@@ -73,6 +135,24 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
     return tica
 
 def clustering(reduction,method,k,stride):
+    """Clustering of the data
+
+    Parameters
+    ----------
+    reduction : pyemma.data
+        Data from pyemma loader or from PCA, TICA reduction
+    method : str
+        Method to use, 'kmeans' and 'regspace' are implemented
+    k : int
+        Number of cluster
+    stride : int
+        Stride
+
+    Returns
+    -------
+    cluster : pyemma.cluster
+        Data clustered
+    """
     if method == 'kmeans':
         cluster = pyemma.coordinates.cluster_kmeans(reduction, k=k, stride=stride,max_iter=200)
     if method == 'regspace':
@@ -81,7 +161,28 @@ def clustering(reduction,method,k,stride):
     return cluster
 
 def clustering_plot(reduction,cluster,save=False,outdir='',display=False):
+    """Plot of the clustering
 
+    Parameters
+    ----------
+    reduction : pyemma.data
+        Data from pyemma loader or from PCA, TICA reduction
+    cluster : pyemma.cluster
+        Data clustered
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+     Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+
+    # If no reduction has been performed
     if type(reduction) == list:
         fig, axe = plt.subplots(1,1,figsize=(10, 4))
         reduction_concatenated = np.concatenate(reduction)
@@ -90,13 +191,16 @@ def clustering_plot(reduction,cluster,save=False,outdir='',display=False):
         axe.set_xlabel('IC 1')
         axe.set_ylabel('IC 2')
     
+    # Reduction has been performed
     else:
         fig, axes = plt.subplots(1,2,figsize=(10, 4))
         reduction_concatenated = np.concatenate(reduction.get_output())
+        # Histogram plot
         pyemma.plots.plot_feature_histograms(
             reduction_concatenated,
             ['IC {}'.format(i + 1) for i in range(reduction.dimension())],
             ax=axes[0])
+        # Density plot
         pyemma.plots.plot_density(*reduction_concatenated.T, ax=axes[1], cbar=False, alpha=0.1, logscale=True)
         axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
         axes[1].set_xlabel('IC 1')

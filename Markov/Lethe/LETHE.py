@@ -15,22 +15,24 @@ def main():
     """
     
     #====PARSING====#
+    # Get the args
     parser, args = LETHEparser.parsing()
-
+    # Handle commun errors
     LETHEparser.LETHE_handle_error(parser,args)
 
     file_list = args.files
     pairNames = args.distances
     pdb = args.topology
     
+    # Convert name in indices
     pair_indices = tools.create_pairIndices_from_pairNames(
         pdb,pairNames
         )
-
+    # Create a feat
     feat = load_feat.create_feat(
         pdb,pair_indices
         )
-
+    # Load the data
     data = load_feat.load_data(
         traj=file_list,feat=feat
         )
@@ -47,6 +49,7 @@ def main():
             outdir=''
         
         #Plots
+        # Histogram plot of the feat
         if 'feat_hist' in args.plot:
             load_feat.plot_feat_hist(
                 data,feat,
@@ -54,6 +57,7 @@ def main():
                 save=save,
                 outdir=outdir
                 )
+        # Density energy map of the feat
         if 'density_energy' in args.plot:
             T = float(args.T)
             load_feat.plot_density_energy(
@@ -66,6 +70,7 @@ def main():
                 )
             
     #====DIMENSION REDUCTION====#
+    # PCA reduction
     if args.reduction == 'pca':
         red = dimension_reduction.pca_reduction(
             data=data,
@@ -75,6 +80,7 @@ def main():
             outdir=outdir
             )
     
+    # TICA reduction
     if args.reduction == 'tica':
         lag = args.lag
         red = dimension_reduction.tica_reduction(
@@ -85,7 +91,8 @@ def main():
             display=display,
             outdir=outdir
             )
-        
+    
+    # No reduction, raw data    
     if args.reduction == 'none' :
         red = data
 
@@ -115,6 +122,7 @@ def main():
                 stride=stride
                 )
             
+            # Plot the clustering result
             if 'cluster' in args.plot:
                 dimension_reduction.clustering_plot(
                     reduction=red,
@@ -133,6 +141,7 @@ def main():
         
 
     #====MSM VALIDATION====#
+    # ITS analysis
     if args.its:
         its = validation.implied_time_scale(
             cluster=cluster,
@@ -149,6 +158,7 @@ def main():
                 outdir=outdir
                 )
     
+    # ITS analysis as a function of the number of cluster
     if args.its_cluster:
         validation.cluster_its(
             data=red,
@@ -160,6 +170,7 @@ def main():
             outdir=outdir
             )
     
+    # CK test
     if 'cktest' in args.plot:
         validation.cktest(
             msm=msm,
@@ -181,6 +192,7 @@ def main():
         )
         )
     
+    # Plot the stationary distribution
     if 'stationary' in args.plot:
         markov_analysis.plot_stationary(
             msm=msm,
@@ -190,7 +202,7 @@ def main():
             save=save,
             outdir=outdir
             )
-    
+    # Plot the first 6 eigenvectors
     if 'eigenvectors' in args.plot:
         markov_analysis.plot_eigenvect(
             msm=msm,
@@ -202,6 +214,8 @@ def main():
         )
 
     #====PCCA AND TPT====#
+    
+    # Display the stationary probabilities
     if args.stationary_prob:
         pcca.stationary_prob(
             msm=msm,
