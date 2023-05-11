@@ -14,21 +14,46 @@ def stationary_prob(msm,nstate):
      for i, s in enumerate(msm.metastable_sets):
           print('π_{} = {:f}'.format(i + 1, msm.pi[s].sum()))
 
+def plot_metastable_membership(
+          msm,
+          nstate,
+          data,
+          cluster,
+          display=False,
+          save=False,
+          outdir=''
+          ):
 
+     # Data without dimension reduction
+     if type(data) == list:
+          data_concatenated = np.concatenate(data)
+     # Dimension reduction
+     else:
+          data_concatenated = np.concatenate(data.get_output())
+          
+     dtrajs_concatenated = np.concatenate(cluster.dtrajs)
 
+     fig, axes = plt.subplots(1, nstate, figsize=(15, 3))
+     for i, ax in enumerate(axes.flat):
+          pyemma.plots.plot_contour(
+               *data_concatenated.T,
+               msm.metastable_distributions[i][dtrajs_concatenated],
+               ax=ax,
+               cmap='afmhot_r', 
+               mask=True,
+               cbar_label='Metastable distribution {}'.format(i + 1)
+               )
+          ax.set_xlabel('Feat 1')
+     axes[0].set_ylabel('Feat 2')
+     
+     if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/metastable_membership.pdf',dpi=300,bbox_inches='tight')
 
-
-
-
-
-
-
-
-
-
-
-
-
+     if display:
+        plt.show()
 
 
 
@@ -54,7 +79,7 @@ if __name__ == '__main__':
     lag=1000
     nits = 4
     lags=[1, 2, 5, 10, 20, 50]
-    stable_state = 4
+    stable_state = 2
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
@@ -89,5 +114,17 @@ if __name__ == '__main__':
          model_name=model_name
     )
 
-    stationary_prob(msm=msm,
-                    nstate=stable_state)
+    stationary_prob(
+        msm=msm,
+        nstate=stable_state
+        )
+    plot_metastable_membership(
+        msm=msm,
+        nstate=stable_state,
+        data=data,
+        cluster=cluster,
+        display=display,
+        save=save,
+        outdir=outdir
+    )
+    
