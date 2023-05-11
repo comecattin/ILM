@@ -9,6 +9,20 @@ import pyemma
 
 
 def create_pairIndices_from_pairNames(pdbfilename, pairNames):
+    """Get the indices from the names
+
+    Parameters
+    ----------
+    pdbfilename : str
+        Path to the .pdb file
+    pairNames : list
+        List of string containing the different pair name
+
+    Returns
+    -------
+    pairsListIndices : list
+        List containing the different indices
+    """
     refu = mda.Universe(pdbfilename)
     pairsListIndices = []
     for pairname in pairNames:
@@ -37,33 +51,83 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
     return pairsListIndices
 
 def get_kT(T):
+    """Compute kT
+
+    Parameters
+    ----------
+    T : float
+        Temperature of the system
+
+    Returns
+    -------
+    kT : float
+        kT
+    """
     return scipy.constants.R *T/1000
 
 def save_model(cluster,msm,outdir,filename,model_name):
-    
+    """Save the given model in a .pyemma file
+
+    Parameters
+    ----------
+    cluster : pyemma.cluster type
+        PyEmma cluster
+    msm : pyemma.msm
+        PyEmma estimation MSM
+    outdir : str
+        Output directory
+    filename : str
+        Name of the file in the output directory
+    model_name : str
+        Name to give to the model
+    """
+    # Save the cluster
     cluster.save(
         f'{outdir}/{filename}',
         model_name=f'{model_name}_cluster',
         overwrite=True
         )
+    # Save the MSM
     msm.save(
         f'{outdir}/{filename}',
         model_name=f'{model_name}_msm',
         overwrite=True
     )
+    # Confirmation print
     print(
         f'Cluster and MSM saved in {outdir}/{filename} with model name {model_name}'
         )
 
 def load_model(outdir,filename,model_name):
+    """Load previous PyEmma model
+
+    Parameters
+    ----------
+    outdir : str
+        Output directory
+    filename : str
+        Name of the file in the output directory
+    model_name : str
+        Name to give to the model
+
+    Returns
+    -------
+    cluster : pyemma.cluster type
+        PyEmma cluster
+    msm : pyemma.msm
+        PyEmma estimation MSM
+    """
+    # Load MSM
     msm = pyemma.load(
         f'{outdir}/{filename}',
         model_name=f'{model_name}_msm'
         )
+    # Load cluster
     cluster = pyemma.load(
         f'{outdir}/{filename}',
         model_name=f'{model_name}_cluster'
         )
+    # Confirmation print
     print(
         f'Cluster and MSM loaded from {outdir}/{filename} with model name {model_name}'
     )
