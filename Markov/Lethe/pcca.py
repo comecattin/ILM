@@ -90,6 +90,8 @@ def plot_mftp(
           nstates,
           mfpt,
           inverse_mfpt,
+          metastable_traj,
+          coarse_state_centers,
           display=False,
           save=False,
           outdir=''
@@ -137,7 +139,7 @@ def plot_mftp(
         if outdir=='':
             raise Exception('Please provide a directory to save the file')
         else:
-            plt.savefig(f'{outdir}/metastable_membership.pdf',dpi=300,bbox_inches='tight')
+            plt.savefig(f'{outdir}/mfpt.pdf',dpi=300,bbox_inches='tight')
 
      if display:
         plt.show()
@@ -235,6 +237,8 @@ if __name__ == '__main__':
         nstates=stable_state,
         mfpt=mfpt,
         inverse_mfpt=inverse_mfpt,
+        metastable_traj=metastable_traj,
+        coarse_state_centers=coarse_state_centers,
         display=display,
         save=save,
         outdir=outdir

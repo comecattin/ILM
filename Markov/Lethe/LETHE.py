@@ -232,6 +232,34 @@ def main():
                 save=save,
                 outdir=outdir
             )
+        
+        (
+            metastable_traj,
+            highest_membership,
+            coarse_state_centers
+        ) = pcca.concatenate(
+            msm=msm,
+            cluster=cluster
+            )
+        
+        mfpt, inverse_mfpt = pcca.get_mfpt(
+            msm=msm,
+            nstates=args.state
+            )
+        
+        if 'mfpt' in args.plot:
+            pcca.plot_mftp(
+                data=red,
+                nstates=args.state,
+                mfpt=mfpt,
+                inverse_mfpt=inverse_mfpt,
+                metastable_traj=metastable_traj,
+                coarse_state_centers=coarse_state_centers,
+                display=display,
+                save=save,
+                outdir=outdir
+                )
+
     
     #====SAVE MSM====#
     if args.save:
