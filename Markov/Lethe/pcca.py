@@ -56,10 +56,91 @@ def plot_metastable_membership(
         plt.show()
 
 
+def concatenate(msm,cluster):
+     dtrajs_concatenated = np.concatenate(cluster.dtrajs)
+
+     metastable_traj = msm.metastable_assignments[
+         dtrajs_concatenated
+         ]
+     
+     highest_membership = msm.metastable_distributions.argmax(1)
+     
+     coarse_state_centers = cluster.clustercenters[
+         msm.active_set[highest_membership]
+         ]
+     
+     return metastable_traj, highest_membership, coarse_state_centers
 
 
+def get_mfpt(msm,nstates):
+     mfpt = np.zeros((nstates, nstates))
+     for i in range(nstates):
+          for j in range(nstates):
+               mfpt[i, j] = msm.mfpt(
+                    msm.metastable_sets[i],
+                    msm.metastable_sets[j])
 
+     inverse_mfpt = np.zeros_like(mfpt)
+     nz = mfpt.nonzero()
+     inverse_mfpt[nz] = 1.0 / mfpt[nz]
+     return mfpt, inverse_mfpt
 
+def plot_mftp(
+          data,
+          nstates,
+          mfpt,
+          inverse_mfpt,
+          display=False,
+          save=False,
+          outdir=''
+          ):
+
+     # Data without dimension reduction
+     if type(data) == list:
+          data_concatenated = np.concatenate(data)
+     # Dimension reduction
+     else:
+          data_concatenated = np.concatenate(data.get_output())
+
+     fig, ax = plt.subplots(figsize=(10, 7))
+
+     _, _, misc = pyemma.plots.plot_state_map(
+          *data_concatenated.T,
+          metastable_traj,
+          ax=ax,
+          zorder=-1)
+     # set state numbers 1 ... nstates
+     misc['cbar'].set_ticklabels(range(1, nstates + 1))  
+
+     pyemma.plots.plot_network(
+          inverse_mfpt,
+          pos=coarse_state_centers,
+          figpadding=0,
+          arrow_label_format='%.1f ps',
+          arrow_labels=mfpt,
+          size=12,
+          show_frame=True,
+          ax=ax)
+
+     ax.set_xlabel('Feat 1')
+     ax.set_ylabel('Feat 2')
+     ax.set_xlim(
+         min(data_concatenated[:,0]),
+         max(data_concatenated[:,0])
+         )
+     ax.set_ylim(
+         min(data_concatenated[:,1]),
+         max(data_concatenated[:,1])
+         )
+     
+     if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/metastable_membership.pdf',dpi=300,bbox_inches='tight')
+
+     if display:
+        plt.show()
 
 
 if __name__ == '__main__':
@@ -121,10 +202,40 @@ if __name__ == '__main__':
     plot_metastable_membership(
         msm=msm,
         nstate=stable_state,
-        data=data,
+        data=tica,
         cluster=cluster,
         display=display,
         save=save,
         outdir=outdir
     )
+
+    (
+        metastable_traj,
+        highest_membership,
+        coarse_state_centers
+        ) = concatenate(
+        msm=msm,
+        cluster=cluster
+    )
+    print(
+        metastable_traj,
+        highest_membership,
+        coarse_state_centers
+        )
     
+    mfpt, inverse_mfpt = get_mfpt(
+         msm=msm,
+         nstates=stable_state
+    )
+    print(mfpt,inverse_mfpt)
+
+
+    plot_mftp(
+        data=tica,
+        nstates=stable_state,
+        mfpt=mfpt,
+        inverse_mfpt=inverse_mfpt,
+        display=display,
+        save=save,
+        outdir=outdir
+    )
