@@ -259,6 +259,26 @@ def main():
                 save=save,
                 outdir=outdir
                 )
+            
+        flux, cgflux = pcca.tpt(
+            msm=msm,
+            state=args.state_path,
+
+        )
+
+        if 'committor' in args.plot:
+            pcca.plot_committor_tpt(
+                data=red,
+                cluster=cluster,
+                flux=flux,
+                state=args.state_path,
+                cgflux=cgflux,
+                coarse_state_centers=coarse_state_centers,
+                nstates=args.state,
+                display=display,
+                outdir=outdir,
+                save=save
+            )
 
     
     #====SAVE MSM====#

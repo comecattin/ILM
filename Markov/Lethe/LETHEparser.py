@@ -48,7 +48,7 @@ def parsing():
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt)'
+        help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)'
     )
     # Do not display the plot 
     parser.add_argument(
@@ -170,6 +170,12 @@ def parsing():
         '--pcca',
         action='store_true',
         help='PCCA and TPT analysis. Display the stationary probabilities'
+    )
+    parser.add_argument(
+        '--state-path',
+        nargs=2,
+        type=int,
+        help='Get the TPT between the two given states'
     )
 
     #Get the arguments

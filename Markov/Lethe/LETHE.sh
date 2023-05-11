@@ -4,7 +4,7 @@
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 -d 64_CA-130_CA 119_CA-24_CA \
 --T 300 \
--p `#feat_hist density_energy` its cluster cktest stationary eigenvectors metastable_membership mfpt \
+-p `#feat_hist density_energy` its cluster cktest stationary eigenvectors metastable_membership mfpt committor \
 --reduction none \
 --lag 1000 \
 --cluster kmeans \
@@ -14,8 +14,9 @@
 --nits 4 \
 `#--its-cluster 20 50 100` \
 --confidence \
---state 2 \
+--state 3 \
 --pcca \
+--state-path 1 2 \
 -o /home/ccattin/Documents/Code/outputs \
 --save test.pyemma GS01_GS02 \
 --load test.pyemma GS01_GS02
