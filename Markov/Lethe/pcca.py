@@ -144,6 +144,79 @@ def plot_mftp(
      if display:
         plt.show()
 
+def tpt(msm,state):
+    A = msm.metastable_sets[state[0]]
+    B = msm.metastable_sets[state[1]]
+    flux = pyemma.msm.tpt(msm, A, B)
+    cg, cgflux = flux.coarse_grain(msm.metastable_sets)
+
+    paths,path_fluxes = cgflux.pathways(fraction=0.99)
+    print('percentage       \tpath')
+    print('-------------------------------------')
+    for i in range(len(paths)):
+        print(
+            np.round(path_fluxes[i] / np.sum(path_fluxes), 3),
+            ' \t',
+            paths[i] + 1)
+
+    return flux, cgflux
+
+def plot_committor_tpt(data,cluster,flux,state,cgflux,coarse_state_centers,nstates,save=False,outdir='',display=False):
+     # Data without dimension reduction
+     if type(data) == list:
+         data_concatenated = np.concatenate(data)
+     # Dimension reduction
+     else:
+          data_concatenated = np.concatenate(data.get_output())
+     
+     dtrajs_concatenated = np.concatenate(cluster.dtrajs)
+
+     fig, ax = plt.subplots(figsize=(10, 7))
+     pyemma.plots.plot_contour(
+         *data_concatenated.T,
+         flux.committor[dtrajs_concatenated],
+         cmap='brg',
+         ax=ax,
+         mask=True,
+         cbar_label=fr'Committor {state[0]} $\to$ {state[1]}',
+         alpha=0.8,
+         zorder=-1)
+     
+     state_labels=['']*nstates
+     state_labels[state[0]] = 'A'
+     state_labels[state[1]] = 'B'
+
+     pyemma.plots.plot_flux(
+         cgflux,
+         coarse_state_centers,
+         cgflux.stationary_distribution,
+         state_labels=state_labels, 
+         ax=ax,
+         show_committor=False,
+         figpadding=0,
+         show_frame=True,
+         arrow_label_format='%2.e / ps');
+     ax.set_xlabel('Feat 1')
+     ax.set_ylabel('Feat 2')
+     ax.set_xlim(
+         min(data_concatenated[:,0]),
+         max(data_concatenated[:,0])
+         )
+     ax.set_ylim(
+         min(data_concatenated[:,1]),
+         max(data_concatenated[:,1])
+         )
+     
+     if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/mfpt_committor.pdf',dpi=300,bbox_inches='tight')
+
+     if display:
+        plt.show()
+    
+
 
 if __name__ == '__main__':
 
@@ -162,7 +235,7 @@ if __name__ == '__main__':
     lag=1000
     nits = 4
     lags=[1, 2, 5, 10, 20, 50]
-    stable_state = 2
+    stable_state = 3
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
@@ -242,4 +315,22 @@ if __name__ == '__main__':
         display=display,
         save=save,
         outdir=outdir
+    )
+
+    flux, cgflux = tpt(
+        msm=msm,
+        state=[1,2]
+    )
+
+    plot_committor_tpt(
+        data=tica,
+        cluster=cluster,
+        flux=flux,
+        state=[1,2],
+        cgflux=cgflux,
+        coarse_state_centers=coarse_state_centers,
+        nstates=stable_state,
+        display=display,
+        outdir=outdir,
+        save=save
     )
