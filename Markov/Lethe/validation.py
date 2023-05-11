@@ -1,25 +1,74 @@
+#! /usr/bin/env python3
+"""Markov State Model validation"""
+
 import pyemma
 from dimension_reduction import *
 from load_feat import *
 from markov_analysis import *
 
 def implied_time_scale(cluster,lags,nits):
+    """Compute the implied time scale (ITS)
+
+    Parameters
+    ----------
+    cluster : pyemma.cluster
+        Cluster to make the analysis
+    lags : list
+        List if lag times for the MSM
+    nits : int
+        Number of iteration
+
+    Returns
+    -------
+    its : pyemma.its
+        Implied time scale
+    """
 
     its = pyemma.msm.its(cluster.dtrajs,lags=lags,nits=nits,errors='bayes')
 
     return its
 
 def plot_its(its,data, cluster, save=False, display=False,outdir=''):
+    """Plot the ITS validation
+
+    Parameters
+    ----------
+    its : pyemma.its
+        Implied time scale
+    cluster : pyemma.cluster
+        Cluster to make the analysis
+    data : pyemma.load
+        Data loaded from pyemma loader
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+
     fig, axes = plt.subplots(1, 3, figsize=(12, 3))
+    
+    # Data were not reduced using TICA or PCA
     if type(data) == list:
         data_concatenated = np.concatenate(data)
+    # Data reduced
     else:
         data_concatenated = np.concatenate(data.get_output())
+    
+    # Histogram plot
     pyemma.plots.plot_feature_histograms(data_concatenated, feature_labels=['Feat 1', 'Feat 2'], ax=axes[0])
+    # Density plot
     pyemma.plots.plot_density(*data_concatenated.T, ax=axes[1], cbar=False, alpha=0.1)
     axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
     axes[1].set_xlabel('Feat 1')
     axes[1].set_ylabel('Feat 2')
+    # ITS plot
     pyemma.plots.plot_implied_timescales(its, ax=axes[2], units='ps')
     
     if save:
@@ -32,17 +81,45 @@ def plot_its(its,data, cluster, save=False, display=False,outdir=''):
 
 
 def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
+    """ITS validation as a function of the cluster numbers
 
+    Parameters
+    ----------
+    data : pyemma.load
+        Data loaded from pyemma loader
+    lag : int
+        Lag time for the MSM
+    nits : int
+        Number of iteration
+    k_list : list
+        List of the different number of cluster size to test
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+
+    # Data were not reduced
     if type(data) == list:
         data_concatenated = np.concatenate(data)
+    # Data were reduced 
     else:
         data_concatenated = np.concatenate(data.get_output())
     
     fig, axes = plt.subplots(2, len(k_list))
+    
     for i, k in enumerate(k_list):
-        
+        # Loop over the number of cluster provided    
         cluster = pyemma.coordinates.cluster_kmeans(data, k=k, max_iter=50, stride=10)
         
+        # Density plot
         pyemma.plots.plot_density(*data_concatenated.T, ax=axes[0, i], cbar=False, alpha=0.1)
         
         axes[0, i].scatter(*cluster.clustercenters.T, s=15, c='C1')
@@ -50,6 +127,7 @@ def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
         axes[0, i].set_ylabel('Feat 2')
         axes[0, i].set_title('k = {} centers'.format(k))
         
+        # ITS plot
         pyemma.plots.plot_implied_timescales(
             pyemma.msm.its(cluster.dtrajs, lags=lags, nits=nits, errors='bayes'),
             ax=axes[1, i], units='ps')
@@ -71,7 +149,28 @@ def cktest(msm,
            save=False,
            display=False,
            outdir=''):
+    """CK test
+
+    Parameters
+    ----------
+    msm : pyemma.msm
+        MSM or bayesian MSM
+    stable_state : int
+        Number of meta stable states to consider
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
     
+    # Plot of the CK test
     pyemma.plots.plot_cktest(msm.cktest(stable_state), units='ps')
 
     if save:
