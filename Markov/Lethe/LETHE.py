@@ -216,22 +216,22 @@ def main():
     #====PCCA AND TPT====#
     
     # Display the stationary probabilities
-    if args.stationary_prob:
+    if args.pcca:
         pcca.stationary_prob(
             msm=msm,
             nstate=args.state
             )
     
-    if 'metastable_membership' in args.plot:
-        pcca.plot_metastable_membership(
-            msm=msm,
-            nstate=args.state,
-            data=red,
-            cluster=cluster,
-            display=display,
-            save=save,
-            outdir=outdir
-        )
+        if 'metastable_membership' in args.plot:
+            pcca.plot_metastable_membership(
+                msm=msm,
+                nstate=args.state,
+                data=red,
+                cluster=cluster,
+                display=display,
+                save=save,
+                outdir=outdir
+            )
     
     #====SAVE MSM====#
     if args.save:

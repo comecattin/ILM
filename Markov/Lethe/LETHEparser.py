@@ -165,11 +165,11 @@ def parsing():
         type=str,
         help='Load previous model. File name (.pyemma) and then model name.'
     )
-    # Display the stationary proba
+    # PCCA analysis, display the stationary proba
     parser.add_argument(
-        '--stationary-prob',
+        '--pcca',
         action='store_true',
-        help='Display the stationary probabilities'
+        help='PCCA and TPT analysis. Display the stationary probabilities'
     )
 
     #Get the arguments
