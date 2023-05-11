@@ -9,6 +9,16 @@ from validation import *
 from markov_analysis import *
 
 def stationary_prob(msm,nstate):
+     """Display the stationary probabilities
+
+     Parameters
+     ----------
+     msm : pyemma.msm
+        MSM or bayesian MSM
+     nstate : int
+         Number of meta stable state to consider
+     """
+
      msm.pcca(nstate)
      print('Sationary probabilities of the metastable sets')
      for i, s in enumerate(msm.metastable_sets):
@@ -23,6 +33,30 @@ def plot_metastable_membership(
           save=False,
           outdir=''
           ):
+     """Plot the metastable membership
+
+     Parameters
+     ----------
+     msm : pyemma.msm
+        MSM or bayesian MSM
+     nstate : int
+         Number of meta stable state to consider
+     cluster : pyemma.cluster
+        Cluster to make the analysis
+    data : pyemma.load
+        Data loaded from pyemma loader
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+     """
 
      # Data without dimension reduction
      if type(data) == list:
@@ -33,6 +67,7 @@ def plot_metastable_membership(
           
      dtrajs_concatenated = np.concatenate(cluster.dtrajs)
 
+     # Metastable distribution plot
      fig, axes = plt.subplots(1, nstate, figsize=(15, 3))
      for i, ax in enumerate(axes.flat):
           pyemma.plots.plot_contour(
@@ -57,6 +92,24 @@ def plot_metastable_membership(
 
 
 def concatenate(msm,cluster):
+     """Concatenate data for TPT analysis
+
+     Parameters
+     ----------
+     msm : pyemma.msm
+        MSM or bayesian MSM
+     cluster : pyemma.cluster
+        Cluster to make the analysis
+
+     Returns
+     -------
+     metastable_traj : pyemma.msm.metastable_assignments
+         Trajectories of metastable states
+     highest_membership : int
+          Indice of the highest membership
+     coarse_state_centers : pyemma.cluster.clustercenters
+          Coarse state centers
+     """
      dtrajs_concatenated = np.concatenate(cluster.dtrajs)
 
      metastable_traj = msm.metastable_assignments[
@@ -73,13 +126,31 @@ def concatenate(msm,cluster):
 
 
 def get_mfpt(msm,nstates):
+     """Mean First Passage Time and its inverse
+
+     Parameters
+     ----------
+     msm : pyemma.msm
+        MSM or bayesian MSM
+     nstate : int
+         Number of meta stable state to consider
+
+     Returns
+     -------
+     mfpt : np.array
+         Array containing the Mean First Passage Time
+     inverse_mfpt : np.array
+          Array containing the inverse of MFPT
+     """
+     # Init
      mfpt = np.zeros((nstates, nstates))
+     # Loop over all the state in a square matrix
      for i in range(nstates):
           for j in range(nstates):
                mfpt[i, j] = msm.mfpt(
                     msm.metastable_sets[i],
                     msm.metastable_sets[j])
-
+     # Compute the inverse
      inverse_mfpt = np.zeros_like(mfpt)
      nz = mfpt.nonzero()
      inverse_mfpt[nz] = 1.0 / mfpt[nz]
@@ -96,6 +167,34 @@ def plot_mftp(
           save=False,
           outdir=''
           ):
+     """Plot the flux map with the MFPT
+
+     Parameters
+     ----------
+     data : pyemma.load
+        Data loaded from pyemma loader
+     nstate : int
+         Number of meta stable state to consider
+     mfpt : np.array
+         Array containing the Mean First Passage Time
+     inverse_mfpt : np.array
+          Array containing the inverse of MFPT
+     metastable_traj : pyemma.msm.metastable_assignments
+         Trajectories of metastable states
+     coarse_state_centers : pyemma.cluster.clustercenters
+          Coarse state centers
+     save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+     """
 
      # Data without dimension reduction
      if type(data) == list:
@@ -106,6 +205,7 @@ def plot_mftp(
 
      fig, ax = plt.subplots(figsize=(10, 7))
 
+     # Plot the state map under
      _, _, misc = pyemma.plots.plot_state_map(
           *data_concatenated.T,
           metastable_traj,
@@ -114,6 +214,7 @@ def plot_mftp(
      # set state numbers 1 ... nstates
      misc['cbar'].set_ticklabels(range(1, nstates + 1))  
 
+     # Plot the network
      pyemma.plots.plot_network(
           inverse_mfpt,
           pos=coarse_state_centers,
@@ -145,23 +246,85 @@ def plot_mftp(
         plt.show()
 
 def tpt(msm,state):
-    A = msm.metastable_sets[state[0]]
-    B = msm.metastable_sets[state[1]]
-    flux = pyemma.msm.tpt(msm, A, B)
-    cg, cgflux = flux.coarse_grain(msm.metastable_sets)
+     """Transition Path Theory between two markov states
 
-    paths,path_fluxes = cgflux.pathways(fraction=0.99)
-    print('percentage       \tpath')
-    print('-------------------------------------')
-    for i in range(len(paths)):
-        print(
-            np.round(path_fluxes[i] / np.sum(path_fluxes), 3),
-            ' \t',
-            paths[i] + 1)
+     Parameters
+     ----------
+     msm : pyemma.msm
+        MSM or bayesian MSM
+     state : list
+         List (len = 2) that contain the two state to study path
 
-    return flux, cgflux
+     Returns
+     -------
+     flux : pyemma.msm.tpt
+         Flux between the two states
+     cgflux : flux.coarse_grain
+          Coarse grained flux between the two states
+     """
 
-def plot_committor_tpt(data,cluster,flux,state,cgflux,coarse_state_centers,nstates,save=False,outdir='',display=False):
+     # Initiate the two states
+     A = msm.metastable_sets[state[0]]
+     B = msm.metastable_sets[state[1]]
+     
+     # Compute the flux and the coarse grained
+     flux = pyemma.msm.tpt(msm, A, B)
+     cg, cgflux = flux.coarse_grain(msm.metastable_sets)
+
+     # Get the pathes
+     paths,path_fluxes = cgflux.pathways(fraction=0.99)
+     print('percentage       \tpath')
+     print('-------------------------------------')
+     for i in range(len(paths)):
+         print(
+             np.round(path_fluxes[i] / np.sum(path_fluxes), 3),
+             ' \t',
+             paths[i] + 1)
+
+     return flux, cgflux
+
+def plot_committor_tpt(
+        data,
+        cluster,
+        flux,
+        state,
+        cgflux,
+        coarse_state_centers,
+        nstates,
+        save=False,
+        outdir='',
+        display=False
+        ):
+     """Plot the committor map
+
+     Parameters
+     ----------
+     data : pyemma.load
+        Data loaded from pyemma loader
+     cluster : pyemma.cluster
+        Cluster to make the analysis
+     flux : pyemma.msm.tpt
+         Flux between the two states
+     state : list
+         List (len = 2) that contain the two state to study path
+     cgflux : flux.coarse_grain
+          Coarse grained flux between the two states
+     coarse_state_centers : pyemma.cluster.clustercenters
+          Coarse state centers
+     nstates : int
+         Number of meta stable states to consider
+     save : bool, optional
+        Save or not the plot, by default False
+     display : bool, optional
+        Display or not the plot, by default False
+     outdir : str, optional
+        Output directory to save the plot, by default ''
+
+     Raises
+     ------
+     Exception
+        Provide a directory to save the file
+     """
      # Data without dimension reduction
      if type(data) == list:
          data_concatenated = np.concatenate(data)
@@ -171,6 +334,7 @@ def plot_committor_tpt(data,cluster,flux,state,cgflux,coarse_state_centers,nstat
      
      dtrajs_concatenated = np.concatenate(cluster.dtrajs)
 
+     # Committor map behind
      fig, ax = plt.subplots(figsize=(10, 7))
      pyemma.plots.plot_contour(
          *data_concatenated.T,
@@ -182,10 +346,12 @@ def plot_committor_tpt(data,cluster,flux,state,cgflux,coarse_state_centers,nstat
          alpha=0.8,
          zorder=-1)
      
+     # State label
      state_labels=['']*nstates
      state_labels[state[0]] = 'A'
      state_labels[state[1]] = 'B'
 
+     # Flux above
      pyemma.plots.plot_flux(
          cgflux,
          coarse_state_centers,

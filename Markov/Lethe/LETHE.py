@@ -221,7 +221,8 @@ def main():
             msm=msm,
             nstate=args.state
             )
-    
+        
+        # Plot the metastable membership
         if 'metastable_membership' in args.plot:
             pcca.plot_metastable_membership(
                 msm=msm,
@@ -233,6 +234,7 @@ def main():
                 outdir=outdir
             )
         
+        # Compute PCCA and TPT
         (
             metastable_traj,
             highest_membership,
@@ -247,6 +249,7 @@ def main():
             nstates=args.state
             )
         
+        # Plot MFPT
         if 'mfpt' in args.plot:
             pcca.plot_mftp(
                 data=red,
@@ -259,13 +262,15 @@ def main():
                 save=save,
                 outdir=outdir
                 )
-            
+
+        # Compute the flux for the committor    
         flux, cgflux = pcca.tpt(
             msm=msm,
             state=args.state_path,
 
         )
 
+        # Plot the committor
         if 'committor' in args.plot:
             pcca.plot_committor_tpt(
                 data=red,
