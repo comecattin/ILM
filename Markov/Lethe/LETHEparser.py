@@ -135,6 +135,12 @@ def parsing():
         type=str,
         help='File name and model name to save the clustering and MSM'
     )
+    parser.add_argument(
+        '--load',
+        nargs=2,
+        type=str,
+        help='Load previous model. File name (.pyemma) and then model name.'
+    )
 
     args = parser.parse_args()
 

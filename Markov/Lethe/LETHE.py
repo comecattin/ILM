@@ -13,7 +13,7 @@ def main():
     CLI main function
     """
     
-    # Parsing
+    #====PARSING====#
     parser, args = LETHEparser.parsing()
 
     LETHEparser.LETHE_handle_error(parser,args)
@@ -34,7 +34,7 @@ def main():
         traj=file_list,feat=feat
         )
 
-    #Handle plots
+    #====HANDLE INITIAL PLOTS====#
     if args.plot:
         # Parameters
         display = not args.no_plot
@@ -64,7 +64,7 @@ def main():
                 outdir=outdir
                 )
             
-    # Dimension reduction
+    #====DIMENSION REDUCTION====#
     if args.reduction == 'pca':
         red = dimension_reduction.pca_reduction(
             data=data,
@@ -88,37 +88,50 @@ def main():
     if args.reduction == 'none' :
         red = data
 
-    # Clustering
-    if args.cluster:
 
-        if args.stride:
-            stride = args.stride
-        elif not args.stride:
-            stride = 1
+    #====LOAD PREVIOUS MODEL====#
+    if args.load:
+        msm, cluster = tools.load_model(
+            outdir=outdir,
+            filename=args.load[0],
+            model_name=args.load[1])
+
+    #=====DO NOT LOAD PREVIOUS MODEL====#    
+    if not args.load:
         
-        cluster = dimension_reduction.clustering(
-            reduction=red,
-            method=args.cluster,
-            k=args.cluster_number,
-            stride=stride
-            )
-        
-        if 'cluster' in args.plot:
-            dimension_reduction.clustering_plot(
+        #====CLUSTERING====#
+        if args.cluster:
+
+            if args.stride:
+                stride = args.stride
+            elif not args.stride:
+                stride = 1
+            
+            cluster = dimension_reduction.clustering(
                 reduction=red,
-                cluster=cluster,
-                save=save,
-                outdir=outdir,
-                display=display
+                method=args.cluster,
+                k=args.cluster_number,
+                stride=stride
                 )
             
-    # Creation of the MSM
-    msm = markov_analysis.create_msm(
-        cluster=cluster,
-        lag=args.lag,
-        error=args.confidence
-        )
-    # Validation
+            if 'cluster' in args.plot:
+                dimension_reduction.clustering_plot(
+                    reduction=red,
+                    cluster=cluster,
+                    save=save,
+                    outdir=outdir,
+                    display=display
+                    )
+                
+        #====CREATE MSM====#
+        msm = markov_analysis.create_msm(
+            cluster=cluster,
+            lag=args.lag,
+            error=args.confidence
+            )
+        
+
+    #====MSM VALIDATION====#
     if args.its:
         its = validation.implied_time_scale(
             cluster=cluster,
@@ -155,8 +168,7 @@ def main():
             save=save
             )
     
-    # Analysis of the MSM
-    
+    #====MSM ANALYSIS====#
     print(
         'fraction of states used = {:f}'.format(
         msm.active_state_fraction
@@ -188,9 +200,10 @@ def main():
             outdir=outdir
         )
     
+    #====SAVE MSM====#
     if args.save:
         # Save the model
-        markov_analysis.save_model(
+        tools.save_model(
             cluster=cluster,
             msm=msm,
             outdir=outdir,

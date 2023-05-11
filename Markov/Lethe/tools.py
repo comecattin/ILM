@@ -5,6 +5,7 @@ Tools used in LETHE
 
 import MDAnalysis as mda
 import scipy
+import pyemma
 
 
 def create_pairIndices_from_pairNames(pdbfilename, pairNames):
@@ -50,6 +51,9 @@ def save_model(cluster,msm,outdir,filename,model_name):
         model_name=f'{model_name}_msm',
         overwrite=True
     )
+    print(
+        f'Cluster and MSM saved in {outdir}/{filename} with model name {model_name}'
+        )
 
 def load_model(outdir,filename,model_name):
     msm = pyemma.load(
@@ -60,6 +64,9 @@ def load_model(outdir,filename,model_name):
         f'{outdir}/{filename}',
         model_name=f'{model_name}_cluster'
         )
+    print(
+        f'Cluster and MSM loaded from {outdir}/{filename} with model name {model_name}'
+    )
     
     return msm, cluster
 

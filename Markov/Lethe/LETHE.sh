@@ -16,4 +16,5 @@
 --confidence \
 --state 4 \
 -o /home/ccattin/Documents/Code/outputs \
---save test.pyemma GS01_GS02
+--save test.pyemma GS01_GS02 \
+--load test.pyemma GS01_GS02
