@@ -42,4 +42,5 @@
 `# Save model` \
 --save all_lag500_k200_stride4_reductionNone.pyemma GSES \
 `# Load previous model` \
-#--load all_lag1000_k200_stride4_reductionNone.pyemma GSES \
+`#--load all_lag1000_k200_stride4_reductionNone.pyemma GSES` \
+> lethe.out \
