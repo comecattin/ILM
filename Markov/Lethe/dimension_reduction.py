@@ -190,27 +190,24 @@ def clustering_plot(reduction,cluster,save=False,outdir='',display=False):
 
     # If no reduction has been performed
     if type(reduction) == list:
-        fig, axe = plt.subplots(1,1,figsize=(10, 4))
         reduction_concatenated = np.concatenate(reduction)
-        pyemma.plots.plot_density(*reduction_concatenated.T, cbar=False, alpha=0.1, logscale=True,ax=axe)
-        axe.scatter(*cluster.clustercenters.T, s=15, c='C1')
-        axe.set_xlabel('IC 1')
-        axe.set_ylabel('IC 2')
-    
-    # Reduction has been performed
+        dimension = len(reduction)
+    # Dimension reduction
     else:
-        fig, axes = plt.subplots(1,2,figsize=(10, 4))
         reduction_concatenated = np.concatenate(reduction.get_output())
-        # Histogram plot
-        pyemma.plots.plot_feature_histograms(
-            reduction_concatenated,
-            ['IC {}'.format(i + 1) for i in range(reduction.dimension())],
-            ax=axes[0])
-        # Density plot
-        pyemma.plots.plot_density(*reduction_concatenated.T, ax=axes[1], cbar=False, alpha=0.1, logscale=True)
-        axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
-        axes[1].set_xlabel('IC 1')
-        axes[1].set_ylabel('IC 2')
+        dimension = reduction.dimension()
+    
+    fig, axes = plt.subplots(1,2,figsize=(10, 4))
+    # Histogram plot
+    pyemma.plots.plot_feature_histograms(
+        reduction_concatenated,
+        ['IC {}'.format(i + 1) for i in range(dimension)],
+        ax=axes[0])
+    # Density plot
+    pyemma.plots.plot_density(*reduction_concatenated.T, ax=axes[1], cbar=False, alpha=0.1, logscale=True)
+    axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
+    axes[1].set_xlabel('IC 1')
+    axes[1].set_ylabel('IC 2')
         
     if save:
         if outdir=='':
@@ -265,11 +262,7 @@ if __name__ == '__main__' :
     tica = tica_reduction(
         data=data,
         lag=lag,
-        dim=dim,
-        T=T,
-        save=save,
-        display=display,
-        outdir=outdir)
+        dim=dim)
     
     plot_tica(
         tica=tica,
@@ -279,10 +272,17 @@ if __name__ == '__main__' :
         display=display,
         outdir=outdir
     )
-    cluster = clustering(reduction=tica,
-                         method='kmeans',
-                         k=200,
-                         stride=1,
-                         save=save,
-                         display=display,
-                         outdir=outdir)
+
+    cluster = clustering(
+        reduction=tica,
+        method='kmeans',
+        k=200,
+        stride=1)
+    
+    clustering_plot(
+        reduction=tica,
+        cluster=cluster,
+        save=save,
+        outdir=outdir,
+        display=display
+    )
