@@ -204,8 +204,8 @@ def clustering_plot(reduction,cluster,save=False,outdir='',display=False):
         ['IC {}'.format(i + 1) for i in range(dimension)],
         ax=axes[0])
     # Density plot
-    pyemma.plots.plot_density(*reduction_concatenated.T, ax=axes[1], cbar=False, alpha=0.1, logscale=True)
-    axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
+    pyemma.plots.plot_density(*reduction_concatenated.T[0:2], ax=axes[1], cbar=False, alpha=0.1, logscale=True)
+    axes[1].scatter(*cluster.clustercenters.T[0:2], s=15, c='C1')
     axes[1].set_xlabel('IC 1')
     axes[1].set_ylabel('IC 2')
         

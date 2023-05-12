@@ -79,12 +79,12 @@ def plot_stationary(msm,
     dtrajs_concatenated = np.concatenate(cluster.dtrajs)
 
     fig, ax, misc = pyemma.plots.plot_contour(
-        *data_concatenated.T, 
+        *data_concatenated.T[0:2], 
         msm.pi[dtrajs_concatenated],
         cbar_label='Stationary distribution',
         method='nearest',
         mask=True)
-    ax.scatter(*cluster.clustercenters.T, s=15, c='C1')
+    ax.scatter(*cluster.clustercenters.T[0:2], s=15, c='C1')
     ax.set_xlabel('Feat 1')
     ax.set_ylabel('Feat 2')
 
@@ -143,17 +143,17 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False,outdir=''):
         )
         )
 
-    fig, axes = plt.subplots(2, 3, figsize=(12, 6))
+    fig, axes = plt.subplots(2, 3, figsize=(17, 6))
 
     for i, ax in enumerate(axes.flat):
         pyemma.plots.plot_contour(
-            *data_concatenated.T,
+            *data_concatenated.T[0:2],
             eigvec[dtrajs_concatenated, i + 1],
             ax=ax,
             cmap='PiYG',
             cbar_label='{}. right eigenvector'.format(i + 2),
             mask=True)
-        ax.scatter(*cluster.clustercenters.T, s=15, c='C1')
+        ax.scatter(*cluster.clustercenters.T[0:2], s=15, c='C1')
         ax.set_xlabel('Feat 1')
         ax.set_ylabel('Feat 2')
 
@@ -179,6 +179,7 @@ if __name__ == '__main__':
     save = False
     display = False
     T = 300
+    dim=2
     lag=1000
     nits = 4
     lags=[1, 2, 5, 10, 20, 50]
@@ -192,12 +193,11 @@ if __name__ == '__main__':
     feat = create_feat(pdb,pair_indices)
     data = load_data(traj,feat)
 
-    tica = tica_reduction(data=data,
-                          lag=lag,
-                          T=T,
-                          save=save,
-                          display=display,
-                          outdir=outdir)
+    tica = tica_reduction(
+        data=data,
+        lag=lag,
+        dim=dim)
+    
     cluster = clustering(reduction=tica,
                          method='kmeans',
                          k=200,
