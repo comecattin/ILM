@@ -49,6 +49,9 @@ def parsing():
         '--plot',
         nargs='+',
         help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)',
+        choices=[
+             'feat_hist','density_energy','its','cluster','cktest','stationary','eigenvectors','metastable_membership','mfpt','committor'
+             ],
         required=True
     )
     # Do not display the plot 
@@ -74,8 +77,14 @@ def parsing():
     parser.add_argument(
         '--reduction',
         type=str,
+        choices=['pca','tica','none'],
         help='Do a PCA or TICA dimension reduction. Select PCA, TICA or none',
         default='none'
+    )
+    parser.add_argument(
+         '--tica-lag',
+         type=int,
+         help='Lag used for the TICA dimension reduction'
     )
     # Lag time
     parser.add_argument(
@@ -87,6 +96,7 @@ def parsing():
     # Clustering method
     parser.add_argument(
         '--cluster',
+        choices=['kmeans', 'regspace'],
         help='Clustering method (kmeans or regspace)',
         type=str
     )
@@ -127,6 +137,7 @@ def parsing():
     parser.add_argument(
         '--cktest',
         type=bool,
+        choices=[True,False],
         help='Perform a CK test on the MSM builded given the number of metastable states. True for having the error, False for not'
     )
     # Meta-stable states
@@ -197,6 +208,9 @@ def LETHE_handle_error(parser, args):
             if not args.T:
                 parser.error('Please provide a temperature')
     
+    if args.reduction == 'tica' and not args.tica_lag:
+         parser.error('Please provide a TICA lag')
+
     if args.cluster and not args.cluster_number:
          parser.error('Please provide a number of cluster')
     

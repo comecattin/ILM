@@ -82,11 +82,10 @@ def main():
     
     # TICA reduction
     if args.reduction == 'tica':
-        lag = args.lag
         red = dimension_reduction.tica_reduction(
             data=data,
             T=args.T,
-            lag=lag,
+            lag=args.tica_lag,
             save=save,
             display=display,
             outdir=outdir
