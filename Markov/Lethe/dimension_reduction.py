@@ -7,34 +7,25 @@ from load_feat import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-def pca_reduction(data,T,save=False,display=False,outdir=''):
+def pca_reduction(data,dim):
     """Do a PCA dimension reduction and plot it
 
     Parameters
     ----------
     data : pyemma.load
         Data loaded from pyemma loader
-    T : float
-        Temperature
-    save : bool, optional
-        Save or not the plot, by default False
-    display : bool, optional
-        Display or not the plot, by default False
-    outdir : str, optional
-        Output directory to save the plot, by default ''
 
     Returns
     -------
     pca : pyemma.pca
         Data reduced using PCA
-
-    Raises
-    ------
-    Exception
-        Provide a directory to save the file
     """
     # Dimension reduction
-    pca = pyemma.coordinates.pca(data,dim=2)
+    pca = pyemma.coordinates.pca(data,dim=dim)
+    
+    return pca
+
+def plot_pca(pca,T,save=False,outdir='',display=False):
     # Concatenate
     pca_concatenated = np.concatenate(pca.get_output())
     
@@ -50,23 +41,27 @@ def pca_reduction(data,T,save=False,display=False,outdir=''):
         plt.show()
     
     # Free energy plot of the new dimension
-    fig, axes = plt.subplots(1, 1, figsize=(5, 4))
-    kT = tools.get_kT(T)
-    pyemma.plots.plot_free_energy(*pca_concatenated.T[0:2],
-                                            ax=axes,
-                                            kT=kT,
-                                            cbar_label='free energy / kJ.mol-1') 
-    axes.set_xlabel('PC 1')
-    axes.set_ylabel('PC 2')
-    if save:
-        if outdir=='':
-            raise Exception('Please provide a directory to save the file')
-        else:
-            plt.savefig(f'{outdir}/pca_free_energy_direct_from_density.pdf', dpi=300,bbox_inches="tight")
-    if display:
-        plt.show()
-    
-    return pca
+    if dim >= 2 :
+        fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+        kT = tools.get_kT(T)
+        pyemma.plots.plot_free_energy(*pca_concatenated.T[0:2],
+                                                ax=axes,
+                                                kT=kT,
+                                                cbar_label='free energy / kJ.mol-1') 
+        axes.set_xlabel('PC 1')
+        axes.set_ylabel('PC 2')
+        if save:
+            if outdir=='':
+                raise Exception('Please provide a directory to save the file')
+            else:
+                plt.savefig(f'{outdir}/pca_free_energy_direct_from_density.pdf', dpi=300,bbox_inches="tight")
+        if display:
+            plt.show()
+
+
+
+
+
 
 def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
     """Do a TICA dimension reduction and plot it
@@ -228,6 +223,7 @@ if __name__ == '__main__' :
     display = True
     T = 300
     lag=1000
+    dim=1
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
@@ -245,10 +241,15 @@ if __name__ == '__main__' :
                         outdir=outdir
                         )
     pca = pca_reduction(data=data,
-                        T=T,
-                        save=save,
-                        display=display,
-                        outdir=outdir)
+                        dim=dim)
+    
+    plot_pca(
+        pca=pca,
+        T=T,
+        save=save,
+        outdir=outdir,
+        display=display)
+
     tica = tica_reduction(data=data,
                           lag=lag,
                           T=T,
