@@ -48,7 +48,8 @@ def parsing():
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)'
+        help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)',
+        required=True
     )
     # Do not display the plot 
     parser.add_argument(
@@ -76,23 +77,12 @@ def parsing():
         help='Do a PCA or TICA dimension reduction. Select PCA, TICA or none',
         default='none'
     )
-    # PCA dimension reduction
-    parser.add_argument(
-        '--pca',
-        help='Do a PCA dimension reduction',
-        action='store_true'
-    )
-    # TICA dimension reduction
-    parser.add_argument(
-        '--tica',
-        help='Do a TICA dimension reduction',
-        action='store_true'
-    )
     # Lag time
     parser.add_argument(
         '--lag',
         help='Lag time for the MSM',
-        type=int
+        type=int,
+        required=True
     )
     # Clustering method
     parser.add_argument(
@@ -207,26 +197,14 @@ def LETHE_handle_error(parser, args):
             if not args.T:
                 parser.error('Please provide a temperature')
     
-    # # Forgot to use the plot option
-    # if args.pca:
-    #     if args.no_plot:
-    #         parser.error('Please use the plot option')
-    
-    # # No lag time or plot option given
-    # if args.tica:
-    #     if args.no_plot:
-    #         parser.error('Please use the plot option')
-    #     if not args.lag:
-    #         parser.error('Please provide a lag time')
-
-    # # Cluster errors
-    # if args.cluster:
-    #     if args.no_plot:
-    #         parser.error('Please use the plot option')
-    #     if not args.cluster_number:
-    #         parser.error("Please provide a number of cluster")
+    if args.cluster and not args.cluster_number:
+         parser.error('Please provide a number of cluster')
     
     # ITS analysis error
     if args.its:
         if not args.nits:
             parser.error("Please provide a number of iteration")
+    
+    if not args.state:
+         if args.cktest or args.pcca:
+              parser.error('Please provide a number of meta-stable state')
