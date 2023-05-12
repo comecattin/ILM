@@ -207,24 +207,24 @@ def LETHE_handle_error(parser, args):
             if not args.T:
                 parser.error('Please provide a temperature')
     
-    # Forgot to use the plot option
-    if args.pca:
-        if args.no_plot:
-            parser.error('Please use the plot option')
+    # # Forgot to use the plot option
+    # if args.pca:
+    #     if args.no_plot:
+    #         parser.error('Please use the plot option')
     
-    # No lag time or plot option given
-    if args.tica:
-        if args.no_plot:
-            parser.error('Please use the plot option')
-        if not args.lag:
-            parser.error('Please provide a lag time')
+    # # No lag time or plot option given
+    # if args.tica:
+    #     if args.no_plot:
+    #         parser.error('Please use the plot option')
+    #     if not args.lag:
+    #         parser.error('Please provide a lag time')
 
-    # Cluster errors
-    if args.cluster:
-        if args.no_plot:
-            parser.error('Please use the plot option')
-        if not args.cluster_number:
-            parser.error("Please provide a number of cluster")
+    # # Cluster errors
+    # if args.cluster:
+    #     if args.no_plot:
+    #         parser.error('Please use the plot option')
+    #     if not args.cluster_number:
+    #         parser.error("Please provide a number of cluster")
     
     # ITS analysis error
     if args.its:
