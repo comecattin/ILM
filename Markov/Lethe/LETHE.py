@@ -69,7 +69,7 @@ def main():
             load_feat.plot_density_energy(
                 data=data,
                 T=T,
-                pairNames=args.distance,
+                pairNames=args.distances,
                 save=save,
                 display=display,
                 outdir=outdir
@@ -82,11 +82,19 @@ def main():
         print('PCA reduction...')
         red = dimension_reduction.pca_reduction(
             data=data,
-            T=args.T,
-            save=save,
-            display=display,
-            outdir=outdir
+            dim=args.dim
             )
+        if 'pca' in args.plot:
+            print('Rendering PCA reduction plot...')
+            dimension_reduction.plot_pca(
+                pca=red,
+                T=args.T,
+                dim=args.dim,
+                save=save,
+                outdir=outdir,
+                display=display
+            )
+
     
     # TICA reduction
     if args.reduction == 'tica':
