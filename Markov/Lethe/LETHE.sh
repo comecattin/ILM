@@ -2,7 +2,7 @@
 # Executable
 ./LETHE.py \
 `# Files to load` \
--f /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS0{1..2}_md_all_fitBB_protonly.xtc \
+-f /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/*_md_all_fitBB_protonly.xtc \
 `# Topology .pdb file` \
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 `# Distances to analyse` \
@@ -10,23 +10,25 @@
 `# Temperature of the system` \
 --T 300 \
 `# Plot to draw` \
--p feat_hist density_energy its cluster cktest stationary eigenvectors metastable_membership mfpt committor \
+-p feat_hist density_energy its `#cluster cktest stationary eigenvectors metastable_membership mfpt committor` \
+`# Do not display the plots` \
+`#--no-plot` \
 `# Do a reduction (tica pca or none)` \
 --reduction none \
-`# Lag time` \
---lag 1000 \
+`# Number of stride` \
+--stride 4 \
 `# Algorithm for clustering` \
 --cluster kmeans \
-`# Number of clusters` \
--k 200 \
-`# Number of stride` \
---stride 1 \
 `# ITS validation on lagtime list` \
---its 1 2 5 10 20 50 \
+--its 1 2 5 10 20 50 100 200 500 1000 2000 4000 8000\
 `# Number of iteeration for the ITS validation` \
 --nits 4 \
 `# ITS validation as a function of the number of clusters` \
---its-cluster 20 50 100 \
+--its-cluster 20 50 100 200 400 800\
+`# Number of clusters` \
+-k 200 \
+`# Lag time` \
+--lag 500 \
 `# Bayesian MSM` \
 --confidence \
 `# Number of metastable states to consider` \
@@ -36,8 +38,8 @@
 `# Transition Path Theory analysis between two state (begin at 0)` \
 --state-path 1 2 \
 `# Output directories for plot and save` \
--o /home/ccattin/Documents/Code/outputs \
+-o /home/ccattin/Documents/Code/outputs/LETHE \
 `# Save model` \
---save test.pyemma GS01_GS02 \
+--save all_lag500_k200_stride4_reductionNone.pyemma GSES \
 `# Load previous model` \
---load test.pyemma GS01_GS02
+#--load all_lag1000_k200_stride4_reductionNone.pyemma GSES \
