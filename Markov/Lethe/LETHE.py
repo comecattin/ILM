@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 """LETHE automatizes the MSM analysis"""
 
+import aesthetic
 import load_feat
 import dimension_reduction
 import tools
@@ -13,28 +14,30 @@ def main():
     """
     CLI main function
     """
+
+    aesthetic.header()    
     
     #====PARSING====#
     # Get the args
     parser, args = LETHEparser.parsing()
+    print('Option given')
+    print(vars(args))
+
     # Handle commun errors
     LETHEparser.LETHE_handle_error(parser,args)
 
-    file_list = args.files
-    pairNames = args.distances
-    pdb = args.topology
-    
+    #====FEAT====#
     # Convert name in indices
     pair_indices = tools.create_pairIndices_from_pairNames(
-        pdb,pairNames
+        args.topology,args.distances
         )
     # Create a feat
     feat = load_feat.create_feat(
-        pdb,pair_indices
+        args.topology,pair_indices
         )
     # Load the data
     data = load_feat.load_data(
-        traj=file_list,feat=feat
+        traj=args.files,feat=feat
         )
 
     #====HANDLE INITIAL PLOTS====#
@@ -63,7 +66,7 @@ def main():
             load_feat.plot_density_energy(
                 data=data,
                 T=T,
-                pairNames=pairNames,
+                pairNames=args.distance,
                 save=save,
                 display=display,
                 outdir=outdir
