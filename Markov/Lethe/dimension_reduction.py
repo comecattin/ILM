@@ -25,7 +25,7 @@ def pca_reduction(data,dim):
     
     return pca
 
-def plot_pca(pca,T,save=False,outdir='',display=False):
+def plot_pca(pca,T,dim,save=False,outdir='',display=False):
     # Concatenate
     pca_concatenated = np.concatenate(pca.get_output())
     
@@ -246,6 +246,7 @@ if __name__ == '__main__' :
     plot_pca(
         pca=pca,
         T=T,
+        dim=dim,
         save=save,
         outdir=outdir,
         display=display)
