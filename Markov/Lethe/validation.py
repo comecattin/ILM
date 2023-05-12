@@ -64,12 +64,12 @@ def plot_its(its,data, cluster, save=False, display=False,outdir=''):
     # Histogram plot
     pyemma.plots.plot_feature_histograms(data_concatenated, feature_labels=['Feat 1', 'Feat 2'], ax=axes[0])
     # Density plot
-    pyemma.plots.plot_density(*data_concatenated.T, ax=axes[1], cbar=False, alpha=0.1)
-    axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
+    pyemma.plots.plot_density(*data_concatenated.T[0:2], ax=axes[1], cbar=False, alpha=0.1)
+    axes[1].scatter(*cluster.clustercenters.T[0:2], s=15, c='C1')
     axes[1].set_xlabel('Feat 1')
     axes[1].set_ylabel('Feat 2')
     # ITS plot
-    pyemma.plots.plot_implied_timescales(its, ax=axes[2], units='ps')
+    pyemma.plots.plot_implied_timescales(its, ax=axes[2], units='steps')
     
     if save:
         if outdir=='':
@@ -117,12 +117,12 @@ def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
     
     for i, k in enumerate(k_list):
         # Loop over the number of cluster provided    
-        cluster = pyemma.coordinates.cluster_kmeans(data, k=k, max_iter=50, stride=10)
+        cluster = pyemma.coordinates.cluster_kmeans(data, k=k, max_iter=500, stride=10)
         
         # Density plot
-        pyemma.plots.plot_density(*data_concatenated.T, ax=axes[0, i], cbar=False, alpha=0.1)
+        pyemma.plots.plot_density(*data_concatenated.T[0:2], ax=axes[0, i], cbar=False, alpha=0.1)
         
-        axes[0, i].scatter(*cluster.clustercenters.T, s=15, c='C1')
+        axes[0, i].scatter(*cluster.clustercenters.T[0:2], s=15, c='C1')
         axes[0, i].set_xlabel('Feat 1')
         axes[0, i].set_ylabel('Feat 2')
         axes[0, i].set_title('k = {} centers'.format(k))
@@ -130,9 +130,8 @@ def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
         # ITS plot
         pyemma.plots.plot_implied_timescales(
             pyemma.msm.its(cluster.dtrajs, lags=lags, nits=nits, errors='bayes'),
-            ax=axes[1, i], units='ps')
+            ax=axes[1, i], units='step')
         
-        axes[1, i].set_ylim(1, 2000)
     
     if save:
         if outdir=='':
@@ -171,7 +170,7 @@ def cktest(msm,
     """
     
     # Plot of the CK test
-    pyemma.plots.plot_cktest(msm.cktest(stable_state), units='ps')
+    pyemma.plots.plot_cktest(msm.cktest(stable_state), units='step')
 
     if save:
         if outdir=='':
@@ -196,6 +195,7 @@ if __name__ == '__main__':
     save = False
     display = False
     T = 300
+    dim=2
     lag=1000
     nits = 4
     lags=[1, 2, 5, 10, 20, 50]
@@ -206,19 +206,17 @@ if __name__ == '__main__':
     feat = create_feat(pdb,pair_indices)
     data = load_data(traj,feat)
 
-    tica = tica_reduction(data=data,
-                          lag=lag,
-                          T=T,
-                          save=save,
-                          display=display,
-                          outdir=outdir)
-    cluster = clustering(reduction=tica,
-                         method='kmeans',
-                         k=200,
-                         stride=1,
-                         save=save,
-                         display=display,
-                         outdir=outdir)
+    tica = tica_reduction(
+        data=data,
+        lag=lag,
+        dim=dim
+        )
+    cluster = clustering(
+        reduction=tica,
+        method='kmeans',
+        k=200,
+        stride=1,
+        )
     
     its = implied_time_scale(cluster=cluster,
                              lags=lags,

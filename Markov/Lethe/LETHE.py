@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 """LETHE automatizes the MSM analysis"""
 
+import aesthetic
 import load_feat
 import dimension_reduction
 import tools
@@ -13,28 +14,31 @@ def main():
     """
     CLI main function
     """
+
+    aesthetic.header()    
     
     #====PARSING====#
     # Get the args
     parser, args = LETHEparser.parsing()
+    print('Option given')
+    print(vars(args))
+
     # Handle commun errors
     LETHEparser.LETHE_handle_error(parser,args)
 
-    file_list = args.files
-    pairNames = args.distances
-    pdb = args.topology
-    
+    #====FEAT====#
+    aesthetic.feat()
     # Convert name in indices
     pair_indices = tools.create_pairIndices_from_pairNames(
-        pdb,pairNames
+        args.topology,args.distances
         )
     # Create a feat
     feat = load_feat.create_feat(
-        pdb,pair_indices
+        args.topology,pair_indices
         )
     # Load the data
     data = load_feat.load_data(
-        traj=file_list,feat=feat
+        traj=args.files,feat=feat
         )
 
     #====HANDLE INITIAL PLOTS====#
@@ -51,6 +55,7 @@ def main():
         #Plots
         # Histogram plot of the feat
         if 'feat_hist' in args.plot:
+            print('Rendering feat histogram...')
             load_feat.plot_feat_hist(
                 data,feat,
                 display=display,
@@ -59,41 +64,60 @@ def main():
                 )
         # Density energy map of the feat
         if 'density_energy' in args.plot:
+            print('Rendering density and energy map...')
             T = float(args.T)
             load_feat.plot_density_energy(
                 data=data,
                 T=T,
-                pairNames=pairNames,
+                pairNames=args.distances,
                 save=save,
                 display=display,
                 outdir=outdir
                 )
             
     #====DIMENSION REDUCTION====#
+    aesthetic.dimension_reduction()
     # PCA reduction
     if args.reduction == 'pca':
+        print('PCA reduction...')
         red = dimension_reduction.pca_reduction(
             data=data,
-            T=args.T,
-            save=save,
-            display=display,
-            outdir=outdir
+            dim=args.dim
             )
+        if 'pca' in args.plot:
+            print('Rendering PCA reduction plot...')
+            dimension_reduction.plot_pca(
+                pca=red,
+                T=args.T,
+                dim=args.dim,
+                save=save,
+                outdir=outdir,
+                display=display
+            )
+
     
     # TICA reduction
     if args.reduction == 'tica':
-        lag = args.lag
+        print('TICA reduction...')
         red = dimension_reduction.tica_reduction(
             data=data,
-            T=args.T,
-            lag=lag,
-            save=save,
-            display=display,
-            outdir=outdir
+            lag=args.tica_lag,
+            dim=args.dim
+            )
+        if 'tica' in args.plot:
+            print('Rendering TICA reduction plot...')
+            dimension_reduction.plot_tica(
+                tica=red,
+                T=args.T,
+                dim=args.dim,
+                display=display,
+                save=save,
+                outdir=outdir
             )
     
     # No reduction, raw data    
     if args.reduction == 'none' :
+        print('No reduction, raw data taken')
         red = data
 
 
@@ -109,12 +133,12 @@ def main():
         
         #====CLUSTERING====#
         if args.cluster:
-
+            aesthetic.cluster()
             if args.stride:
                 stride = args.stride
             elif not args.stride:
                 stride = 1
-            
+            print('Clustering...')
             cluster = dimension_reduction.clustering(
                 reduction=red,
                 method=args.cluster,
@@ -124,6 +148,7 @@ def main():
             
             # Plot the clustering result
             if 'cluster' in args.plot:
+                print('Rendering clustering plot...')
                 dimension_reduction.clustering_plot(
                     reduction=red,
                     cluster=cluster,
@@ -133,6 +158,7 @@ def main():
                     )
                 
         #====CREATE MSM====#
+        print('Creating MSM...')
         msm = markov_analysis.create_msm(
             cluster=cluster,
             lag=args.lag,
@@ -141,8 +167,10 @@ def main():
         
 
     #====MSM VALIDATION====#
+    aesthetic.validation()
     # ITS analysis
     if args.its:
+        print('ITS analysis...')
         its = validation.implied_time_scale(
             cluster=cluster,
             lags=args.its,
@@ -160,6 +188,7 @@ def main():
     
     # ITS analysis as a function of the number of cluster
     if args.its_cluster:
+        print('ITS cluster analysis...')
         validation.cluster_its(
             data=red,
             lags=args.its,
@@ -172,6 +201,7 @@ def main():
     
     # CK test
     if 'cktest' in args.plot:
+        print('CK Test...')
         validation.cktest(
             msm=msm,
             stable_state=args.state,
@@ -181,6 +211,7 @@ def main():
             )
     
     #====MSM ANALYSIS====#
+    aesthetic.analysis()
     print(
         'fraction of states used = {:f}'.format(
         msm.active_state_fraction
@@ -194,6 +225,7 @@ def main():
     
     # Plot the stationary distribution
     if 'stationary' in args.plot:
+        print('Rendering stationary plot...')
         markov_analysis.plot_stationary(
             msm=msm,
             cluster=cluster,
@@ -204,6 +236,7 @@ def main():
             )
     # Plot the first 6 eigenvectors
     if 'eigenvectors' in args.plot:
+        print('Rendering eigenvectors plot...')
         markov_analysis.plot_eigenvect(
             msm=msm,
             cluster=cluster,
@@ -217,6 +250,8 @@ def main():
     
     # Display the stationary probabilities
     if args.pcca:
+        aesthetic.pcca()
+        print('Computing stationary probabilities...')
         pcca.stationary_prob(
             msm=msm,
             nstate=args.state
@@ -224,6 +259,7 @@ def main():
         
         # Plot the metastable membership
         if 'metastable_membership' in args.plot:
+            print('Rendering metastable membership...')
             pcca.plot_metastable_membership(
                 msm=msm,
                 nstate=args.state,
@@ -235,6 +271,7 @@ def main():
             )
         
         # Compute PCCA and TPT
+        print('Concatenating results...')
         (
             metastable_traj,
             highest_membership,
@@ -244,6 +281,8 @@ def main():
             cluster=cluster
             )
         
+        print('Computing MFPT')
+        
         mfpt, inverse_mfpt = pcca.get_mfpt(
             msm=msm,
             nstates=args.state
@@ -251,6 +290,7 @@ def main():
         
         # Plot MFPT
         if 'mfpt' in args.plot:
+            print('Rendering MFPT')
             pcca.plot_mftp(
                 data=red,
                 nstates=args.state,
@@ -263,7 +303,8 @@ def main():
                 outdir=outdir
                 )
 
-        # Compute the flux for the committor    
+        # Compute the flux for the committor
+        print('Computing flux...')    
         flux, cgflux = pcca.tpt(
             msm=msm,
             state=args.state_path,
@@ -272,6 +313,7 @@ def main():
 
         # Plot the committor
         if 'committor' in args.plot:
+            print('Rendering committor plot...')
             pcca.plot_committor_tpt(
                 data=red,
                 cluster=cluster,

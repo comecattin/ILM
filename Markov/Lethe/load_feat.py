@@ -65,9 +65,6 @@ def plot_feat_hist(data, feat,display=False,save=False,outdir=''):
     data_concatenated = np.concatenate(data)
     fig, ax = pyemma.plots.plot_feature_histograms(data_concatenated, feature_labels=feat,ignore_dim_warning=True)
     
-    fig.set_figwidth(10)
-    fig.set_figheight(5)
-    
     if save:
         if outdir=='':
             raise Exception('Please provide a directory to save the file')
@@ -97,7 +94,7 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''
     data_concatenated = np.concatenate(data)
     
     # Density plot
-    fig, axes = plt.subplots(1, 1, figsize=(6, 4), sharex=True, sharey=True)    
+    fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)    
 
     pyemma.plots.plot_density(*data_concatenated.T[0:2],ax=axes)
     
@@ -113,7 +110,7 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''
         plt.show()
 
     # Energy plot
-    fig, axes = plt.subplots(1, 1, figsize=(6, 4), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)
     kT = tools.get_kT(T)
     fig,axes = pyemma.plots.plot_free_energy(*data_concatenated.T[0:2],
                                             ax=axes,
