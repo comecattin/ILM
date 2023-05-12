@@ -59,12 +59,8 @@ def plot_pca(pca,T,dim,save=False,outdir='',display=False):
             plt.show()
 
 
-
-
-
-
-def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
-    """Do a TICA dimension reduction and plot it
+def tica_reduction(data,lag,dim):
+    """Do a TICA dimension reduction
 
     Parameters
     ----------
@@ -72,8 +68,33 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
         Data loaded from pyemma loader
     lag : int
         Lag time
+    dim : int
+        Number of dimension to project the reduction
+
+    Returns
+    -------
+    tica : pyemma.tica
+        Data reduced using TICA
+    """
+
+    # TICA reduction
+    tica = pyemma.coordinates.tica(data, dim=dim, lag=lag)
+    
+    return tica
+
+def plot_tica(tica,T,dim,display=False,save=False,outdir=''):
+    """Plot a TICA dimension reduction
+
+    Parameters
+    ----------
+    tica : pyemma.tica
+        Data reduced using TICA
+    lag : int
+        Lag time
     T : float
         Temperature of the system
+    dim : int
+        Number of dimension to project the reduction
     save : bool, optional
         Save or not the plot, by default False
     display : bool, optional
@@ -81,19 +102,11 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
     outdir : str, optional
         Output directory to save the plot, by default ''
 
-    Returns
-    -------
-    pca : pyemma.tica
-        Data reduced using TICA
-
     Raises
     ------
     Exception
         Provide a directory to save the file
     """
-
-    # TICA reduction
-    tica = pyemma.coordinates.tica(data, dim=2, lag=lag)
     tica_concatenated = np.concatenate(tica.get_output())
 
     # Histogramm plot
@@ -111,23 +124,23 @@ def tica_reduction(data,lag,T,save=False,display=False,outdir=''):
     if display:
         plt.show()
 
+
     # Free energy plot
-    fig, axes = plt.subplots(1, 1, figsize=(5, 4))
-    kT=tools.get_kT(T)
-    pyemma.plots.plot_free_energy(*tica_concatenated.T[0:2],
-                                            ax=axes,
-                                            kT=kT,cbar_label='free energy / kJ.mol-1') 
-    axes.set_xlabel('TIC 1')
-    axes.set_ylabel('TIC 2')
-    if save:
-        if outdir=='':
-            raise Exception('Please provide a directory to save the file')
-        else:
-            plt.savefig(f'{outdir}/tica_free_energy_direct_from_density.pdf',dpi=300,bbox_inches='tight')
-    if display:
-        plt.show()
-    
-    return tica
+    if dim >= 2:
+        fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+        kT=tools.get_kT(T)
+        pyemma.plots.plot_free_energy(*tica_concatenated.T[0:2],
+                                                ax=axes,
+                                                kT=kT,cbar_label='free energy / kJ.mol-1') 
+        axes.set_xlabel('TIC 1')
+        axes.set_ylabel('TIC 2')
+        if save:
+            if outdir=='':
+                raise Exception('Please provide a directory to save the file')
+            else:
+                plt.savefig(f'{outdir}/tica_free_energy_direct_from_density.pdf',dpi=300,bbox_inches='tight')
+        if display:
+            plt.show()
 
 def clustering(reduction,method,k,stride):
     """Clustering of the data
@@ -223,7 +236,7 @@ if __name__ == '__main__' :
     display = True
     T = 300
     lag=1000
-    dim=1
+    dim=2
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
@@ -251,12 +264,23 @@ if __name__ == '__main__' :
         outdir=outdir,
         display=display)
 
-    tica = tica_reduction(data=data,
-                          lag=lag,
-                          T=T,
-                          save=save,
-                          display=display,
-                          outdir=outdir)
+    tica = tica_reduction(
+        data=data,
+        lag=lag,
+        dim=dim,
+        T=T,
+        save=save,
+        display=display,
+        outdir=outdir)
+    
+    plot_tica(
+        tica=tica,
+        T=T,
+        dim=dim,
+        save=save,
+        display=display,
+        outdir=outdir
+    )
     cluster = clustering(reduction=tica,
                          method='kmeans',
                          k=200,
