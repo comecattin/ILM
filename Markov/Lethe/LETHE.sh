@@ -10,11 +10,12 @@
 `# Temperature of the system` \
 --T 300 \
 `# Plot to draw` \
--p feat_hist density_energy pca its `#cluster cktest stationary eigenvectors metastable_membership mfpt committor` \
+-p feat_hist density_energy tica its `#cluster cktest stationary eigenvectors metastable_membership mfpt committor` \
 `# Do not display the plots` \
 `#--no-plot` \
 `# Do a reduction (tica pca or none)` \
---reduction pca \
+--reduction tica \
+--tica-lag 1000 \
 --dim 2 \
 `# Number of stride` \
 --stride 4 \

@@ -48,9 +48,9 @@ def parsing():
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist, density_energy, pca, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)',
+        help='Plot wanted (feat_hist, density_energy, pca, tica, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)',
         choices=[
-             'feat_hist','density_energy','pca','its','cluster','cktest','stationary','eigenvectors','metastable_membership','mfpt','committor'
+             'feat_hist','density_energy','pca','tica','its','cluster','cktest','stationary','eigenvectors','metastable_membership','mfpt','committor'
              ],
         required=True
     )

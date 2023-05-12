@@ -89,8 +89,6 @@ def plot_tica(tica,T,dim,display=False,save=False,outdir=''):
     ----------
     tica : pyemma.tica
         Data reduced using TICA
-    lag : int
-        Lag time
     T : float
         Temperature of the system
     dim : int

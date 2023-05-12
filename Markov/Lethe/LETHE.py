@@ -101,11 +101,18 @@ def main():
         print('TICA reduction...')
         red = dimension_reduction.tica_reduction(
             data=data,
-            T=args.T,
             lag=args.tica_lag,
-            save=save,
-            display=display,
-            outdir=outdir
+            dim=args.dim
+            )
+        if 'tica' in args.plot:
+            print('Rendering TICA reduction plot...')
+            dimension_reduction.plot_tica(
+                tica=red,
+                T=args.T,
+                dim=args.dim,
+                display=display,
+                save=save,
+                outdir=outdir
             )
     
     # No reduction, raw data    
