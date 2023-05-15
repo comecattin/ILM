@@ -141,7 +141,7 @@ def main():
                 reduction=red,
                 method=args.cluster,
                 k=args.cluster_number,
-                stride=args.stride
+                stride=1
                 )
             
             # Plot the clustering result
@@ -193,7 +193,7 @@ def main():
             lags=args.its,
             nits=args.nits,
             k_list=args.its_cluster,
-            stride=args.stride,
+            stride=1,
             save=save,
             display=display,
             outdir=outdir
