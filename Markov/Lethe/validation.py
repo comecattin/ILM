@@ -115,7 +115,7 @@ def cluster_its(data,lags,nits, stride, k_list,save=False,display=False,outdir='
     else:
         data_concatenated = np.concatenate(data.get_output())
     
-    fig, axes = plt.subplots(2, len(k_list))
+    fig, axes = plt.subplots(2, len(k_list),figsize=(15,15))
     
     for i, k in enumerate(k_list):
         # Loop over the number of cluster provided    

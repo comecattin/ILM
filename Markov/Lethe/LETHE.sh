@@ -2,7 +2,7 @@
 # Executable
 ./LETHE.py \
 `# Files to load` \
--f /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/*_md_all_fitBB_protonly.xtc \
+-f /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS0{1..2}_md_all_fitBB_protonly.xtc \
 `# Topology .pdb file` \
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 `# Distances to analyse` \

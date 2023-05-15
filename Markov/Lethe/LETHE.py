@@ -132,6 +132,12 @@ def main():
     if not args.load:
         
         #====CLUSTERING====#
+        
+        if args.stride:
+            stride = args.stride
+        elif not args.stride:
+            stride = 1
+        
         if args.cluster:
             aesthetic.cluster()    
             print('Clustering...')
@@ -152,10 +158,7 @@ def main():
                 #     outdir=outdir,
                 #     display=display
                 #     )
-        if args.stride:
-            stride = args.stride
-        elif not args.stride:
-            stride = 1
+        
         
         #====CREATE MSM====#
         print('Creating MSM...')
