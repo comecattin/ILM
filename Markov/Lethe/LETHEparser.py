@@ -116,7 +116,8 @@ def parsing():
     parser.add_argument(
         '--stride',
         help='Number of stride',
-        type=int
+        type=int,
+        default=1
     )
     # Perform ITS analysis
     parser.add_argument(

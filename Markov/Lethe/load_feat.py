@@ -24,7 +24,7 @@ def create_feat(pdb,pair_indices):
     print(f'PyEmma feat description:\n{feat.describe()}')
     return feat
 
-def load_data(traj, feat):
+def load_data(traj, feat,stride):
     """Load all the given trajectories in PyEmma
 
     Parameters
@@ -33,13 +33,15 @@ def load_data(traj, feat):
         List that contain the path of all the trajectories to analyze
     feat : PyEmma object
         PyEmma featurizer
+    stride : int
+        Number of stride to consider. Only read every stride'th frame.
 
     Returns
     -------
     data : List
         List of all the value of the feat for each snapshot
     """
-    data = pyemma.coordinates.load(traj, features=feat,stride=1)
+    data = pyemma.coordinates.load(traj, features=feat,stride=stride)
     
     print('Lengths (number of trajectories ):', len(data))
     print('Shape of elements (for each trajectories, number of timestep, number of features):', data[0].shape)
