@@ -80,7 +80,7 @@ def plot_its(its,data, cluster, save=False, display=False,outdir=''):
         plt.show()
 
 
-def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
+def cluster_its(data,lags,nits, stride, k_list,save=False,display=False,outdir=''):
     """ITS validation as a function of the cluster numbers
 
     Parameters
@@ -91,6 +91,8 @@ def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
         Lag time for the MSM
     nits : int
         Number of iteration
+    stride : int
+        Stride of the trajectory, read only every stride'th frames
     k_list : list
         List of the different number of cluster size to test
     save : bool, optional
@@ -117,7 +119,7 @@ def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
     
     for i, k in enumerate(k_list):
         # Loop over the number of cluster provided    
-        cluster = pyemma.coordinates.cluster_kmeans(data, k=k, max_iter=500, stride=10)
+        cluster = pyemma.coordinates.cluster_kmeans(data, k=k, max_iter=500, stride=stride)
         
         # Density plot
         pyemma.plots.plot_density(*data_concatenated.T[0:2], ax=axes[0, i], cbar=False, alpha=0.1)

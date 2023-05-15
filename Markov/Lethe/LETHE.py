@@ -133,11 +133,7 @@ def main():
         
         #====CLUSTERING====#
         if args.cluster:
-            aesthetic.cluster()
-            if args.stride:
-                stride = args.stride
-            elif not args.stride:
-                stride = 1
+            aesthetic.cluster()    
             print('Clustering...')
             cluster = dimension_reduction.clustering(
                 reduction=red,
@@ -149,14 +145,18 @@ def main():
             # Plot the clustering result
             if 'cluster' in args.plot:
                 print('Rendering clustering plot...')
-                dimension_reduction.clustering_plot(
-                    reduction=red,
-                    cluster=cluster,
-                    save=save,
-                    outdir=outdir,
-                    display=display
-                    )
-                
+                # dimension_reduction.clustering_plot(
+                #     reduction=red,
+                #     cluster=cluster,
+                #     save=save,
+                #     outdir=outdir,
+                #     display=display
+                #     )
+        if args.stride:
+            stride = args.stride
+        elif not args.stride:
+            stride = 1
+        
         #====CREATE MSM====#
         print('Creating MSM...')
         msm = markov_analysis.create_msm(
@@ -194,6 +194,7 @@ def main():
             lags=args.its,
             nits=args.nits,
             k_list=args.its_cluster,
+            stride=stride,
             save=save,
             display=display,
             outdir=outdir
