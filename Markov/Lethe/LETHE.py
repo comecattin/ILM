@@ -39,7 +39,8 @@ def main():
     # Load the data
     data = load_feat.load_data(
         traj=args.files,feat=feat,
-        stride=args.stride
+        stride=args.stride,
+        ram=args.ram
         )
 
     #====HANDLE INITIAL PLOTS====#

@@ -43,6 +43,12 @@ def parsing():
         required=True,
         help='Reference .pdb file'
     )
+    # Load into RAM
+    parser.add_argument(
+         '--ram',
+         action='store_true',
+         help='Store the data into the RAM. More efficient but maybe not possible for large data set'
+    )
     # What properties to plot
     parser.add_argument(
         '-p',

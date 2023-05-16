@@ -2,11 +2,13 @@
 # Executable
 ./LETHE.py \
 `# Files to load` \
--f /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS0{1..2}_md_all_fitBB_protonly.xtc \
+-f /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS0{1..4}_md_all_fitBB_protonly.xtc \
 `# Topology .pdb file` \
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 `# Distances to analyse` \
 -d 64_CA-130_CA 119_CA-24_CA \
+`# Load into RAM` \
+`#--ram` \
 `# Temperature of the system` \
 --T 300 \
 `# Plot to draw` \
@@ -22,15 +24,15 @@
 `# Algorithm for clustering` \
 --cluster kmeans \
 `# ITS validation on lagtime list` \
---its 200 500 1000 2000 4000 8000 10000\
+--its 20 50 100\
 `# Number of iteeration for the ITS validation` \
 --nits 4 \
 `# ITS validation as a function of the number of clusters` \
---its-cluster 200 400 800 1000 2000 4000\
+--its-cluster 200 400 \
 `# Number of clusters` \
 -k 200 \
 `# Lag time` \
---lag 500 \
+--lag 100 \
 `# Bayesian MSM` \
 --confidence \
 `# Number of metastable states to consider` \
@@ -45,4 +47,4 @@
 --save all_lag500_k200_stride10_reductionNone.pyemma GSES \
 `# Load previous model` \
 `#--load all_lag1000_k200_stride4_reductionNone.pyemma GSES` \
-> lethe.out \
+#> lethe.out \
