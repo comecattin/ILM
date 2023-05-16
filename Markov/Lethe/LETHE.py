@@ -38,7 +38,9 @@ def main():
         )
     # Load the data
     data = load_feat.load_data(
-        traj=args.files,feat=feat
+        traj=args.files,feat=feat,
+        stride=args.stride,
+        ram=args.ram
         )
 
     #====HANDLE INITIAL PLOTS====#
@@ -133,11 +135,6 @@ def main():
         
         #====CLUSTERING====#
         
-        if args.stride:
-            stride = args.stride
-        elif not args.stride:
-            stride = 1
-        
         if args.cluster:
             aesthetic.cluster()    
             print('Clustering...')
@@ -145,7 +142,7 @@ def main():
                 reduction=red,
                 method=args.cluster,
                 k=args.cluster_number,
-                stride=stride
+                stride=1
                 )
             
             # Plot the clustering result
@@ -197,7 +194,7 @@ def main():
             lags=args.its,
             nits=args.nits,
             k_list=args.its_cluster,
-            stride=stride,
+            stride=1,
             save=save,
             display=display,
             outdir=outdir
