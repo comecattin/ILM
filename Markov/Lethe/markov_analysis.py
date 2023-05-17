@@ -161,7 +161,7 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False,outdir=''):
         if outdir=='':
             raise Exception('Please provide a directory to save the file')
         else:
-            plt.savefig(f'{outdir}/stationary_distribution.pdf',dpi=300,bbox_inches='tight')
+            plt.savefig(f'{outdir}/eigen_vect.pdf',dpi=300,bbox_inches='tight')
 
     if display:
         plt.show()

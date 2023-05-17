@@ -148,13 +148,13 @@ def main():
             # Plot the clustering result
             if 'cluster' in args.plot:
                 print('Rendering clustering plot...')
-                # dimension_reduction.clustering_plot(
-                #     reduction=red,
-                #     cluster=cluster,
-                #     save=save,
-                #     outdir=outdir,
-                #     display=display
-                #     )
+                dimension_reduction.clustering_plot(
+                    reduction=red,
+                    cluster=cluster,
+                    save=save,
+                    outdir=outdir,
+                    display=display
+                    )
         
         
         #====CREATE MSM====#
