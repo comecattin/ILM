@@ -172,7 +172,7 @@ def cktest(msm,
     """
     
     # Plot of the CK test
-    pyemma.plots.plot_cktest(msm.cktest(stable_state), units='step')
+    pyemma.plots.plot_cktest(msm.cktest(stable_state,mlags=None), units='step')
 
     if save:
         if outdir=='':
@@ -190,15 +190,15 @@ if __name__ == '__main__':
      # Path
     pdb = '/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb'
     traj = ['/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS01_md_all_fitBB_protonly.xtc','/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS02_md_all_fitBB_protonly.xtc']
-    outdir='/home/ccattin/Documents/Code/outputs'
+    outdir='/home/ccattin/Documents/Code/outputs/LETHE'
     # Feat
     pairNames = ['64_CA-130_CA', '119_CA-24_CA']
     # Parameters
     save = False
-    display = False
+    display = True
     T = 300
     dim=2
-    lag=1000
+    lag=400
     nits = 4
     lags=[1, 2, 5, 10, 20, 50]
     k_list=[20,50,100]
