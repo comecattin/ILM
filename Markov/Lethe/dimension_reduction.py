@@ -219,6 +219,22 @@ def clustering_plot(reduction,cluster,save=False,outdir='',display=False):
 
 
 def vamp_reduction(data,dim,lag):
+    """Do a VAMP dimension reduction
+
+    Parameters
+    ----------
+    data : pyemma.load
+        Data loaded from pyemma loader
+    lag : int
+        Lag time
+    dim : int
+        Number of dimension to project the reduction
+
+    Returns
+    -------
+    vamp : pyemma.vamp
+        Data reduced using vamp
+    """
 
     vamp = pyemma.coordinates.vamp(
         data=data,
@@ -229,6 +245,29 @@ def vamp_reduction(data,dim,lag):
     return vamp
 
 def plot_vamp(vamp,T,dim,save=False,display=False,outdir=''):
+    """Plot a VAMP dimension reduction
+
+    Parameters
+    ----------
+    vamp : pyemma.vamp
+        Data reduced using VAMP
+    T : float
+        Temperature of the system
+    dim : int
+        Number of dimension to project the reduction
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+
     vamp_concatenated = np.concatenate(vamp.get_output())
 
     # Histogramm plot
