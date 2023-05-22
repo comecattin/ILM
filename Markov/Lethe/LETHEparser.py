@@ -36,6 +36,11 @@ def parsing():
         nargs='+',
         help='List of the pair names'
     )
+    parser.add_argument(
+         '--vamp-score',
+         action='store_true',
+         help='Compute the VAMP score of the features'
+    )
     # Topology .pdb file
     parser.add_argument(
         '-t',

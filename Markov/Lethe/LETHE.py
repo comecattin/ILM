@@ -42,6 +42,12 @@ def main():
         stride=args.stride,
         ram=args.ram
         )
+    
+    if args.vamp_score:
+        vamp = load_feat.vamp_score(
+            data=data,
+            dim=args.dim
+        )
 
     #====HANDLE INITIAL PLOTS====#
     if args.plot:

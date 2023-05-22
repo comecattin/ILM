@@ -7,6 +7,7 @@
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 `# Distances to analyse` \
 -d 64_CA-130_CA 119_CA-24_CA \
+--vamp-score \
 `# Load into RAM` \
 --ram \
 `# Temperature of the system` \
