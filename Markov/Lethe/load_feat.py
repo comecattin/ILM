@@ -3,7 +3,8 @@ import tools
 import numpy as np
 import matplotlib.pyplot as plt
 
-def create_feat(pdb,pair_indices):
+
+def create_feat(pdb, pair_indices):
     """Create a PyEmma featurizer
 
     Parameters
@@ -18,13 +19,14 @@ def create_feat(pdb,pair_indices):
     feat : PyEmma object
         PyEmma featurizer
     """
-    #Create the feat and add the right coordinates
+    # Create the feat and add the right coordinates
     feat = pyemma.coordinates.featurizer(pdb)
-    feat.add_distances(indices = pair_indices, periodic=True, indices2=None)
-    print(f'PyEmma feat description:\n{feat.describe()}')
+    feat.add_distances(indices=pair_indices, periodic=True, indices2=None)
+    print(f"PyEmma feat description:\n{feat.describe()}")
     return feat
 
-def load_data(traj, feat,stride,ram):
+
+def load_data(traj, feat, stride, ram):
     """Load all the given trajectories in PyEmma
 
     Parameters
@@ -44,32 +46,27 @@ def load_data(traj, feat,stride,ram):
         List of all the value of the feat for each snapshot
     """
     if not ram:
-        data = pyemma.coordinates.source(traj, features=feat,stride=stride)
+        data = pyemma.coordinates.source(traj, features=feat, stride=stride)
         out = data.get_output()
+        print("Lengths (number of trajectories ):", len(out))
         print(
-            'Lengths (number of trajectories ):',
-            len(out)
-            )
-        print(
-            'Shape of elements (for each trajectories, number of timestep, number of features):',
-            out[0].shape
-            )
+            "Shape of elements (for each trajectories, number of timestep, number of features):",
+            out[0].shape,
+        )
 
     if ram:
-        data = pyemma.coordinates.load(traj,features=feat,stride=stride)
-    
+        data = pyemma.coordinates.load(traj, features=feat, stride=stride)
+
+        print("Lengths (number of trajectories ):", len(data))
         print(
-            'Lengths (number of trajectories ):',
-            len(data)
-            )
-        print(
-            'Shape of elements (for each trajectories, number of timestep, number of features):',
-            data[0].shape
-            )
-    
+            "Shape of elements (for each trajectories, number of timestep, number of features):",
+            data[0].shape,
+        )
+
     return data
 
-def plot_feat_hist(data, feat,display=False,save=False,outdir=''):
+
+def plot_feat_hist(data, feat, display=False, save=False, outdir=""):
     """Make a histogram plot of the feat values
 
     Parameters
@@ -85,22 +82,25 @@ def plot_feat_hist(data, feat,display=False,save=False,outdir=''):
     outdir : str, optional
         Path where to save the files, by default ''
     """
-    
+
     if type(data) == pyemma.coordinates.data.feature_reader.FeatureReader:
         data = data.get_output()
-    
+
     data_concatenated = np.concatenate(data)
-    fig, ax = pyemma.plots.plot_feature_histograms(data_concatenated, feature_labels=feat,ignore_dim_warning=True)
-    
+    fig, ax = pyemma.plots.plot_feature_histograms(
+        data_concatenated, feature_labels=feat, ignore_dim_warning=True
+    )
+
     if save:
-        if outdir=='':
-            raise Exception('Please provide a directory to save the file')
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
         else:
-            plt.savefig(f'{outdir}/feat_hist.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(f"{outdir}/feat_hist.pdf", dpi=300, bbox_inches="tight")
     if display:
         plt.show()
 
-def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''):
+
+def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=""):
     """Plot the density map and the energy map
 
     Parameters
@@ -121,86 +121,94 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''
     if type(data) == pyemma.coordinates.data.feature_reader.FeatureReader:
         data = data.get_output()
     data_concatenated = np.concatenate(data)
-    
-    # Density plot
-    fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)    
 
-    pyemma.plots.plot_density(*data_concatenated.T[0:2],ax=axes)
-    
-    axes.set_xlabel(f' {pairNames[0]} (nm)')
-    axes.set_ylabel(f' {pairNames[1]} (nm)')
+    # Density plot
+    fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)
+
+    pyemma.plots.plot_density(*data_concatenated.T[0:2], ax=axes)
+
+    axes.set_xlabel(f" {pairNames[0]} (nm)")
+    axes.set_ylabel(f" {pairNames[1]} (nm)")
 
     if save:
-        if outdir=='':
-            raise Exception('Please provide a directory to save the file')
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
         else:
-            plt.savefig(f'{outdir}/data_density.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(f"{outdir}/data_density.pdf", dpi=300, bbox_inches="tight")
     if display:
         plt.show()
 
     # Energy plot
     fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)
     kT = tools.get_kT(T)
-    fig,axes = pyemma.plots.plot_free_energy(*data_concatenated.T[0:2],
-                                            ax=axes,
-                                            kT=kT,
-                                            cbar_label='free energy / kJ.mol-1')  
-    
-    axes.set_xlabel(f' {pairNames[0]} (nm)')
-    axes.set_ylabel(f' {pairNames[1]} (nm)')
-    
+    fig, axes = pyemma.plots.plot_free_energy(
+        *data_concatenated.T[0:2], ax=axes, kT=kT, cbar_label="free energy / kJ.mol-1"
+    )
+
+    axes.set_xlabel(f" {pairNames[0]} (nm)")
+    axes.set_ylabel(f" {pairNames[1]} (nm)")
+
     if save:
-        if outdir=='':
-            raise Exception('Please provide a directory to save the file')
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
         else:
-            plt.savefig(f'{outdir}/data_free_energy_direct_from_density.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(
+                f"{outdir}/data_free_energy_direct_from_density.pdf",
+                dpi=300,
+                bbox_inches="tight",
+            )
     if display:
         plt.show()
 
-    
-def vamp_score(data,dim):
-    score = pyemma.coordinates.vamp(
-        data[:-1],dim=dim
-        ).score(
-        test_data=data[-1],
-        score_method='VAMP2'
-        )
 
-    print('VAMP2 score: {:.2f}'.format(score))
+def vamp_score(data, dim):
+    """Compute the vamp score of the feat
+
+    Parameters
+    ----------
+    data : List
+        List of all the value of the feat for each snapshot
+    dim : int
+        Dimension of the VAMP reduction
+
+    Returns
+    -------
+    score : float
+        VAMP2 score
+    """
+
+    score = pyemma.coordinates.vamp(data[:-1], dim=dim).score(
+        test_data=data[-1], score_method="VAMP2"
+    )
+
+    print("VAMP2 score: {:.2f}".format(score))
 
     return score
 
-if __name__ == '__main__' :
 
+if __name__ == "__main__":
     # Path
-    pdb = '/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb'
-    traj = ['/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS01_md_all_fitBB_protonly.xtc','/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS02_md_all_fitBB_protonly.xtc']
-    outdir='/home/ccattin/Documents/Code/outputs'
+    pdb = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb"
+    traj = [
+        "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS01_md_all_fitBB_protonly.xtc",
+        "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS02_md_all_fitBB_protonly.xtc",
+    ]
+    outdir = "/home/ccattin/Documents/Code/outputs"
     # Feat
-    pairNames = ['64_CA-130_CA', '119_CA-24_CA']
+    pairNames = ["64_CA-130_CA", "119_CA-24_CA"]
     # Parameters
     save = True
     display = True
     T = 300
-    lag=1000
+    lag = 1000
 
-    pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
-    feat = create_feat(pdb,pair_indices)
-    data = load_data(traj,feat,stride=5,ram=True)
+    pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
+    feat = create_feat(pdb, pair_indices)
+    data = load_data(traj, feat, stride=5, ram=True)
 
-    plot_feat_hist(data,feat,
-                   display=display,
-                   save=save,
-                   outdir=outdir)
-    plot_density_energy(data=data,
-                        T=T,
-                        pairNames=pairNames,
-                        display=display,
-                        save=save,
-                        outdir=outdir
-                        )
-    
-    score = vamp_score(
-        data=data,
-        dim=2
+    plot_feat_hist(data, feat, display=display, save=save, outdir=outdir)
+    plot_density_energy(
+        data=data, T=T, pairNames=pairNames, display=display, save=save, outdir=outdir
     )
+
+    score = vamp_score(data=data, dim=2)
