@@ -218,9 +218,13 @@ def clustering_plot(reduction,cluster,save=False,outdir='',display=False):
         plt.show()
 
 
-def vamp_reduction(data,dim):
+def vamp_reduction(data,dim,lag):
 
-    vamp = pyemma.coordinates.vamp(data=data,dim=dim)
+    vamp = pyemma.coordinates.vamp(
+        data=data,
+        dim=dim,
+        lag=lag
+        )
 
     return vamp
 
@@ -332,7 +336,8 @@ if __name__ == '__main__' :
 
     vamp = vamp_reduction(
         data=data,
-        dim=dim
+        dim=dim,
+        lag=lag
     )
 
     plot_vamp(
