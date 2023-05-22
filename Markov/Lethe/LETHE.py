@@ -43,6 +43,7 @@ def main():
         ram=args.ram
         )
     
+    # Compute the VAMP2 score
     if args.vamp_score:
         vamp = load_feat.vamp_score(
             data=data,
@@ -123,6 +124,7 @@ def main():
                 outdir=outdir
             )
     
+    # VAMP reduction
     if args.reduction == 'vamp':
         print('VAMP reduction...')
         red = dimension_reduction.vamp_reduction(
