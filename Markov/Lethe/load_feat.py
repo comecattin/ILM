@@ -159,6 +159,21 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''
 
     
 def vamp_score(data,dim):
+    """Compute the vamp score of the feat
+
+    Parameters
+    ----------
+    data : List
+        List of all the value of the feat for each snapshot
+    dim : int
+        Dimension of the VAMP reduction
+
+    Returns
+    -------
+    score : float
+        VAMP2 score
+    """
+    
     score = pyemma.coordinates.vamp(
         data[:-1],dim=dim
         ).score(
