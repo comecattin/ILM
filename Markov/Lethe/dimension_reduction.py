@@ -228,7 +228,7 @@ def vamp_reduction(data,dim,lag):
 
     return vamp
 
-def plot_vamp(vamp,T,save=False,display=False,outdir=''):
+def plot_vamp(vamp,T,dim,save=False,display=False,outdir=''):
     vamp_concatenated = np.concatenate(vamp.get_output())
 
     # Histogramm plot
@@ -343,6 +343,7 @@ if __name__ == '__main__' :
     plot_vamp(
         vamp=vamp,
         T=T,
+        dim=dim,
         save=save,
         display=display,
         outdir=outdir

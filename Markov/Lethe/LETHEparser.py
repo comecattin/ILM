@@ -54,9 +54,9 @@ def parsing():
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist, density_energy, pca, tica, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)',
+        help='Plot wanted (feat_hist, density_energy, pca, tica, vamp, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)',
         choices=[
-             'feat_hist','density_energy','pca','tica','its','cluster','cktest','stationary','eigenvectors','metastable_membership','mfpt','committor'
+             'feat_hist','density_energy','pca','tica','vamp','its','cluster','cktest','stationary','eigenvectors','metastable_membership','mfpt','committor'
              ],
         required=True
     )
@@ -83,14 +83,19 @@ def parsing():
     parser.add_argument(
         '--reduction',
         type=str,
-        choices=['pca','tica','none'],
-        help='Do a PCA or TICA dimension reduction. Select PCA, TICA or none',
+        choices=['pca','tica','vamp','none'],
+        help='Do a PCA, TICA or VAMP dimension reduction. Select PCA, TICA, VAMP or none',
         default='none'
     )
     parser.add_argument(
          '--tica-lag',
          type=int,
          help='Lag used for the TICA dimension reduction'
+    )
+    parser.add_argument(
+         '--vamp-lag',
+         type=int,
+         help='Lag used for the VAMP dimension reduction'
     )
     parser.add_argument(
          '--dim',

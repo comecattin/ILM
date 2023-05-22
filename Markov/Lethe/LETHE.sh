@@ -8,16 +8,17 @@
 `# Distances to analyse` \
 -d 64_CA-130_CA 119_CA-24_CA \
 `# Load into RAM` \
-`#--ram` \
+--ram \
 `# Temperature of the system` \
 --T 300 \
 `# Plot to draw` \
--p feat_hist density_energy tica its cluster cktest stationary eigenvectors metastable_membership mfpt committor \
+-p feat_hist density_energy tica vamp its cluster cktest stationary eigenvectors metastable_membership mfpt committor \
 `# Do not display the plots` \
---no-plot \
+`#--no-plot` \
 `# Do a reduction (tica pca or none)` \
---reduction none \
+--reduction vamp \
 `#--tica-lag 1000` \
+--vamp-lag 1000 \
 --dim 2 \
 `# Number of stride` \
 --stride 10 \
@@ -44,7 +45,7 @@
 `# Output directories for plot and save` \
 -o /home/ccattin/Documents/Code/outputs/LETHE \
 `# Save model` \
---save all_lag500_k200_stride10_reductionNone.pyemma GSES \
+`#--save all_lag500_k200_stride10_reductionNone.pyemma GSES` \
 `# Load previous model` \
 `#--load all_lag1000_k200_stride4_reductionNone.pyemma GSES` \
 #> lethe.out \

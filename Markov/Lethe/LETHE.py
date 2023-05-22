@@ -117,6 +117,24 @@ def main():
                 outdir=outdir
             )
     
+    if args.reduction == 'vamp':
+        print('VAMP reduction...')
+        red = dimension_reduction.vamp_reduction(
+            data=data,
+            lag=args.vamp_lag,
+            dim=args.dim
+        )
+        if 'vamp' in args.plot:
+            print('Rendering VAMP reduction plot...')
+            dimension_reduction.plot_vamp(
+                vamp=red,
+                T = args.T,
+                dim=args.dim,
+                save=save,
+                display=display,
+                outdir=outdir
+            )
+    
     # No reduction, raw data    
     if args.reduction == 'none' :
         print('No reduction, raw data taken')
