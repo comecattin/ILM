@@ -36,6 +36,7 @@ def parsing():
         nargs='+',
         help='List of the pair names'
     )
+    # Compute the VAMP2 score
     parser.add_argument(
          '--vamp-score',
          action='store_true',
@@ -92,16 +93,19 @@ def parsing():
         help='Do a PCA, TICA or VAMP dimension reduction. Select PCA, TICA, VAMP or none',
         default='none'
     )
+    # Select the TICA lag time
     parser.add_argument(
          '--tica-lag',
          type=int,
          help='Lag used for the TICA dimension reduction'
     )
+    # Select the VAMP lag time
     parser.add_argument(
          '--vamp-lag',
          type=int,
          help='Lag used for the VAMP dimension reduction'
     )
+    # Select the number of dimension for the reduction
     parser.add_argument(
          '--dim',
          type=int,
@@ -194,6 +198,7 @@ def parsing():
         action='store_true',
         help='PCCA and TPT analysis. Display the stationary probabilities'
     )
+    # TPT between two states
     parser.add_argument(
         '--state-path',
         nargs=2,
@@ -230,11 +235,17 @@ def LETHE_handle_error(parser, args):
             if not args.T:
                 parser.error('Please provide a temperature')
     
+    # Forgot to give dimension
     if args.reduction and not args.dim:
          parser.error('Please provide a dimension for dimension reduction')
+    if args.vamp_score and not args.dim:
+         parser.error('Please provide a dimension for VAMP dimension reduction')
 
+    # Forgot to give the lag time in reduction
     if args.reduction == 'tica' and not args.tica_lag:
          parser.error('Please provide a TICA lag')
+    if args.reduction == 'vamp' and not args.vamp_lag:
+         parser.error('Please provide a VAMP lag')
 
     if args.cluster and not args.cluster_number:
          parser.error('Please provide a number of cluster')
