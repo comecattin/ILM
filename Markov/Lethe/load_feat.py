@@ -157,6 +157,19 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''
     if display:
         plt.show()
 
+    
+def vamp_score(data,dim):
+    score = pyemma.coordinates.vamp(
+        data[:-1],dim=dim
+        ).score(
+        test_data=data[-1],
+        score_method='VAMP2'
+        )
+
+    print('VAMP2 score: {:.2f}'.format(score))
+
+    return score
+
 if __name__ == '__main__' :
 
     # Path
@@ -173,7 +186,7 @@ if __name__ == '__main__' :
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
-    data = load_data(traj,feat)
+    data = load_data(traj,feat,stride=5,ram=True)
 
     plot_feat_hist(data,feat,
                    display=display,
@@ -186,3 +199,8 @@ if __name__ == '__main__' :
                         save=save,
                         outdir=outdir
                         )
+    
+    score = vamp_score(
+        data=data,
+        dim=2
+    )

@@ -42,6 +42,12 @@ def main():
         stride=args.stride,
         ram=args.ram
         )
+    
+    if args.vamp_score:
+        vamp = load_feat.vamp_score(
+            data=data,
+            dim=args.dim
+        )
 
     #====HANDLE INITIAL PLOTS====#
     if args.plot:
@@ -114,6 +120,24 @@ def main():
                 dim=args.dim,
                 display=display,
                 save=save,
+                outdir=outdir
+            )
+    
+    if args.reduction == 'vamp':
+        print('VAMP reduction...')
+        red = dimension_reduction.vamp_reduction(
+            data=data,
+            lag=args.vamp_lag,
+            dim=args.dim
+        )
+        if 'vamp' in args.plot:
+            print('Rendering VAMP reduction plot...')
+            dimension_reduction.plot_vamp(
+                vamp=red,
+                T = args.T,
+                dim=args.dim,
+                save=save,
+                display=display,
                 outdir=outdir
             )
     

@@ -218,6 +218,53 @@ def clustering_plot(reduction,cluster,save=False,outdir='',display=False):
         plt.show()
 
 
+def vamp_reduction(data,dim,lag):
+
+    vamp = pyemma.coordinates.vamp(
+        data=data,
+        dim=dim,
+        lag=lag
+        )
+
+    return vamp
+
+def plot_vamp(vamp,T,dim,save=False,display=False,outdir=''):
+    vamp_concatenated = np.concatenate(vamp.get_output())
+
+    # Histogramm plot
+    fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+    pyemma.plots.plot_feature_histograms(
+        vamp_concatenated,
+        ['VAMP {}'.format(i + 1) for i in range(vamp.dimension())],
+        ax=axes,
+        ignore_dim_warning=True)
+    if save:
+        if outdir=='':
+            raise Exception('Please provide a directory to save the file')
+        else:
+            plt.savefig(f'{outdir}/vamp_histogram.pdf',dpi=300,bbox_inches='tight')
+    if display:
+        plt.show()
+
+
+    # Free energy plot
+    if dim >= 2:
+        fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+        kT=tools.get_kT(T)
+        pyemma.plots.plot_free_energy(*vamp_concatenated.T[0:2],
+                                                ax=axes,
+                                                kT=kT,cbar_label='free energy / kJ.mol-1') 
+        axes.set_xlabel('VAMP 1')
+        axes.set_ylabel('VAMP 2')
+        if save:
+            if outdir=='':
+                raise Exception('Please provide a directory to save the file')
+            else:
+                plt.savefig(f'{outdir}/vamp_free_energy_direct_from_density.pdf',dpi=300,bbox_inches='tight')
+        if display:
+            plt.show()
+
+
 if __name__ == '__main__' :
 
     # Path
@@ -235,7 +282,7 @@ if __name__ == '__main__' :
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
-    data = load_data(traj,feat)
+    data = load_data(traj,feat,stride=5,ram=True)
 
     plot_feat_hist(data,feat,
                    display=display,
@@ -285,4 +332,19 @@ if __name__ == '__main__' :
         save=save,
         outdir=outdir,
         display=display
+    )
+
+    vamp = vamp_reduction(
+        data=data,
+        dim=dim,
+        lag=lag
+    )
+
+    plot_vamp(
+        vamp=vamp,
+        T=T,
+        dim=dim,
+        save=save,
+        display=display,
+        outdir=outdir
     )
