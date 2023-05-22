@@ -36,6 +36,11 @@ def parsing():
         nargs='+',
         help='List of the pair names'
     )
+    parser.add_argument(
+         '--vamp-score',
+         action='store_true',
+         help='Compute the VAMP score of the features'
+    )
     # Topology .pdb file
     parser.add_argument(
         '-t',
@@ -43,12 +48,22 @@ def parsing():
         required=True,
         help='Reference .pdb file'
     )
+    # Load into RAM
+    parser.add_argument(
+         '--ram',
+         action='store_true',
+         help='Store the data into the RAM. More efficient but maybe not possible for large data set'
+    )
     # What properties to plot
     parser.add_argument(
         '-p',
         '--plot',
         nargs='+',
-        help='Plot wanted (feat_hist, density_energy, its, cluster, cktest, stationary, eigenvectors)'
+        help='Plot wanted (feat_hist, density_energy, pca, tica, vamp, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)',
+        choices=[
+             'feat_hist','density_energy','pca','tica','vamp','its','cluster','cktest','stationary','eigenvectors','metastable_membership','mfpt','committor'
+             ],
+        required=True
     )
     # Do not display the plot 
     parser.add_argument(
@@ -73,30 +88,36 @@ def parsing():
     parser.add_argument(
         '--reduction',
         type=str,
-        help='Do a PCA or TICA dimension reduction. Select PCA, TICA or none',
+        choices=['pca','tica','vamp','none'],
+        help='Do a PCA, TICA or VAMP dimension reduction. Select PCA, TICA, VAMP or none',
         default='none'
     )
-    # PCA dimension reduction
     parser.add_argument(
-        '--pca',
-        help='Do a PCA dimension reduction',
-        action='store_true'
+         '--tica-lag',
+         type=int,
+         help='Lag used for the TICA dimension reduction'
     )
-    # TICA dimension reduction
     parser.add_argument(
-        '--tica',
-        help='Do a TICA dimension reduction',
-        action='store_true'
+         '--vamp-lag',
+         type=int,
+         help='Lag used for the VAMP dimension reduction'
+    )
+    parser.add_argument(
+         '--dim',
+         type=int,
+         help='Dimension to project for the dimension reduction'
     )
     # Lag time
     parser.add_argument(
         '--lag',
         help='Lag time for the MSM',
-        type=int
+        type=int,
+        required=True
     )
     # Clustering method
     parser.add_argument(
         '--cluster',
+        choices=['kmeans', 'regspace'],
         help='Clustering method (kmeans or regspace)',
         type=str
     )
@@ -111,7 +132,8 @@ def parsing():
     parser.add_argument(
         '--stride',
         help='Number of stride',
-        type=int
+        type=int,
+        default=1
     )
     # Perform ITS analysis
     parser.add_argument(
@@ -137,6 +159,7 @@ def parsing():
     parser.add_argument(
         '--cktest',
         type=bool,
+        choices=[True,False],
         help='Perform a CK test on the MSM builded given the number of metastable states. True for having the error, False for not'
     )
     # Meta-stable states
@@ -165,11 +188,17 @@ def parsing():
         type=str,
         help='Load previous model. File name (.pyemma) and then model name.'
     )
-    # Display the stationary proba
+    # PCCA analysis, display the stationary proba
     parser.add_argument(
-        '--stationary-prob',
+        '--pcca',
         action='store_true',
-        help='Display the stationary probabilities'
+        help='PCCA and TPT analysis. Display the stationary probabilities'
+    )
+    parser.add_argument(
+        '--state-path',
+        nargs=2,
+        type=int,
+        help='Get the TPT between the two given states'
     )
 
     #Get the arguments
@@ -201,26 +230,20 @@ def LETHE_handle_error(parser, args):
             if not args.T:
                 parser.error('Please provide a temperature')
     
-    # Forgot to use the plot option
-    if args.pca:
-        if args.no_plot:
-            parser.error('Please use the plot option')
-    
-    # No lag time or plot option given
-    if args.tica:
-        if args.no_plot:
-            parser.error('Please use the plot option')
-        if not args.lag:
-            parser.error('Please provide a lag time')
+    if args.reduction and not args.dim:
+         parser.error('Please provide a dimension for dimension reduction')
 
-    # Cluster errors
-    if args.cluster:
-        if args.no_plot:
-            parser.error('Please use the plot option')
-        if not args.cluster_number:
-            parser.error("Please provide a number of cluster")
+    if args.reduction == 'tica' and not args.tica_lag:
+         parser.error('Please provide a TICA lag')
+
+    if args.cluster and not args.cluster_number:
+         parser.error('Please provide a number of cluster')
     
     # ITS analysis error
     if args.its:
         if not args.nits:
             parser.error("Please provide a number of iteration")
+    
+    if not args.state:
+         if args.cktest or args.pcca:
+              parser.error('Please provide a number of meta-stable state')

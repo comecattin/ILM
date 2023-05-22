@@ -24,7 +24,7 @@ def create_feat(pdb,pair_indices):
     print(f'PyEmma feat description:\n{feat.describe()}')
     return feat
 
-def load_data(traj, feat):
+def load_data(traj, feat,stride,ram):
     """Load all the given trajectories in PyEmma
 
     Parameters
@@ -33,16 +33,39 @@ def load_data(traj, feat):
         List that contain the path of all the trajectories to analyze
     feat : PyEmma object
         PyEmma featurizer
+    stride : int
+        Number of stride to consider. Only read every stride'th frame.
+    ram : bool
+        Load the data in the ram of not
 
     Returns
     -------
     data : List
         List of all the value of the feat for each snapshot
     """
-    data = pyemma.coordinates.load(traj, features=feat,stride=1)
+    if not ram:
+        data = pyemma.coordinates.source(traj, features=feat,stride=stride)
+        out = data.get_output()
+        print(
+            'Lengths (number of trajectories ):',
+            len(out)
+            )
+        print(
+            'Shape of elements (for each trajectories, number of timestep, number of features):',
+            out[0].shape
+            )
+
+    if ram:
+        data = pyemma.coordinates.load(traj,features=feat,stride=stride)
     
-    print('Lengths (number of trajectories ):', len(data))
-    print('Shape of elements (for each trajectories, number of timestep, number of features):', data[0].shape)
+        print(
+            'Lengths (number of trajectories ):',
+            len(data)
+            )
+        print(
+            'Shape of elements (for each trajectories, number of timestep, number of features):',
+            data[0].shape
+            )
     
     return data
 
@@ -62,11 +85,12 @@ def plot_feat_hist(data, feat,display=False,save=False,outdir=''):
     outdir : str, optional
         Path where to save the files, by default ''
     """
+    
+    if type(data) == pyemma.coordinates.data.feature_reader.FeatureReader:
+        data = data.get_output()
+    
     data_concatenated = np.concatenate(data)
     fig, ax = pyemma.plots.plot_feature_histograms(data_concatenated, feature_labels=feat,ignore_dim_warning=True)
-    
-    fig.set_figwidth(10)
-    fig.set_figheight(5)
     
     if save:
         if outdir=='':
@@ -94,10 +118,12 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''
     outdir : str, optional
         Path where to save the files, by default ''
     """
+    if type(data) == pyemma.coordinates.data.feature_reader.FeatureReader:
+        data = data.get_output()
     data_concatenated = np.concatenate(data)
     
     # Density plot
-    fig, axes = plt.subplots(1, 1, figsize=(6, 4), sharex=True, sharey=True)    
+    fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)    
 
     pyemma.plots.plot_density(*data_concatenated.T[0:2],ax=axes)
     
@@ -113,7 +139,7 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''
         plt.show()
 
     # Energy plot
-    fig, axes = plt.subplots(1, 1, figsize=(6, 4), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)
     kT = tools.get_kT(T)
     fig,axes = pyemma.plots.plot_free_energy(*data_concatenated.T[0:2],
                                             ax=axes,
@@ -131,6 +157,19 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=''
     if display:
         plt.show()
 
+    
+def vamp_score(data,dim):
+    score = pyemma.coordinates.vamp(
+        data[:-1],dim=dim
+        ).score(
+        test_data=data[-1],
+        score_method='VAMP2'
+        )
+
+    print('VAMP2 score: {:.2f}'.format(score))
+
+    return score
+
 if __name__ == '__main__' :
 
     # Path
@@ -147,7 +186,7 @@ if __name__ == '__main__' :
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb,pairNames)
     feat = create_feat(pdb,pair_indices)
-    data = load_data(traj,feat)
+    data = load_data(traj,feat,stride=5,ram=True)
 
     plot_feat_hist(data,feat,
                    display=display,
@@ -160,3 +199,8 @@ if __name__ == '__main__' :
                         save=save,
                         outdir=outdir
                         )
+    
+    score = vamp_score(
+        data=data,
+        dim=2
+    )

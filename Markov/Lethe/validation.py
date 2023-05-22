@@ -64,12 +64,12 @@ def plot_its(its,data, cluster, save=False, display=False,outdir=''):
     # Histogram plot
     pyemma.plots.plot_feature_histograms(data_concatenated, feature_labels=['Feat 1', 'Feat 2'], ax=axes[0])
     # Density plot
-    pyemma.plots.plot_density(*data_concatenated.T, ax=axes[1], cbar=False, alpha=0.1)
-    axes[1].scatter(*cluster.clustercenters.T, s=15, c='C1')
+    pyemma.plots.plot_density(*data_concatenated.T[0:2], ax=axes[1], cbar=False, alpha=0.1)
+    axes[1].scatter(*cluster.clustercenters.T[0:2], s=15, c='C1')
     axes[1].set_xlabel('Feat 1')
     axes[1].set_ylabel('Feat 2')
     # ITS plot
-    pyemma.plots.plot_implied_timescales(its, ax=axes[2], units='ps')
+    pyemma.plots.plot_implied_timescales(its, ax=axes[2], units='steps')
     
     if save:
         if outdir=='':
@@ -80,7 +80,7 @@ def plot_its(its,data, cluster, save=False, display=False,outdir=''):
         plt.show()
 
 
-def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
+def cluster_its(data,lags,nits, stride, k_list,save=False,display=False,outdir=''):
     """ITS validation as a function of the cluster numbers
 
     Parameters
@@ -91,6 +91,8 @@ def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
         Lag time for the MSM
     nits : int
         Number of iteration
+    stride : int
+        Stride of the trajectory, read only every stride'th frames
     k_list : list
         List of the different number of cluster size to test
     save : bool, optional
@@ -113,16 +115,16 @@ def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
     else:
         data_concatenated = np.concatenate(data.get_output())
     
-    fig, axes = plt.subplots(2, len(k_list))
+    fig, axes = plt.subplots(2, len(k_list),figsize=(15,15))
     
     for i, k in enumerate(k_list):
         # Loop over the number of cluster provided    
-        cluster = pyemma.coordinates.cluster_kmeans(data, k=k, max_iter=50, stride=10)
+        cluster = pyemma.coordinates.cluster_kmeans(data, k=k, max_iter=500, stride=stride)
         
         # Density plot
-        pyemma.plots.plot_density(*data_concatenated.T, ax=axes[0, i], cbar=False, alpha=0.1)
+        pyemma.plots.plot_density(*data_concatenated.T[0:2], ax=axes[0, i], cbar=False, alpha=0.1)
         
-        axes[0, i].scatter(*cluster.clustercenters.T, s=15, c='C1')
+        axes[0, i].scatter(*cluster.clustercenters.T[0:2], s=15, c='C1')
         axes[0, i].set_xlabel('Feat 1')
         axes[0, i].set_ylabel('Feat 2')
         axes[0, i].set_title('k = {} centers'.format(k))
@@ -130,9 +132,8 @@ def cluster_its(data,lags,nits, k_list,save=False,display=False,outdir=''):
         # ITS plot
         pyemma.plots.plot_implied_timescales(
             pyemma.msm.its(cluster.dtrajs, lags=lags, nits=nits, errors='bayes'),
-            ax=axes[1, i], units='ps')
+            ax=axes[1, i], units='step')
         
-        axes[1, i].set_ylim(1, 2000)
     
     if save:
         if outdir=='':
@@ -171,7 +172,7 @@ def cktest(msm,
     """
     
     # Plot of the CK test
-    pyemma.plots.plot_cktest(msm.cktest(stable_state), units='ps')
+    pyemma.plots.plot_cktest(msm.cktest(stable_state,mlags=None), units='step')
 
     if save:
         if outdir=='':
@@ -189,14 +190,15 @@ if __name__ == '__main__':
      # Path
     pdb = '/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb'
     traj = ['/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS01_md_all_fitBB_protonly.xtc','/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS02_md_all_fitBB_protonly.xtc']
-    outdir='/home/ccattin/Documents/Code/outputs'
+    outdir='/home/ccattin/Documents/Code/outputs/LETHE'
     # Feat
     pairNames = ['64_CA-130_CA', '119_CA-24_CA']
     # Parameters
     save = False
-    display = False
+    display = True
     T = 300
-    lag=1000
+    dim=2
+    lag=400
     nits = 4
     lags=[1, 2, 5, 10, 20, 50]
     k_list=[20,50,100]
@@ -206,19 +208,17 @@ if __name__ == '__main__':
     feat = create_feat(pdb,pair_indices)
     data = load_data(traj,feat)
 
-    tica = tica_reduction(data=data,
-                          lag=lag,
-                          T=T,
-                          save=save,
-                          display=display,
-                          outdir=outdir)
-    cluster = clustering(reduction=tica,
-                         method='kmeans',
-                         k=200,
-                         stride=1,
-                         save=save,
-                         display=display,
-                         outdir=outdir)
+    tica = tica_reduction(
+        data=data,
+        lag=lag,
+        dim=dim
+        )
+    cluster = clustering(
+        reduction=tica,
+        method='kmeans',
+        k=200,
+        stride=1,
+        )
     
     its = implied_time_scale(cluster=cluster,
                              lags=lags,
