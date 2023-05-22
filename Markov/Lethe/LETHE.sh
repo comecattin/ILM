@@ -7,6 +7,7 @@
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 `# Distances to analyse` \
 -d 64_CA-130_CA 119_CA-24_CA \
+`# Compute the VAMP2 score` \
 --vamp-score \
 `# Load into RAM` \
 --ram \
@@ -16,7 +17,7 @@
 -p feat_hist density_energy tica vamp its cluster cktest stationary eigenvectors metastable_membership mfpt committor \
 `# Do not display the plots` \
 `#--no-plot` \
-`# Do a reduction (tica pca or none)` \
+`# Do a reduction (tica pca vamp or none)` \
 --reduction vamp \
 `#--tica-lag 1000` \
 --vamp-lag 1000 \
