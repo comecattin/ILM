@@ -61,7 +61,7 @@ def plot_metastable_membership(
     else:
         data_concatenated = np.concatenate(data.get_output())
 
-    dtrajs_concatenated = np.concatenate(cluster.dtrajs)
+    dtrajs_concatenated = np.concatenate(msm.dtrajs_active)
 
     # Metastable distribution plot
     fig, axes = plt.subplots(1, nstate, figsize=(15, 3))
@@ -108,7 +108,7 @@ def concatenate(msm, cluster):
     coarse_state_centers : pyemma.cluster.clustercenters
          Coarse state centers
     """
-    dtrajs_concatenated = np.concatenate(cluster.dtrajs)
+    dtrajs_concatenated = np.concatenate(msm.dtrajs_active)
 
     metastable_traj = msm.metastable_assignments[dtrajs_concatenated]
 
@@ -270,7 +270,7 @@ def tpt(msm, state):
 
 def plot_committor_tpt(
     data,
-    cluster,
+    msm,
     flux,
     state,
     cgflux,
@@ -286,8 +286,8 @@ def plot_committor_tpt(
     ----------
     data : pyemma.load
        Data loaded from pyemma loader
-    cluster : pyemma.cluster
-       Cluster to make the analysis
+    msm : pyemma.msm
+       Estimate of the MSM
     flux : pyemma.msm.tpt
         Flux between the two states
     state : list
@@ -317,7 +317,7 @@ def plot_committor_tpt(
     else:
         data_concatenated = np.concatenate(data.get_output())
 
-    dtrajs_concatenated = np.concatenate(cluster.dtrajs)
+    dtrajs_concatenated = np.concatenate(msm.dtrajs_active)
 
     # Committor map behind
     fig, ax = plt.subplots(figsize=(10, 7))

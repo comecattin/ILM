@@ -70,7 +70,7 @@ def plot_stationary(msm, cluster, data, display=False, save=False, outdir=""):
     else:
         data_concatenated = np.concatenate(data.get_output())
 
-    dtrajs_concatenated = np.concatenate(cluster.dtrajs)
+    dtrajs_concatenated = np.concatenate(msm.dtrajs_active)
 
     fig, ax, misc = pyemma.plots.plot_contour(
         *data_concatenated.T[0:2],
@@ -126,7 +126,7 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False, outdir=""):
     else:
         data_concatenated = np.concatenate(data.get_output())
 
-    dtrajs_concatenated = np.concatenate(cluster.dtrajs)
+    dtrajs_concatenated = np.concatenate(msm.dtrajs_active)
 
     eigvec = msm.eigenvectors_right()
 

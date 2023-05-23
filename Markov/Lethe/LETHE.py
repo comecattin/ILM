@@ -303,7 +303,7 @@ def main():
             print("Rendering committor plot...")
             pcca.plot_committor_tpt(
                 data=red,
-                cluster=cluster,
+                msm=msm,
                 flux=flux,
                 state=args.state_path,
                 cgflux=cgflux,
