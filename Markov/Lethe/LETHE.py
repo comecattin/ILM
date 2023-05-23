@@ -165,6 +165,18 @@ def main():
             cluster=cluster, lag=args.lag, error=args.confidence
         )
 
+    
+    # ====SAVE MSM====#
+    if args.save:
+        # Save the model
+        tools.save_model(
+            cluster=cluster,
+            msm=msm,
+            outdir=outdir,
+            filename=args.save[0],
+            model_name=args.save[1],
+        )
+
     # ====MSM VALIDATION====#
     aesthetic.validation()
     # ITS analysis
@@ -302,16 +314,6 @@ def main():
                 save=save,
             )
 
-    # ====SAVE MSM====#
-    if args.save:
-        # Save the model
-        tools.save_model(
-            cluster=cluster,
-            msm=msm,
-            outdir=outdir,
-            filename=args.save[0],
-            model_name=args.save[1],
-        )
 
 
 if __name__ == "__main__":
