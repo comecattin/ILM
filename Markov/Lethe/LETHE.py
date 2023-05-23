@@ -165,6 +165,18 @@ def main():
             cluster=cluster, lag=args.lag, error=args.confidence
         )
 
+    
+    # ====SAVE MSM====#
+    if args.save:
+        # Save the model
+        tools.save_model(
+            cluster=cluster,
+            msm=msm,
+            outdir=outdir,
+            filename=args.save[0],
+            model_name=args.save[1],
+        )
+
     # ====MSM VALIDATION====#
     aesthetic.validation()
     # ITS analysis
@@ -248,7 +260,6 @@ def main():
                 msm=msm,
                 nstate=args.state,
                 data=red,
-                cluster=cluster,
                 display=display,
                 save=save,
                 outdir=outdir,
@@ -291,7 +302,7 @@ def main():
             print("Rendering committor plot...")
             pcca.plot_committor_tpt(
                 data=red,
-                cluster=cluster,
+                msm=msm,
                 flux=flux,
                 state=args.state_path,
                 cgflux=cgflux,
@@ -302,16 +313,6 @@ def main():
                 save=save,
             )
 
-    # ====SAVE MSM====#
-    if args.save:
-        # Save the model
-        tools.save_model(
-            cluster=cluster,
-            msm=msm,
-            outdir=outdir,
-            filename=args.save[0],
-            model_name=args.save[1],
-        )
 
 
 if __name__ == "__main__":
