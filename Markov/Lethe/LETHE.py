@@ -260,7 +260,6 @@ def main():
                 msm=msm,
                 nstate=args.state,
                 data=red,
-                cluster=cluster,
                 display=display,
                 save=save,
                 outdir=outdir,

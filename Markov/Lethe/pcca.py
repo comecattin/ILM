@@ -27,7 +27,7 @@ def stationary_prob(msm, nstate):
 
 
 def plot_metastable_membership(
-    msm, nstate, data, cluster, display=False, save=False, outdir=""
+    msm, nstate, data, display=False, save=False, outdir=""
 ):
     """Plot the metastable membership
 
@@ -37,8 +37,6 @@ def plot_metastable_membership(
         MSM or bayesian MSM
      nstate : int
          Number of meta stable state to consider
-     cluster : pyemma.cluster
-        Cluster to make the analysis
     data : pyemma.load
         Data loaded from pyemma loader
     save : bool, optional
