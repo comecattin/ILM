@@ -221,3 +221,6 @@ def LETHE_handle_error(parser, args):
     if not args.state:
         if args.cktest or args.pcca:
             parser.error("Please provide a number of meta-stable state")
+
+    if args.state <= max(args.state_path):
+        parser.error("This path does not exist. The state counting begin at 0. Please check your path")
