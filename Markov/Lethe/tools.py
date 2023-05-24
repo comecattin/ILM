@@ -52,6 +52,14 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
 
     return pairsListIndices
 
+def create_pairIndices_from_indices(pairNames):
+    pairsListIndices = []
+    for i, pair in enumerate(pairNames):
+        pair = pair.split('-')
+        pair = [int(i) for i in pair]
+        pairsListIndices.append(pair)
+    return pairsListIndices
+
 
 def get_kT(T):
     """Compute kT
@@ -130,3 +138,5 @@ if __name__ == "__main__":
     refGS = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb"
     pairNames = ["64_CA-130_CA", "119_CA-24_CA"]
     print(create_pairIndices_from_pairNames(pdbfilename=refGS, pairNames=pairNames))
+    pairNames = ['16-109','17-109','18-109']
+    print(create_pairIndices_from_indices(pairNames))
