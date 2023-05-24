@@ -53,12 +53,28 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
     return pairsListIndices
 
 def create_pairIndices_from_indices(pairNames):
+    """Get the indices list from the indices input
+
+    Parameters
+    ----------
+    pairNames : list
+        List containing the indices. Pairs are separated by a space. Atoms inside a pair are separated by '-'
+
+    Returns
+    -------
+    pairsListIndices : list
+        List containing the different indices
+    """
+    # Initialization
     pairsListIndices = []
+    # Loop over all the pair and convert
     for i, pair in enumerate(pairNames):
         pair = pair.split('-')
         pair = [int(i) for i in pair]
         pairsListIndices.append(pair)
+
     print(f"Found indices: {pairsListIndices}")
+    
     return pairsListIndices
 
 
