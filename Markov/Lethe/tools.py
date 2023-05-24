@@ -58,6 +58,7 @@ def create_pairIndices_from_indices(pairNames):
         pair = pair.split('-')
         pair = [int(i) for i in pair]
         pairsListIndices.append(pair)
+    print(f"Found indices: {pairsListIndices}")
     return pairsListIndices
 
 
