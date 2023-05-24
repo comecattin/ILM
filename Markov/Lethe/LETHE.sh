@@ -7,6 +7,7 @@
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 `# Distances to analyse` \
 -d 64_CA-130_CA 119_CA-24_CA \
+--indices 16-109 17-109 18-109 18-110 19-109 19-110 20-109 20-110 21-109 21-110 109-113 109-169 109-170 109-171 109-172 110-114\
 `# Compute the VAMP2 score` \
 --vamp-score \
 `# Load into RAM` \

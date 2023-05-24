@@ -29,10 +29,19 @@ def main():
 
     # ====FEAT====#
     aesthetic.feat()
-    # Convert name in indices
-    pair_indices = tools.create_pairIndices_from_pairNames(
-        args.topology, args.distances
-    )
+    
+    if args.distances:
+        # Convert name in indices
+        pair_indices = tools.create_pairIndices_from_pairNames(
+            args.topology, args.distances
+        )
+
+    if args.indices:
+        # Get the indices
+        pair_indices = tools.create_pairIndices_from_indices(
+            args.indices
+        )
+        
     # Create a feat
     feat = load_feat.create_feat(args.topology, pair_indices)
     # Load the data

@@ -22,9 +22,25 @@ def parsing():
     )
 
     # List of files
-    parser.add_argument("-f", "--files", required=True, nargs="+", help="List of files")
+    parser.add_argument(
+        "-f",
+        "--files",
+        required=True,
+        nargs="+",
+        help="List of files"
+    )
     # Distances to add to the feat
-    parser.add_argument("-d", "--distances", nargs="+", help="List of the pair names")
+    parser.add_argument(
+        "-d",
+        "--distances",
+        nargs="+",
+        help="List of the pair names",
+    )
+    parser.add_argument(
+        "--indices",
+        nargs="+",
+        help="Indices of the distance to consider. Pairs are separated by a space and '-' separate the two atoms inside a pair"
+    )
     # Compute the VAMP2 score
     parser.add_argument(
         "--vamp-score",
@@ -190,7 +206,7 @@ def LETHE_handle_error(parser, args):
         parser.error("No trajectories file given")
 
     # No distance given
-    if not args.distances:
+    if not args.distances or not args.indices:
         parser.error("No distances given")
 
     # Forgot to give the temperature
