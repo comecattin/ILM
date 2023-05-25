@@ -183,6 +183,12 @@ def parsing():
         type=int,
         help="Get the TPT between the two given states",
     )
+    # Save .pdb files of the meta stable states
+    parser.add_argument(
+        '--pdb',
+        type=int,
+        help="Generate .pdb files of the sampled meta stable states. The number of this option correspond to the number of frame to write in the .pdb files."
+    )
 
     # Get the arguments
     args = parser.parse_args()
