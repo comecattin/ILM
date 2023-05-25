@@ -370,6 +370,36 @@ def plot_committor_tpt(
         plt.show()
 
 
+def sample_structures(
+        msm,
+        number_of_sample,
+        feat,
+        files,
+        outdir
+    ):
+    data_source = pyemma.coordinates.source(
+        files,
+        features=feat
+    )
+    pcca_samples = msm.sample_by_distributions(
+        msm.metastable_distributions,
+        number_of_sample
+        )
+    
+    pyemma.coordinates.save_trajs(
+        data_source,
+        pcca_samples,
+        outfiles=[
+            f'{outdir}/pcca{n+1}_{number_of_sample}samples.pdb'
+            for n in range(msm.n_metastable)
+        ]
+    )
+
+    print(
+        f"Samples saved in {outdir}/pcca_{number_of_sample}samples.pdb"
+    )
+
+
 if __name__ == "__main__":
     # Path
     pdb = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb"
@@ -389,7 +419,7 @@ if __name__ == "__main__":
     lag = 1000
     nits = 4
     lags = [1, 2, 5, 10, 20, 50]
-    stable_state = 3
+    stable_state = 2
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
     feat = create_feat(pdb, pair_indices)
@@ -435,8 +465,13 @@ if __name__ == "__main__":
     print(metastable_traj, highest_membership, coarse_state_centers)
 
     mfpt, inverse_mfpt = get_mfpt(msm=msm, nstates=stable_state)
-    print(mfpt, inverse_mfpt)
-
+    sample_structures(
+            msm=msm,
+            number_of_sample=10,
+            files=traj,
+            feat=feat,
+            outdir=outdir
+        )
     plot_mftp(
         data=tica,
         nstates=stable_state,
@@ -449,7 +484,7 @@ if __name__ == "__main__":
         outdir=outdir,
     )
 
-    flux, cgflux = tpt(msm=msm, state=[1, 2])
+    flux, cgflux = tpt(msm=msm, state=[0, 1])
 
     plot_committor_tpt(
         data=tica,
@@ -463,3 +498,4 @@ if __name__ == "__main__":
         outdir=outdir,
         save=save,
     )
+    
