@@ -322,6 +322,15 @@ def main():
                 save=save,
             )
 
+        # Render pdb sample files
+        if args.pdb:
+            print("Saving .pdb sample files...")
+            pcca.sample_structures(
+                msm=msm,
+                number_of_sample=args.pdb,
+                feat=feat,
+                files=args.file
+            )
 
 
 if __name__ == "__main__":
