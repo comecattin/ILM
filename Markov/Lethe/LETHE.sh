@@ -45,6 +45,7 @@
 --pcca \
 `# Transition Path Theory analysis between two state (begin at 0)` \
 --state-path 1 2 \
+# Writte .pdb file of the meta stable states
 --pdb 10 \
 `# Output directories for plot and save` \
 -o /home/ccattin/Documents/Code/outputs/LETHE \

@@ -377,15 +377,34 @@ def sample_structures(
         files,
         outdir
     ):
+    """Write pdb structure of the sampled meta stable states
+
+    Parameters
+    ----------
+    msm : pyemma.msm
+        Estimation of the Markov State Model
+    number_of_sample : int
+        Number of frame to write into the .pdb file
+    feat : pyemma.coordinates.feat
+        PyEmma features
+    files : list
+        List containing all the trajectories to analysis
+    outdir : str
+        Output directory to save the .pdb files
+    """
+    
+    # Load data inside a source object
     data_source = pyemma.coordinates.source(
         files,
         features=feat
     )
+
     pcca_samples = msm.sample_by_distributions(
         msm.metastable_distributions,
         number_of_sample
         )
     
+    # Save trajectories
     pyemma.coordinates.save_trajs(
         data_source,
         pcca_samples,
