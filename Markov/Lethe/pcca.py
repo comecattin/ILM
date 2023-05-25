@@ -10,7 +10,7 @@ from markov_analysis import *
 
 
 def stationary_prob(msm, nstate):
-    """Display the stationary probabilities
+    """Display the stationary probabilities and free energy of the states
 
     Parameters
     ----------
@@ -20,10 +20,18 @@ def stationary_prob(msm, nstate):
         Number of meta stable state to consider
     """
 
+    # Stationary probabilities
     msm.pcca(nstate)
     print("Sationary probabilities of the metastable sets")
     for i, s in enumerate(msm.metastable_sets):
         print("π_{} = {:f}".format(i + 1, msm.pi[s].sum()))
+    
+    # Free energies of the states
+    print("Free energy of the states")
+    print('state\tπ\t\tG/kT')
+    for i, s in enumerate(msm.metastable_sets):
+        p = msm.pi[s].sum()
+        print('{}\t{:f}\t{:f}'.format(i + 1, p, -np.log(p)))
 
 
 def plot_metastable_membership(
@@ -385,20 +393,20 @@ if __name__ == "__main__":
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
     feat = create_feat(pdb, pair_indices)
-    data = load_data(traj, feat)
+    data = load_data(traj, feat,stride=5,ram=True)
 
     tica = tica_reduction(
-        data=data, lag=lag, T=T, save=save, display=display, outdir=outdir
+        data=data, lag=lag,dim=2
     )
 
-    #     cluster = clustering(reduction=tica,
-    #                          method='kmeans',
-    #                          k=200,
-    #                          stride=1)
+    cluster = clustering(reduction=tica,
+                            method='kmeans',
+                            k=200,
+                            stride=1)
 
-    #     msm = create_msm(cluster=cluster,
-    #            lag=lag,
-    #            error=False)
+    msm = create_msm(cluster=cluster,
+            lag=lag,
+            error=False)
 
     #     tools.save_model(
     #         cluster=cluster,
@@ -407,16 +415,15 @@ if __name__ == "__main__":
     #         model_name=model_name,
     #         filename=filename
     #         )
-    msm, cluster = tools.load_model(
-        outdir=outdir, filename=filename, model_name=model_name
-    )
+    #msm, cluster = tools.load_model(
+    #    outdir=outdir, filename=filename, model_name=model_name
+    #)
 
     stationary_prob(msm=msm, nstate=stable_state)
     plot_metastable_membership(
         msm=msm,
         nstate=stable_state,
         data=tica,
-        cluster=cluster,
         display=display,
         save=save,
         outdir=outdir,
@@ -446,7 +453,7 @@ if __name__ == "__main__":
 
     plot_committor_tpt(
         data=tica,
-        cluster=cluster,
+        msm=msm,
         flux=flux,
         state=[1, 2],
         cgflux=cgflux,
