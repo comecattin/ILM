@@ -412,18 +412,54 @@ def plot_lag_dim_vamp(lags,data,dim,save=False,outdir='',display=False):
     if display:
         plt.show()
 
-def plot_vamp_cluster(n_clustercenters,lag,data,save=False,outdir='',display=False):
+def plot_vamp_cluster(
+        n_clustercenters,
+        lag,
+        data,
+        save=False,
+        outdir='',
+        display=False
+    ):
+    """Plot the VAMP2 score as a function of the number of cluster
+
+    Parameters
+    ----------
+    n_clustercenters : list
+        List of the number of cluster to test
+    lag : int
+        Lag time of the MSM
+    data : pyemma.load
+        Data loaded from pyemma loader
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+    # At this point the MSM lag time has to be guessed...
     scores = np.zeros((len(n_clustercenters), 5))
     for n, k in enumerate(n_clustercenters):
+        # Multiple round of discretization
         for m in range(5):
+            # Clusters
             _cl = pyemma.coordinates.cluster_kmeans(
                 data, k=k, max_iter=500, stride=1)
+            # MSM
             _msm = pyemma.msm.estimate_markov_model(_cl.dtrajs, lag)
+            # Score
             scores[n, m] = _msm.score_cv(
                 _cl.dtrajs, n=1, score_method='VAMP2', score_k=min(10, k))
 
     fig, ax = plt.subplots()
+    
     lower, upper = pyemma.util.statistics.confidence_interval(scores.T.tolist(), conf=0.9)
+    
     ax.fill_between(n_clustercenters, lower, upper, alpha=0.3)
     ax.plot(n_clustercenters, np.mean(scores, axis=1), '-o')
     ax.semilogx()
