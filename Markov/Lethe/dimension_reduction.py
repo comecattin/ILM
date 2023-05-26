@@ -412,6 +412,26 @@ def plot_lag_dim_vamp(lags,data,dim,save=False,outdir='',display=False):
     if display:
         plt.show()
 
+def plot_vamp_cluster(n_clustercenters,lag,data):
+    scores = np.zeros((len(n_clustercenters), 5))
+    for n, k in enumerate(n_clustercenters):
+        for m in range(5):
+            _cl = pyemma.coordinates.cluster_kmeans(
+                data, k=k, max_iter=500, stride=1)
+            _msm = pyemma.msm.estimate_markov_model(_cl.dtrajs, lag)
+            scores[n, m] = _msm.score_cv(
+                _cl.dtrajs, n=1, score_method='VAMP2', score_k=min(10, k))
+
+    fig, ax = plt.subplots()
+    lower, upper = pyemma.util.statistics.confidence_interval(scores.T.tolist(), conf=0.9)
+    ax.fill_between(n_clustercenters, lower, upper, alpha=0.3)
+    ax.plot(n_clustercenters, np.mean(scores, axis=1), '-o')
+    ax.semilogx()
+    ax.set_xlabel('Number of cluster centers')
+    ax.set_ylabel('VAMP-2 score')
+    fig.tight_layout()
+    plt.show()
+
 
 if __name__ == "__main__":
     # Path
@@ -427,11 +447,12 @@ if __name__ == "__main__":
     save = True
     display = True
     T = 300
-    lag = 1000
+    lag = 300
     dim = 2
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
-    feat = create_feat(pdb, pair_indices)
+    feat = create_feat(pdb)
+    feat = feat_atom_distances(feat,pair_indices)
     data = load_data(traj, feat, stride=5, ram=True)
 
     plot_feat_hist(data, feat, display=display, save=save, outdir=outdir)
@@ -460,4 +481,10 @@ if __name__ == "__main__":
         lags=[1,2,5,10,20],
         data=data,
         dim=2
+    )
+
+    plot_vamp_cluster(
+        n_clustercenters=[10,50,100,200,400,1000],
+        lag=300,
+        data=tica
     )
