@@ -412,7 +412,7 @@ def plot_lag_dim_vamp(lags,data,dim,save=False,outdir='',display=False):
     if display:
         plt.show()
 
-def plot_vamp_cluster(n_clustercenters,lag,data):
+def plot_vamp_cluster(n_clustercenters,lag,data,save=False,outdir='',display=False):
     scores = np.zeros((len(n_clustercenters), 5))
     for n, k in enumerate(n_clustercenters):
         for m in range(5):
@@ -429,8 +429,18 @@ def plot_vamp_cluster(n_clustercenters,lag,data):
     ax.semilogx()
     ax.set_xlabel('Number of cluster centers')
     ax.set_ylabel('VAMP-2 score')
-    fig.tight_layout()
-    plt.show()
+    
+    if save:
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
+        else:
+            plt.savefig(
+                f"{outdir}/vamp_kcluster.pdf",
+                dpi=300,
+                bbox_inches="tight",
+            )
+    if display:
+        plt.show()
 
 
 if __name__ == "__main__":
