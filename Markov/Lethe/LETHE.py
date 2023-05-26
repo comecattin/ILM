@@ -29,21 +29,23 @@ def main():
 
     # ====FEAT====#
     aesthetic.feat()
-    
+    # Create a feat
+    feat = load_feat.create_feat(args.topology)
+
     if args.distances:
         # Convert name in indices
         pair_indices = tools.create_pairIndices_from_pairNames(
             args.topology, args.distances
         )
+        feat = load_feat.feat_atom_distances(feat,pair_indices)
 
     if args.residue:
         # Get the indices
         pair_indices = tools.create_pairIndices_from_indices(
             args.residue
         )
+        feat = load_feat.feat_residue_midist(feat,pair_indices)
         
-    # Create a feat
-    feat = load_feat.create_feat(args.topology, pair_indices)
     # Load the data
     data = load_feat.load_data(
         traj=args.files, feat=feat, stride=args.stride, ram=args.ram

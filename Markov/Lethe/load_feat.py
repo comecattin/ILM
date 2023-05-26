@@ -4,13 +4,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def create_feat(pdb, pair_indices):
+def create_feat(pdb):
     """Create a PyEmma featurizer
 
     Parameters
     ----------
     pdb : str
         Path to a reference topology .pdb file
+    
+    Returns
+    -------
+    feat : PyEmma object
+        PyEmma featurizer
+    """
+    # Create the feat
+    feat = pyemma.coordinates.featurizer(pdb)
+    return feat
+
+def feat_atom_distances(feat,pair_indices):
+    """Add atom distances to the featurizer
+
+    Parameters
+    ----------
+    feat : PyEmma object
+        PyEmma featurizer
     pair_indices : list
         List containing the indices of the pair to compute distances
 
@@ -19,9 +36,27 @@ def create_feat(pdb, pair_indices):
     feat : PyEmma object
         PyEmma featurizer
     """
-    # Create the feat and add the right coordinates
-    feat = pyemma.coordinates.featurizer(pdb)
+    # Add the right coordinates to the feat
     feat.add_distances(indices=pair_indices, periodic=True, indices2=None)
+    print(f"PyEmma feat description:\n{feat.describe()}")
+    return feat
+
+def feat_residue_midist(feat,pair_indices):
+    """Add the minimum distance between residues
+
+    Parameters
+    ----------
+    feat : PyEmma object
+        PyEmma featurizer
+    pair_indices : list
+        List containing the indices of residue pairs to compute distances
+
+    Returns
+    -------
+    feat : PyEmma object
+        PyEmma featurizer
+    """
+    feat.add_residue_mindist(residue_pairs=pair_indices)
     print(f"PyEmma feat description:\n{feat.describe()}")
     return feat
 
