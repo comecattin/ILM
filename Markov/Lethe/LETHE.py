@@ -36,10 +36,10 @@ def main():
             args.topology, args.distances
         )
 
-    if args.indices:
+    if args.residue:
         # Get the indices
         pair_indices = tools.create_pairIndices_from_indices(
-            args.indices
+            args.residue
         )
         
     # Create a feat

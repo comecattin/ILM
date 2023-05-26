@@ -37,9 +37,9 @@ def parsing():
         help="List of the pair names",
     )
     parser.add_argument(
-        "--indices",
+        "--residue",
         nargs="+",
-        help="Indices of the distance to consider. Pairs are separated by a space and '-' separate the two atoms inside a pair"
+        help="Shortest distance between residue indices to consider. Pairs of residue are separated by a space and '-' separate the two residues inside a pair"
     )
     # Compute the VAMP2 score
     parser.add_argument(
@@ -212,7 +212,7 @@ def LETHE_handle_error(parser, args):
         parser.error("No trajectories file given")
 
     # No distance given
-    if not args.distances or not args.indices:
+    if not args.distances or not args.residue:
         parser.error("No distances given")
 
     # Forgot to give the temperature
