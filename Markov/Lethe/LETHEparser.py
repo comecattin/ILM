@@ -241,6 +241,9 @@ def LETHE_handle_error(parser, args):
     if args.vamp_score and not args.dim:
         parser.error("Please provide a dimension for VAMP dimension reduction")
 
+    if 'vamp_lag_dim' in args.plot and not args.vamp_lags or not args.vamp_dim:
+        parser.error("Please provide a correct maximum dimension and list of lags for VAMP2 score analysis")
+
     # Forgot to give the lag time in reduction
     if args.reduction == "tica" and not args.tica_lag:
         parser.error("Please provide a TICA lag")
