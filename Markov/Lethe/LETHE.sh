@@ -7,6 +7,7 @@
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 `# Distances to analyse` \
 -d 64_CA-130_CA 119_CA-24_CA \
+--residue 16-109 17-109 18-109 18-110 19-109 19-110 20-109 20-110 21-109 21-110 109-113 109-169 109-170 109-171 109-172 110-114 \
 `# Compute the VAMP2 score` \
 --vamp-score \
 `# Load into RAM` \
@@ -14,9 +15,11 @@
 `# Temperature of the system` \
 --T 300 \
 `# Plot to draw` \
--p feat_hist density_energy tica vamp its cluster cktest stationary eigenvectors metastable_membership mfpt committor \
+-p feat_hist density_energy vamp_lag_dim tica vamp its cluster cktest stationary eigenvectors metastable_membership mfpt committor \
 `# Do not display the plots` \
 `#--no-plot` \
+--vamp-lags 1 2 5 10 20 50 100 200 500 1000 \
+--vamp-dim 5 \
 `# Do a reduction (tica pca vamp or none)` \
 --reduction vamp \
 `#--tica-lag 1000` \
@@ -44,6 +47,8 @@
 --pcca \
 `# Transition Path Theory analysis between two state (begin at 0)` \
 --state-path 1 2 \
+`# Writte .pdb file of the meta stable states` \
+--pdb 10 \
 `# Output directories for plot and save` \
 -o /home/ccattin/Documents/Code/outputs/LETHE \
 `# Save model` \

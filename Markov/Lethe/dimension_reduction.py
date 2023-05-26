@@ -333,6 +333,34 @@ def plot_vamp(vamp, T, dim, save=False, display=False, outdir=""):
             plt.show()
 
 
+def plot_lag_dim_vamp(lags,data,dim,save=False,outdir='',display=False):
+    dims = np.arange(1,dim+1)
+    fig, ax = plt.subplots()
+    for i, lag in enumerate(lags):
+        scores_ = np.array(
+            [score_cv(data=data,dim=d,lag=lag) for d in dims]
+        )
+        scores = np.mean(scores_, axis=1)
+        errors = np.std(scores_, axis=1, ddof=1)
+        color = 'C{}'.format(i)
+        ax.fill_between(dims, scores - errors, scores + errors, alpha=0.3, facecolor=color)
+        ax.plot(dims, scores, '--o', color=color, label='lag={:.1f} steps'.format(lag))
+    ax.legend()
+    ax.set_xlabel('Number of dimension')
+    ax.set_ylabel('VAMP-2 score')
+    if save:
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
+        else:
+            plt.savefig(
+                f"{outdir}/vamp_lag_dim.pdf",
+                dpi=300,
+                bbox_inches="tight",
+            )
+    if display:
+        plt.show()
+
+
 if __name__ == "__main__":
     # Path
     pdb = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb"
@@ -375,3 +403,9 @@ if __name__ == "__main__":
     vamp = vamp_reduction(data=data, dim=dim, lag=lag)
 
     plot_vamp(vamp=vamp, T=T, dim=dim, save=save, display=display, outdir=outdir)
+
+    plot_lag_dim_vamp(
+        lags=[1,2,5,10,20],
+        data=data,
+        dim=2
+    )

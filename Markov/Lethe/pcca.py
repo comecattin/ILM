@@ -10,7 +10,7 @@ from markov_analysis import *
 
 
 def stationary_prob(msm, nstate):
-    """Display the stationary probabilities
+    """Display the stationary probabilities and free energy of the states
 
     Parameters
     ----------
@@ -20,10 +20,18 @@ def stationary_prob(msm, nstate):
         Number of meta stable state to consider
     """
 
+    # Stationary probabilities
     msm.pcca(nstate)
     print("Sationary probabilities of the metastable sets")
     for i, s in enumerate(msm.metastable_sets):
         print("π_{} = {:f}".format(i + 1, msm.pi[s].sum()))
+    
+    # Free energies of the states
+    print("Free energy of the states")
+    print('state\tπ\t\tG/kT')
+    for i, s in enumerate(msm.metastable_sets):
+        p = msm.pi[s].sum()
+        print('{}\t{:f}\t{:f}'.format(i + 1, p, -np.log(p)))
 
 
 def plot_metastable_membership(
@@ -362,6 +370,55 @@ def plot_committor_tpt(
         plt.show()
 
 
+def sample_structures(
+        msm,
+        number_of_sample,
+        feat,
+        files,
+        outdir
+    ):
+    """Write pdb structure of the sampled meta stable states
+
+    Parameters
+    ----------
+    msm : pyemma.msm
+        Estimation of the Markov State Model
+    number_of_sample : int
+        Number of frame to write into the .pdb file
+    feat : pyemma.coordinates.feat
+        PyEmma features
+    files : list
+        List containing all the trajectories to analysis
+    outdir : str
+        Output directory to save the .pdb files
+    """
+    
+    # Load data inside a source object
+    data_source = pyemma.coordinates.source(
+        files,
+        features=feat
+    )
+
+    pcca_samples = msm.sample_by_distributions(
+        msm.metastable_distributions,
+        number_of_sample
+        )
+    
+    # Save trajectories
+    pyemma.coordinates.save_trajs(
+        data_source,
+        pcca_samples,
+        outfiles=[
+            f'{outdir}/pcca{n+1}_{number_of_sample}samples.pdb'
+            for n in range(msm.n_metastable)
+        ]
+    )
+
+    print(
+        f"Samples saved in {outdir}/pcca_{number_of_sample}samples.pdb"
+    )
+
+
 if __name__ == "__main__":
     # Path
     pdb = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb"
@@ -381,24 +438,24 @@ if __name__ == "__main__":
     lag = 1000
     nits = 4
     lags = [1, 2, 5, 10, 20, 50]
-    stable_state = 3
+    stable_state = 2
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
     feat = create_feat(pdb, pair_indices)
-    data = load_data(traj, feat)
+    data = load_data(traj, feat,stride=5,ram=True)
 
     tica = tica_reduction(
-        data=data, lag=lag, T=T, save=save, display=display, outdir=outdir
+        data=data, lag=lag,dim=2
     )
 
-    #     cluster = clustering(reduction=tica,
-    #                          method='kmeans',
-    #                          k=200,
-    #                          stride=1)
+    cluster = clustering(reduction=tica,
+                            method='kmeans',
+                            k=200,
+                            stride=1)
 
-    #     msm = create_msm(cluster=cluster,
-    #            lag=lag,
-    #            error=False)
+    msm = create_msm(cluster=cluster,
+            lag=lag,
+            error=False)
 
     #     tools.save_model(
     #         cluster=cluster,
@@ -407,16 +464,15 @@ if __name__ == "__main__":
     #         model_name=model_name,
     #         filename=filename
     #         )
-    msm, cluster = tools.load_model(
-        outdir=outdir, filename=filename, model_name=model_name
-    )
+    #msm, cluster = tools.load_model(
+    #    outdir=outdir, filename=filename, model_name=model_name
+    #)
 
     stationary_prob(msm=msm, nstate=stable_state)
     plot_metastable_membership(
         msm=msm,
         nstate=stable_state,
         data=tica,
-        cluster=cluster,
         display=display,
         save=save,
         outdir=outdir,
@@ -428,8 +484,13 @@ if __name__ == "__main__":
     print(metastable_traj, highest_membership, coarse_state_centers)
 
     mfpt, inverse_mfpt = get_mfpt(msm=msm, nstates=stable_state)
-    print(mfpt, inverse_mfpt)
-
+    sample_structures(
+            msm=msm,
+            number_of_sample=10,
+            files=traj,
+            feat=feat,
+            outdir=outdir
+        )
     plot_mftp(
         data=tica,
         nstates=stable_state,
@@ -442,11 +503,11 @@ if __name__ == "__main__":
         outdir=outdir,
     )
 
-    flux, cgflux = tpt(msm=msm, state=[1, 2])
+    flux, cgflux = tpt(msm=msm, state=[0, 1])
 
     plot_committor_tpt(
         data=tica,
-        cluster=cluster,
+        msm=msm,
         flux=flux,
         state=[1, 2],
         cgflux=cgflux,
@@ -456,3 +517,4 @@ if __name__ == "__main__":
         outdir=outdir,
         save=save,
     )
+    

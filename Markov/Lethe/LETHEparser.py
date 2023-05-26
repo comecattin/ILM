@@ -22,9 +22,25 @@ def parsing():
     )
 
     # List of files
-    parser.add_argument("-f", "--files", required=True, nargs="+", help="List of files")
+    parser.add_argument(
+        "-f",
+        "--files",
+        required=True,
+        nargs="+",
+        help="List of files"
+    )
     # Distances to add to the feat
-    parser.add_argument("-d", "--distances", nargs="+", help="List of the pair names")
+    parser.add_argument(
+        "-d",
+        "--distances",
+        nargs="+",
+        help="List of the pair names",
+    )
+    parser.add_argument(
+        "--residue",
+        nargs="+",
+        help="Shortest distance between residue indices to consider. Pairs of residue are separated by a space and '-' separate the two residues inside a pair"
+    )
     # Compute the VAMP2 score
     parser.add_argument(
         "--vamp-score",
@@ -44,10 +60,11 @@ def parsing():
         "-p",
         "--plot",
         nargs="+",
-        help="Plot wanted (feat_hist, density_energy, pca, tica, vamp, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)",
+        help="Plot wanted (feat_hist, density_energy, vamp_lag_dim, pca, tica, vamp, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)",
         choices=[
             "feat_hist",
             "density_energy",
+            "vamp_lag_dim",
             "pca",
             "tica",
             "vamp",
@@ -69,6 +86,20 @@ def parsing():
     # Temperature in K of the system
     parser.add_argument(
         "--T", "--temperature", type=float, help="Temperature of the system"
+    )
+    # Get the lag time and the dimension for dimension reduction
+    # Lag time
+    parser.add_argument(
+        "--vamp-lags",
+        nargs="+",
+        type=int,
+        help="Dimension reduction lags to test"
+    )
+    # Dimension
+    parser.add_argument(
+        "--vamp-dim",
+        type=int,
+        help="Number of dimension to test the dimension reduction"
     )
     # Dimension reduction
     parser.add_argument(
@@ -167,6 +198,12 @@ def parsing():
         type=int,
         help="Get the TPT between the two given states",
     )
+    # Save .pdb files of the meta stable states
+    parser.add_argument(
+        '--pdb',
+        type=int,
+        help="Generate .pdb files of the sampled meta stable states. The number of this option correspond to the number of frame to write in the .pdb files."
+    )
 
     # Get the arguments
     args = parser.parse_args()
@@ -190,7 +227,7 @@ def LETHE_handle_error(parser, args):
         parser.error("No trajectories file given")
 
     # No distance given
-    if not args.distances:
+    if not args.distances or not args.residue:
         parser.error("No distances given")
 
     # Forgot to give the temperature
@@ -203,6 +240,9 @@ def LETHE_handle_error(parser, args):
         parser.error("Please provide a dimension for dimension reduction")
     if args.vamp_score and not args.dim:
         parser.error("Please provide a dimension for VAMP dimension reduction")
+
+    if 'vamp_lag_dim' in args.plot and not args.vamp_lags or not args.vamp_dim:
+        parser.error("Please provide a correct maximum dimension and list of lags for VAMP2 score analysis")
 
     # Forgot to give the lag time in reduction
     if args.reduction == "tica" and not args.tica_lag:
