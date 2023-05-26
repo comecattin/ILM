@@ -60,10 +60,11 @@ def parsing():
         "-p",
         "--plot",
         nargs="+",
-        help="Plot wanted (feat_hist, density_energy, pca, tica, vamp, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)",
+        help="Plot wanted (feat_hist, density_energy, vamp_lag_dim, pca, tica, vamp, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)",
         choices=[
             "feat_hist",
             "density_energy",
+            "vamp_lag_dim",
             "pca",
             "tica",
             "vamp",
@@ -85,6 +86,20 @@ def parsing():
     # Temperature in K of the system
     parser.add_argument(
         "--T", "--temperature", type=float, help="Temperature of the system"
+    )
+    # Get the lag time and the dimension for dimension reduction
+    # Lag time
+    parser.add_argument(
+        "--vamp-lags",
+        nargs="+",
+        type=int,
+        help="Dimension reduction lags to test"
+    )
+    # Dimension
+    parser.add_argument(
+        "--vamp-dim",
+        type=int,
+        help="Number of dimension to test the dimension reduction"
     )
     # Dimension reduction
     parser.add_argument(

@@ -86,6 +86,19 @@ def main():
 
     # ====DIMENSION REDUCTION====#
     aesthetic.dimension_reduction()
+
+    # Get the lag time and the number of dimension
+    if 'vamp_lag_dim' in args.plot:
+        print("Rendering VAMP2 score as a function of lag time and dimension...")
+        dimension_reduction.plot_lag_dim_vamp(
+            lags=args.vamp_lags,
+            data=data,
+            dim=args.vamp_dim,
+            save=save,
+            outdir=outdir,
+            display=display
+        )
+
     # PCA reduction
     if args.reduction == "pca":
         print("PCA reduction...")

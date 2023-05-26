@@ -15,9 +15,11 @@
 `# Temperature of the system` \
 --T 300 \
 `# Plot to draw` \
--p feat_hist density_energy tica vamp its cluster cktest stationary eigenvectors metastable_membership mfpt committor \
+-p feat_hist density_energy vamp_lag_dim tica vamp its cluster cktest stationary eigenvectors metastable_membership mfpt committor \
 `# Do not display the plots` \
 `#--no-plot` \
+--vamp-lags 1 2 5 10 20 50 100 200 500 1000 \
+--vamp-dim 5 \
 `# Do a reduction (tica pca vamp or none)` \
 --reduction vamp \
 `#--tica-lag 1000` \
