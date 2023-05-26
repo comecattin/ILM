@@ -28,6 +28,28 @@ def pca_reduction(data, dim):
 
 
 def plot_pca(pca, T, dim, save=False, outdir="", display=False):
+    """Plot the PCA dimension reduction
+
+    Parameters
+    ----------
+    pca : pyemma.pca
+        Data reduced using PCA
+    T : float
+        Temperature of the system
+    dim : int
+        Number of dimension to project the reduction
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
     # Concatenate
     pca_concatenated = np.concatenate(pca.get_output())
 
@@ -334,20 +356,50 @@ def plot_vamp(vamp, T, dim, save=False, display=False, outdir=""):
 
 
 def plot_lag_dim_vamp(lags,data,dim,save=False,outdir='',display=False):
+    """Plot the VAMP2 score as a function of the number of dimension and the lag time
+
+    Parameters
+    ----------
+    lags : list
+        List containing the different lag times to test
+    data : pyemma.load
+        Data loaded from pyemma loader
+    dim : int
+        Maximum number of dimension to test
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+    # Get the dimensions
     dims = np.arange(1,dim+1)
+    
     fig, ax = plt.subplots()
+    
+    # Get a line plot for each lag
     for i, lag in enumerate(lags):
         scores_ = np.array(
             [score_cv(data=data,dim=d,lag=lag) for d in dims]
         )
+        # Score and associated error
         scores = np.mean(scores_, axis=1)
         errors = np.std(scores_, axis=1, ddof=1)
         color = 'C{}'.format(i)
+        # Plot
         ax.fill_between(dims, scores - errors, scores + errors, alpha=0.3, facecolor=color)
         ax.plot(dims, scores, '--o', color=color, label='lag={:.1f} steps'.format(lag))
+    
     ax.legend()
     ax.set_xlabel('Number of dimension')
     ax.set_ylabel('VAMP-2 score')
+    
     if save:
         if outdir == "":
             raise Exception("Please provide a directory to save the file")
