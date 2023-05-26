@@ -1,0 +1,3 @@
+*.html linguist-vendored
+VMD/la1.0/* linguist-vendored
+VMD/orient/* linguist-vendored
