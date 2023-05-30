@@ -35,6 +35,8 @@
 --nits 4 \
 `# ITS validation as a function of the number of clusters` \
 --its-cluster 200 400 \
+`# Get the number of cluster` \
+--vamp-cluster 50 100 200 400 \
 `# Number of clusters` \
 -k 200 \
 `# Lag time` \

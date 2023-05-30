@@ -29,21 +29,23 @@ def main():
 
     # ====FEAT====#
     aesthetic.feat()
-    
+    # Create a feat
+    feat = load_feat.create_feat(args.topology)
+
     if args.distances:
         # Convert name in indices
         pair_indices = tools.create_pairIndices_from_pairNames(
             args.topology, args.distances
         )
+        feat = load_feat.feat_atom_distances(feat,pair_indices)
 
     if args.residue:
         # Get the indices
         pair_indices = tools.create_pairIndices_from_indices(
             args.residue
         )
+        feat = load_feat.feat_residue_midist(feat,pair_indices)
         
-    # Create a feat
-    feat = load_feat.create_feat(args.topology, pair_indices)
     # Load the data
     data = load_feat.load_data(
         traj=args.files, feat=feat, stride=args.stride, ram=args.ram
@@ -152,6 +154,18 @@ def main():
     if args.reduction == "none":
         print("No reduction, raw data taken")
         red = data
+
+    # VAMP2 score as a function of the number of cluster
+    if args.vamp_cluster:
+        dimension_reduction.plot_vamp_cluster(
+            n_clustercenters=args.vamp_cluster,
+            lag=args.lag,
+            data=red,
+            save=save,
+            display=display,
+            outdir=outdir
+        )
+
 
     # ====LOAD PREVIOUS MODEL====#
     if args.load:

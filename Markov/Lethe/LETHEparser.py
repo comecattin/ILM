@@ -130,6 +130,13 @@ def parsing():
         help="Clustering method (kmeans or regspace)",
         type=str,
     )
+    # VAMP2 score as a function of the number of cluster
+    parser.add_argument(
+        "--vamp-cluster",
+        nargs="+",
+        type=int,
+        help="Compute the VAMP2 score as a function of the number of cluster center. Put the number of cluster center after"
+    )
     # Number of cluster
     parser.add_argument(
         "-k", "--cluster-number", help="Number of cluster wanted", type=int

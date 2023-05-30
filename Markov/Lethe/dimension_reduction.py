@@ -28,6 +28,28 @@ def pca_reduction(data, dim):
 
 
 def plot_pca(pca, T, dim, save=False, outdir="", display=False):
+    """Plot the PCA dimension reduction
+
+    Parameters
+    ----------
+    pca : pyemma.pca
+        Data reduced using PCA
+    T : float
+        Temperature of the system
+    dim : int
+        Number of dimension to project the reduction
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
     # Concatenate
     pca_concatenated = np.concatenate(pca.get_output())
 
@@ -334,26 +356,122 @@ def plot_vamp(vamp, T, dim, save=False, display=False, outdir=""):
 
 
 def plot_lag_dim_vamp(lags,data,dim,save=False,outdir='',display=False):
+    """Plot the VAMP2 score as a function of the number of dimension and the lag time
+
+    Parameters
+    ----------
+    lags : list
+        List containing the different lag times to test
+    data : pyemma.load
+        Data loaded from pyemma loader
+    dim : int
+        Maximum number of dimension to test
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+    # Get the dimensions
     dims = np.arange(1,dim+1)
+    
     fig, ax = plt.subplots()
+    
+    # Get a line plot for each lag
     for i, lag in enumerate(lags):
         scores_ = np.array(
             [score_cv(data=data,dim=d,lag=lag) for d in dims]
         )
+        # Score and associated error
         scores = np.mean(scores_, axis=1)
         errors = np.std(scores_, axis=1, ddof=1)
         color = 'C{}'.format(i)
+        # Plot
         ax.fill_between(dims, scores - errors, scores + errors, alpha=0.3, facecolor=color)
         ax.plot(dims, scores, '--o', color=color, label='lag={:.1f} steps'.format(lag))
+    
     ax.legend()
     ax.set_xlabel('Number of dimension')
     ax.set_ylabel('VAMP-2 score')
+    
     if save:
         if outdir == "":
             raise Exception("Please provide a directory to save the file")
         else:
             plt.savefig(
                 f"{outdir}/vamp_lag_dim.pdf",
+                dpi=300,
+                bbox_inches="tight",
+            )
+    if display:
+        plt.show()
+
+def plot_vamp_cluster(
+        n_clustercenters,
+        lag,
+        data,
+        save=False,
+        outdir='',
+        display=False
+    ):
+    """Plot the VAMP2 score as a function of the number of cluster
+
+    Parameters
+    ----------
+    n_clustercenters : list
+        List of the number of cluster to test
+    lag : int
+        Lag time of the MSM
+    data : pyemma.load
+        Data loaded from pyemma loader
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+    # At this point the MSM lag time has to be guessed...
+    scores = np.zeros((len(n_clustercenters), 5))
+    for n, k in enumerate(n_clustercenters):
+        # Multiple round of discretization
+        for m in range(5):
+            # Clusters
+            _cl = pyemma.coordinates.cluster_kmeans(
+                data, k=k, max_iter=500, stride=1)
+            # MSM
+            _msm = pyemma.msm.estimate_markov_model(_cl.dtrajs, lag)
+            # Score
+            scores[n, m] = _msm.score_cv(
+                _cl.dtrajs, n=1, score_method='VAMP2', score_k=min(10, k))
+
+    fig, ax = plt.subplots()
+    
+    lower, upper = pyemma.util.statistics.confidence_interval(scores.T.tolist(), conf=0.9)
+    
+    ax.fill_between(n_clustercenters, lower, upper, alpha=0.3)
+    ax.plot(n_clustercenters, np.mean(scores, axis=1), '-o')
+    ax.semilogx()
+    ax.set_xlabel('Number of cluster centers')
+    ax.set_ylabel('VAMP-2 score')
+    
+    if save:
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
+        else:
+            plt.savefig(
+                f"{outdir}/vamp_kcluster.pdf",
                 dpi=300,
                 bbox_inches="tight",
             )
@@ -375,11 +493,12 @@ if __name__ == "__main__":
     save = True
     display = True
     T = 300
-    lag = 1000
+    lag = 300
     dim = 2
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
-    feat = create_feat(pdb, pair_indices)
+    feat = create_feat(pdb)
+    feat = feat_atom_distances(feat,pair_indices)
     data = load_data(traj, feat, stride=5, ram=True)
 
     plot_feat_hist(data, feat, display=display, save=save, outdir=outdir)
@@ -408,4 +527,10 @@ if __name__ == "__main__":
         lags=[1,2,5,10,20],
         data=data,
         dim=2
+    )
+
+    plot_vamp_cluster(
+        n_clustercenters=[10,50,100,200,400,1000],
+        lag=300,
+        data=tica
     )
