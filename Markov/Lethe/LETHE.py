@@ -155,6 +155,18 @@ def main():
         print("No reduction, raw data taken")
         red = data
 
+    # VAMP2 score as a function of the number of cluster
+    if args.vamp_cluster:
+        dimension_reduction.plot_vamp_cluster(
+            n_clustercenters=args.vamp_cluster,
+            lag=args.lag,
+            data=red,
+            save=save,
+            display=display,
+            outdir=outdir
+        )
+
+
     # ====LOAD PREVIOUS MODEL====#
     if args.load:
         msm, cluster = tools.load_model(
