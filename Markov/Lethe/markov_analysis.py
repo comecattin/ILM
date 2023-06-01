@@ -150,7 +150,7 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False, outdir=""):
             cbar_label="{}. right eigenvector".format(i + 2),
             mask=True,
         )
-        ax.scatter(*cluster.clustercenters.T[0:2], s=15, c="C1")
+        #ax.scatter(*cluster.clustercenters.T[0:2], s=15, c="C1")
         ax.set_xlabel("Feat 1")
         ax.set_ylabel("Feat 2")
 
