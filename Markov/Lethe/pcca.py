@@ -216,7 +216,7 @@ def plot_mftp(
         inverse_mfpt,
         pos=coarse_state_centers,
         figpadding=0,
-        arrow_label_format="%.1f ps",
+        arrow_label_format="%.1f",
         arrow_labels=mfpt,
         size=12,
         show_frame=True,
@@ -353,7 +353,7 @@ def plot_committor_tpt(
         show_committor=False,
         figpadding=0,
         show_frame=True,
-        arrow_label_format="%2.e / ps",
+        arrow_label_format="%2.e / frame",
     )
     ax.set_xlabel("Feat 1")
     ax.set_ylabel("Feat 2")
