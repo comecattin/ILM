@@ -356,7 +356,8 @@ def main():
                 msm=msm,
                 number_of_sample=args.pdb,
                 feat=feat,
-                files=args.file
+                files=args.files,
+                outdir=outdir
             )
 
 
