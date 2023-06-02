@@ -60,7 +60,7 @@ def parsing():
         "-p",
         "--plot",
         nargs="+",
-        help="Plot wanted (feat_hist, density_energy, vamp_lag_dim, pca, tica, vamp, its, cluster, cktest, stationary, eigenvectors, metastable_membership, mfpt, committor)",
+        help="Plot wanted (feat_hist, density_energy, vamp_lag_dim, pca, tica, vamp, its, cluster, cktest, stationary, eigenvalues, eigenvectors, metastable_membership, mfpt, committor)",
         choices=[
             "feat_hist",
             "density_energy",
@@ -72,6 +72,7 @@ def parsing():
             "cluster",
             "cktest",
             "stationary",
+            "eigenvalues",
             "eigenvectors",
             "metastable_membership",
             "mfpt",
@@ -150,9 +151,9 @@ def parsing():
         type=int,
         help="Perform ITS analysis on the following lags",
     )
-    # Number of iteration for ITS analysis
+    # Number of ITS  for analysis
     parser.add_argument(
-        "--nits", type=int, help="Number of iteration for the ITS validation"
+        "--nits", type=int, help="Number ITS  to consider validation"
     )
     # ITS analysis on different cluster size
     parser.add_argument(
