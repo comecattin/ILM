@@ -161,6 +161,10 @@ def read_feat_from_txt(file_path):
 
     return data
 
+def select_data_from_quality(data,quality_max):
+    selection = data[data[:,-1] == quality_max]
+    return selection[:,1:3]
+
 if __name__ == "__main__":
     refGS = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb"
     pairNames = ["64_CA-130_CA", "119_CA-24_CA"]
@@ -169,3 +173,4 @@ if __name__ == "__main__":
     print(create_pairIndices_from_indices(pairNames))
     file_path = '/home/ccattin/Documents/Markov/HSP90/Amber19_OPC_300K/elisa_feat/2022_10_26_Liste_interactions_simulations.txt'
     data = read_feat_from_txt(file_path)
+    print(select_data_from_quality(data,1))
