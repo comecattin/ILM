@@ -213,6 +213,7 @@ def plot_eigenvalues(msm, nvalues,save=False,display=False,outdir=''):
     ax.set_xlabel("Index")
     ax.set_ylabel("Eigenvalue")
     ax.set_ylim(0, 1.1)
+    ax.set_xticks(np.arange(nvalues))
     
     if save:
         if outdir == "":
