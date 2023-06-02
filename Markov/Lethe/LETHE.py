@@ -269,6 +269,18 @@ def main():
             save=save,
             outdir=outdir,
         )
+    
+    # Plot the eigenvalues
+    if 'eigenvalues' in args.plot:
+        print("Rendering eigenvalues plot...")
+        markov_analysis.plot_eigenvalues(
+            msm=msm,
+            nvalues=args.nits,
+            save=save,
+            display=display,
+            outdir=outdir
+        )
+
     # Plot the first 6 eigenvectors
     if "eigenvectors" in args.plot:
         print("Rendering eigenvectors plot...")
