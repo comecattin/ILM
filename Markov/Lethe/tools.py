@@ -6,6 +6,7 @@ Tools used in LETHE
 import MDAnalysis as mda
 import scipy
 import pyemma
+import numpy as np
 
 
 def create_pairIndices_from_pairNames(pdbfilename, pairNames):
@@ -150,6 +151,15 @@ def load_model(outdir, filename, model_name):
 
     return msm, cluster
 
+def read_feat_from_txt(file_path):
+    data = np.loadtxt(
+        file_path,
+        skiprows=1,
+        usecols=(0,1,2,3),
+        dtype=int
+    )
+
+    return data
 
 if __name__ == "__main__":
     refGS = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb"
@@ -157,3 +167,5 @@ if __name__ == "__main__":
     print(create_pairIndices_from_pairNames(pdbfilename=refGS, pairNames=pairNames))
     pairNames = ['16-109','17-109','18-109']
     print(create_pairIndices_from_indices(pairNames))
+    file_path = '/home/ccattin/Documents/Markov/HSP90/Amber19_OPC_300K/elisa_feat/2022_10_26_Liste_interactions_simulations.txt'
+    data = read_feat_from_txt(file_path)
