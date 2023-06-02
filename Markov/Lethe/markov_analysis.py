@@ -163,6 +163,46 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False, outdir=""):
     if display:
         plt.show()
 
+def plot_eigenvalues(msm, nvalues,save=False,display=False,outdir=''):
+    
+    eigenvalues = np.abs(msm.eigenvalues(nvalues))
+
+    fig, ax = plt.subplots()
+
+    ax.bar(
+        np.arange(nvalues),
+        eigenvalues,
+        width=0.05,
+        color='grey',
+        zorder=0
+        )
+    ax.scatter(
+        np.arange(nvalues),
+        eigenvalues,
+        zorder=1,
+        s=50
+        )
+    ax.plot(
+        np.arange(nvalues),
+        np.ones(nvalues),
+        '--',
+        color='lightgrey'
+    )
+
+    ax.set_xlabel("Index")
+    ax.set_ylabel("Eigenvalue")
+    ax.set_ylim(0, 1.1)
+    
+    if save:
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
+        else:
+            plt.savefig(f"{outdir}/eigen_values.pdf", dpi=300, bbox_inches="tight")
+
+    if display:
+        plt.show()
+
+
 
 if __name__ == "__main__":
     # Path
@@ -189,8 +229,9 @@ if __name__ == "__main__":
     model_name = "GS01_GS02"
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
-    feat = create_feat(pdb, pair_indices)
-    data = load_data(traj, feat)
+    feat = create_feat(pdb)
+    feat = feat_atom_distances(feat,pair_indices)
+    data = load_data(traj, feat,stride=2,ram=True)
 
     tica = tica_reduction(data=data, lag=lag, dim=dim)
 
@@ -213,3 +254,10 @@ if __name__ == "__main__":
         filename=filename,
         model_name=model_name,
     )
+
+    plot_eigenvalues(
+        msm,
+        6,
+        save=save,
+        display=display,
+        outdir=outdir)
