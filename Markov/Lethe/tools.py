@@ -152,6 +152,23 @@ def load_model(outdir, filename, model_name):
     return msm, cluster
 
 def read_feat_from_txt(file_path):
+    """Read features from .txt files
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the .txt file. This file contain all the interaction we want to consider. Each line is an interaction. The first line is a header.
+        - Column 1 : index of the interaction (not useful)
+        - Column 2 : index of the i residue
+        - Column 3 : index of the j residue
+        - Column 4 : quality of the interaction (1: good quality then decreasing, must be int)
+
+    Returns
+    -------
+    data : np.array
+        Array containing the data
+    """
+
     data = np.loadtxt(
         file_path,
         skiprows=1,
@@ -162,7 +179,23 @@ def read_feat_from_txt(file_path):
     return data
 
 def select_data_from_quality(data,quality_max):
+    """Get the features with the corresponding quality
+
+    Parameters
+    ----------
+    data : np.array
+        Array containing the data
+    quality_max : int
+        Maximum quality to consider (1: good quality then decreasing, must be int)
+
+    Returns
+    -------
+    selection : np.array
+        Array containing residue pairs to consider their distances
+    """
+
     selection = data[data[:,-1] == quality_max]
+    
     return selection[:,1:3]
 
 if __name__ == "__main__":
