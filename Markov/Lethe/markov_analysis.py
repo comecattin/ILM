@@ -164,7 +164,28 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False, outdir=""):
         plt.show()
 
 def plot_eigenvalues(msm, nvalues,save=False,display=False,outdir=''):
+    """Plot the eigenvalues and their index
+
+    Parameters
+    ----------
+    msm : pyemma.msm
+        MSM or bayesian MSM
+    nvalues : int
+        Number of eigenvalues to consider
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
     
+    # Get the eigenvalues of the MSM
     eigenvalues = np.abs(msm.eigenvalues(nvalues))
 
     fig, ax = plt.subplots()
