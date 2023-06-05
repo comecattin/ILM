@@ -46,6 +46,13 @@ def main():
         )
         feat = load_feat.feat_residue_midist(feat,pair_indices)
         
+    if args.feat_txt:
+        pair_indices = tools.read_feat_from_txt(
+            file_path = args.feat_txt[0],
+            quality_max = int(args.feat_txt[1])
+            )
+        feat = load_feat.feat_atom_distances(feat,pair_indices)
+
     # Load the data
     data = load_feat.load_data(
         traj=args.files, feat=feat, stride=args.stride, ram=args.ram

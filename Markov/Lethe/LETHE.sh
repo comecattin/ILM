@@ -8,6 +8,7 @@
 `# Distances to analyse` \
 -d 64_CA-130_CA 119_CA-24_CA \
 --residue 16-109 17-109 18-109 18-110 19-109 19-110 20-109 20-110 21-109 21-110 109-113 109-169 109-170 109-171 109-172 110-114 \
+--feat-txt /home/ccattin/Documents/Markov/HSP90/Amber19_OPC_300K/elisa_feat/2022_10_26_Liste_interactions_simulations.txt 1 \
 `# Compute the VAMP2 score` \
 --vamp-score \
 `# Load into RAM` \
