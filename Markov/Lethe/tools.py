@@ -195,6 +195,8 @@ def select_data_from_quality(data,quality_max):
     """
 
     selection = data[data[:,-1] == quality_max]
+
+    print(f"Found indices {selection[:,1:3]}")
     
     return selection[:,1:3]
 
