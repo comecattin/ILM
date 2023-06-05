@@ -82,6 +82,7 @@ def parsing():
             "stationary",
             "eigenvalues",
             "eigenvectors",
+            "reweight_free_energy",
             "metastable_membership",
             "mfpt",
             "committor",

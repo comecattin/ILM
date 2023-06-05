@@ -300,6 +300,17 @@ def main():
             outdir=outdir,
         )
 
+    # Plot the re-weighted energy landscape
+    if "reweight_free_energy" in args.plot:
+        print("Rendering re-weighted free energy plot...")
+        markov_analysis.plot_reweighted_free_energy(
+            data=red,
+            msm=msm,
+            save=save,
+            display=display,
+            outdir=outdir
+        )
+
     # ====PCCA AND TPT====#
 
     # Display the stationary probabilities

@@ -224,6 +224,67 @@ def plot_eigenvalues(msm, nvalues,save=False,display=False,outdir=''):
     if display:
         plt.show()
 
+def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir=''):
+    """Plot the energetic landscape after having reweighed the trajectory frames with the stationary probability of the MSM
+
+    Parameters
+    ----------
+    msm : pyemma.msm
+        MSM or bayesian MSM
+    data : pyemma.load
+        Data loaded from pyemma loader
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+
+    # Data without dimension reduction
+    if type(data) == list:
+        data_concatenated = np.concatenate(data)
+    # Dimension reduction
+    else:
+        data_concatenated = np.concatenate(data.get_output())
+
+    dtrajs_concatenated = np.concatenate(msm.dtrajs_active)
+
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharex=True, sharey=True)
+
+    # Stationary distribution
+    pyemma.plots.plot_contour(
+        *data_concatenated[:, :2].T,
+        msm.pi[dtrajs_concatenated],
+        ax=axes[0],
+        mask=True,
+        cbar_label='Stationary distribution')
+    
+    # Free energy
+    pyemma.plots.plot_free_energy(
+        *data_concatenated[:, :2].T,
+        weights=np.concatenate(msm.trajectory_weights()),
+        ax=axes[1],
+        legacy=False)
+    for ax in axes.flat:
+        ax.set_xlabel('IC 1')
+    axes[0].set_ylabel('IC 2')
+    #axes[0].set_title('Stationary distribution', fontweight='bold')
+    #axes[1].set_title('Reweighted free energy surface', fontweight='bold')
+    
+    if save:
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
+        else:
+            plt.savefig(f"{outdir}/reweighted_free_energy.pdf", dpi=300, bbox_inches="tight")
+
+    if display:
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -283,3 +344,11 @@ if __name__ == "__main__":
         save=save,
         display=display,
         outdir=outdir)
+    
+    plot_reweighted_free_energy(
+        data=tica,
+        msm=msm,
+        display=display,
+        outdir=outdir,
+        save=save
+    )
