@@ -65,7 +65,7 @@ def plot_its(its, data, cluster, save=False, display=False, outdir=""):
 
     # Histogram plot
     pyemma.plots.plot_feature_histograms(
-        data_concatenated, feature_labels=["Feat 1", "Feat 2"], ax=axes[0]
+        data_concatenated[:,0:2], feature_labels=["Feat 1", "Feat 2"], ax=axes[0]
     )
     # Density plot
     pyemma.plots.plot_density(
@@ -200,12 +200,12 @@ if __name__ == "__main__":
     ]
     outdir = "/home/ccattin/Documents/Code/outputs/LETHE"
     # Feat
-    pairNames = ["64_CA-130_CA", "119_CA-24_CA"]
+    pairNames = ["64_CA-130_CA", "119_CA-24_CA","115_CA-24_CA","119_CA-27_CA"]
     # Parameters
     save = False
     display = True
     T = 300
-    dim = 2
+    dim = 3
     lag = 400
     nits = 4
     lags = [1, 2, 5, 10, 20, 50]
@@ -213,8 +213,9 @@ if __name__ == "__main__":
     stable_state = 4
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
-    feat = create_feat(pdb, pair_indices)
-    data = load_data(traj, feat)
+    feat = create_feat(pdb)
+    feat = feat_atom_distances(feat,pair_indices)
+    data = load_data(traj, feat,stride=1,ram=True)
 
     tica = tica_reduction(data=data, lag=lag, dim=dim)
     cluster = clustering(
@@ -236,6 +237,7 @@ if __name__ == "__main__":
         nits=nits,
         k_list=k_list,
         save=save,
+        stride=1,
         display=display,
         outdir=outdir,
     )
