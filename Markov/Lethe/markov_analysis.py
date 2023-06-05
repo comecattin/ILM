@@ -225,6 +225,26 @@ def plot_eigenvalues(msm, nvalues,save=False,display=False,outdir=''):
         plt.show()
 
 def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir=''):
+    """Plot the energetic landscape after having reweighed the trajectory frames with the stationary probability of the MSM
+
+    Parameters
+    ----------
+    msm : pyemma.msm
+        MSM or bayesian MSM
+    data : pyemma.load
+        Data loaded from pyemma loader
+    save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
 
     # Data without dimension reduction
     if type(data) == list:
@@ -236,6 +256,8 @@ def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir=''):
     dtrajs_concatenated = np.concatenate(msm.dtrajs_active)
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharex=True, sharey=True)
+
+    # Stationary distribution
     pyemma.plots.plot_contour(
         *data_concatenated[:, :2].T,
         msm.pi[dtrajs_concatenated],
@@ -243,6 +265,7 @@ def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir=''):
         mask=True,
         cbar_label='Stationary distribution')
     
+    # Free energy
     pyemma.plots.plot_free_energy(
         *data_concatenated[:, :2].T,
         weights=np.concatenate(msm.trajectory_weights()),
