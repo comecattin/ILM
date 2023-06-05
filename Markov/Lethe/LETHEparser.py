@@ -243,7 +243,7 @@ def LETHE_handle_error(parser, args):
         parser.error("No trajectories file given")
 
     # No distance given
-    if not args.distances and not args.residue:
+    if not args.distances and not args.residue and not args.feat_txt:
         parser.error("No distances given")
 
     # Forgot to give the temperature
