@@ -151,7 +151,7 @@ def load_model(outdir, filename, model_name):
 
     return msm, cluster
 
-def read_feat_from_txt(file_path):
+def read_feat_from_txt(file_path,quality_max):
     """Read features from .txt files
 
     Parameters
@@ -162,11 +162,14 @@ def read_feat_from_txt(file_path):
         - Column 2 : index of the i residue
         - Column 3 : index of the j residue
         - Column 4 : quality of the interaction (1: good quality then decreasing, must be int)
+    
+    quality_max : int
+        Maximum quality to consider (1: good quality then decreasing, must be int)
 
     Returns
     -------
-    data : np.array
-        Array containing the data
+    selection : np.array
+        Array containing the selected atom indices
     """
 
     data = np.loadtxt(
@@ -176,26 +179,8 @@ def read_feat_from_txt(file_path):
         dtype=int
     )
 
-    return data
-
-def select_data_from_quality(data,quality_max):
-    """Get the features with the corresponding quality
-
-    Parameters
-    ----------
-    data : np.array
-        Array containing the data
-    quality_max : int
-        Maximum quality to consider (1: good quality then decreasing, must be int)
-
-    Returns
-    -------
-    selection : np.array
-        Array containing residue pairs to consider their distances
-    """
-
     selection = data[data[:,-1] == quality_max]
-
+    
     print(f"Found indices {selection[:,1:3]}")
     
     return selection[:,1:3]
@@ -207,5 +192,4 @@ if __name__ == "__main__":
     pairNames = ['16-109','17-109','18-109']
     print(create_pairIndices_from_indices(pairNames))
     file_path = '/home/ccattin/Documents/Markov/HSP90/Amber19_OPC_300K/elisa_feat/2022_10_26_Liste_interactions_simulations.txt'
-    data = read_feat_from_txt(file_path)
-    print(select_data_from_quality(data,1))
+    print(read_feat_from_txt(file_path,1))
