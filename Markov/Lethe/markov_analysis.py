@@ -251,8 +251,8 @@ def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir=''):
     for ax in axes.flat:
         ax.set_xlabel('IC 1')
     axes[0].set_ylabel('IC 2')
-    axes[0].set_title('Stationary distribution', fontweight='bold')
-    axes[1].set_title('Reweighted free energy surface', fontweight='bold')
+    #axes[0].set_title('Stationary distribution', fontweight='bold')
+    #axes[1].set_title('Reweighted free energy surface', fontweight='bold')
     
     if save:
         if outdir == "":
