@@ -47,7 +47,7 @@ def parsing():
         "--feat-txt",
         type=str,
         nargs=2,
-        help="Load the features from a .txt file given and the maximum quality to consider"
+        help="Load the features from a .txt file given and the maximum quality to consider. Give first the file and then the maximum quality to consider."
     )
     # Compute the VAMP2 score
     parser.add_argument(
