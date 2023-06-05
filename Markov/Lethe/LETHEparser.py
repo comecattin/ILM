@@ -36,10 +36,18 @@ def parsing():
         nargs="+",
         help="List of the pair names",
     )
+    # Residue to add to the feat
     parser.add_argument(
         "--residue",
         nargs="+",
         help="Shortest distance between residue indices to consider. Pairs of residue are separated by a space and '-' separate the two residues inside a pair"
+    )
+    # Load the distances from a .txt file
+    parser.add_argument(
+        "--feat-txt",
+        type=str,
+        nargs=2,
+        help="Load the features from a .txt file given and the maximum quality to consider"
     )
     # Compute the VAMP2 score
     parser.add_argument(
