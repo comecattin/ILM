@@ -39,7 +39,7 @@ def create_msm(cluster, lag, dt_traj="1 ps", error=False):
     return msm
 
 
-def plot_stationary(msm, cluster, data, display=False, save=False, outdir=""):
+def plot_stationary(msm, cluster, data, display=False, save=False, outdir="",ij=(0,1)):
     """Stationary plot
 
     Parameters
@@ -56,6 +56,8 @@ def plot_stationary(msm, cluster, data, display=False, save=False, outdir=""):
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -72,16 +74,18 @@ def plot_stationary(msm, cluster, data, display=False, save=False, outdir=""):
 
     dtrajs_concatenated = np.concatenate(msm.dtrajs_active)
 
+    i,j = ij
+
     fig, ax, misc = pyemma.plots.plot_contour(
-        *data_concatenated.T[0:2],
+        *data_concatenated.T[[i,j]],
         msm.pi[dtrajs_concatenated],
         cbar_label="Stationary distribution",
         method="nearest",
         mask=True,
     )
-    ax.scatter(*cluster.clustercenters.T[0:2], s=15, c="C1")
-    ax.set_xlabel("Feat 1")
-    ax.set_ylabel("Feat 2")
+    ax.scatter(*cluster.clustercenters.T[[i,j]], s=15, c="C1")
+    ax.set_xlabel(f"Feat {i+1}")
+    ax.set_ylabel(f"Feat {j+1}")
 
     if save:
         if outdir == "":
@@ -95,7 +99,7 @@ def plot_stationary(msm, cluster, data, display=False, save=False, outdir=""):
         plt.show()
 
 
-def plot_eigenvect(msm, data, cluster, display=False, save=False, outdir=""):
+def plot_eigenvect(msm, data, cluster, display=False, save=False, outdir="",ij=(0,1)):
     """Plot the first 6 eigen vectors
 
     Parameters
@@ -112,6 +116,8 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False, outdir=""):
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -140,10 +146,10 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False, outdir=""):
     )
 
     fig, axes = plt.subplots(2, 3, figsize=(17, 6))
-
+    x,y = ij
     for i, ax in enumerate(axes.flat):
         pyemma.plots.plot_contour(
-            *data_concatenated.T[0:2],
+            *data_concatenated.T[[x,y]],
             eigvec[dtrajs_concatenated, i + 1],
             ax=ax,
             cmap="PiYG",
@@ -151,8 +157,8 @@ def plot_eigenvect(msm, data, cluster, display=False, save=False, outdir=""):
             mask=True,
         )
         #ax.scatter(*cluster.clustercenters.T[0:2], s=15, c="C1")
-        ax.set_xlabel("Feat 1")
-        ax.set_ylabel("Feat 2")
+        ax.set_xlabel(f"Feat {x+1}")
+        ax.set_ylabel(f"Feat {y+1}")
 
     if save:
         if outdir == "":
@@ -224,7 +230,7 @@ def plot_eigenvalues(msm, nvalues,save=False,display=False,outdir=''):
     if display:
         plt.show()
 
-def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir=''):
+def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir='',ij=(0,1)):
     """Plot the energetic landscape after having reweighed the trajectory frames with the stationary probability of the MSM
 
     Parameters
@@ -239,6 +245,8 @@ def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir=''):
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -258,8 +266,9 @@ def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir=''):
     fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharex=True, sharey=True)
 
     # Stationary distribution
+    i,j = ij
     pyemma.plots.plot_contour(
-        *data_concatenated[:, :2].T,
+        *data_concatenated[:, [i,j]].T,
         msm.pi[dtrajs_concatenated],
         ax=axes[0],
         mask=True,
@@ -267,13 +276,13 @@ def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir=''):
     
     # Free energy
     pyemma.plots.plot_free_energy(
-        *data_concatenated[:, :2].T,
+        *data_concatenated[:, [i,j]].T,
         weights=np.concatenate(msm.trajectory_weights()),
         ax=axes[1],
         legacy=False)
     for ax in axes.flat:
-        ax.set_xlabel('IC 1')
-    axes[0].set_ylabel('IC 2')
+        ax.set_xlabel(f'IC {i+1}')
+    axes[0].set_ylabel(f'IC {j+1}')
     #axes[0].set_title('Stationary distribution', fontweight='bold')
     #axes[1].set_title('Reweighted free energy surface', fontweight='bold')
     
@@ -296,16 +305,17 @@ if __name__ == "__main__":
     ]
     outdir = "/home/ccattin/Documents/Code/outputs"
     # Feat
-    pairNames = ["64_CA-130_CA", "119_CA-24_CA"]
+    pairNames = ["64_CA-130_CA", "119_CA-24_CA","115_CA-24_CA","119_CA-27_CA"]
     # Parameters
     save = False
     display = False
     T = 300
-    dim = 2
+    dim = 3
     lag = 1000
     nits = 4
     lags = [1, 2, 5, 10, 20, 50]
     stable_state = 4
+    ij = (0,2)
 
     # Save
     filename = "test.pyemma"
@@ -323,11 +333,11 @@ if __name__ == "__main__":
     msm = create_msm(cluster=cluster, lag=lag, error=True)
 
     plot_stationary(
-        msm=msm, data=tica, cluster=cluster, display=display, save=save, outdir=outdir
+        msm=msm, data=tica, cluster=cluster, display=display, save=save, outdir=outdir,ij=ij
     )
 
     plot_eigenvect(
-        msm=msm, data=tica, cluster=cluster, display=display, outdir=outdir, save=save
+        msm=msm, data=tica, cluster=cluster, display=display, outdir=outdir, save=save,ij=ij
     )
 
     tools.save_model(
@@ -350,5 +360,5 @@ if __name__ == "__main__":
         msm=msm,
         display=display,
         outdir=outdir,
-        save=save
+        save=save,ij=ij
     )

@@ -2,6 +2,7 @@
 """LETHE's parser"""
 
 import argparse
+import tools
 
 
 def parsing():
@@ -88,6 +89,14 @@ def parsing():
             "committor",
         ],
         required=True,
+    )
+    # 2D plots projected on axis i and j
+    parser.add_argument(
+        "--axis",
+        nargs=2,
+        help="Axis to project for the plot. Begin at 0. By default the first two dimensions (0,1)",
+        type=int,
+        default=(0,1)
     )
     # Do not display the plot
     parser.add_argument("--no-plot", action="store_true", help="Do not display plots")

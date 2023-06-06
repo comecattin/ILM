@@ -27,6 +27,9 @@ def main():
     # Handle commun errors
     LETHEparser.LETHE_handle_error(parser, args)
 
+    # Projection on axis default (0,1)
+    ij = args.axis
+
     # ====FEAT====#
     aesthetic.feat()
     # Create a feat
@@ -87,10 +90,11 @@ def main():
             load_feat.plot_density_energy(
                 data=data,
                 T=T,
-                pairNames=args.distances,
+                pairNames=feat.describe(),
                 save=save,
                 display=display,
                 outdir=outdir,
+                ij=ij
             )
 
     # ====DIMENSION REDUCTION====#
@@ -121,6 +125,7 @@ def main():
                 save=save,
                 outdir=outdir,
                 display=display,
+                ij=ij
             )
 
     # TICA reduction
@@ -138,6 +143,7 @@ def main():
                 display=display,
                 save=save,
                 outdir=outdir,
+                ij=ij
             )
 
     # VAMP reduction
@@ -155,6 +161,7 @@ def main():
                 save=save,
                 display=display,
                 outdir=outdir,
+                ij=ij
             )
 
     # No reduction, raw data
@@ -200,6 +207,7 @@ def main():
                     save=save,
                     outdir=outdir,
                     display=display,
+                    ij=ij
                 )
 
         # ====CREATE MSM====#
@@ -237,6 +245,7 @@ def main():
                 save=save,
                 display=display,
                 outdir=outdir,
+                ij=ij
             )
 
     # ITS analysis as a function of the number of cluster
@@ -251,6 +260,7 @@ def main():
             save=save,
             display=display,
             outdir=outdir,
+            ij=ij
         )
 
     # CK test
@@ -275,6 +285,7 @@ def main():
             display=display,
             save=save,
             outdir=outdir,
+            ij=ij
         )
     
     # Plot the eigenvalues
@@ -285,7 +296,7 @@ def main():
             nvalues=args.nits,
             save=save,
             display=display,
-            outdir=outdir
+            outdir=outdir,
         )
 
     # Plot the first 6 eigenvectors
@@ -298,6 +309,7 @@ def main():
             display=display,
             save=save,
             outdir=outdir,
+            ij=ij
         )
 
     # Plot the re-weighted energy landscape
@@ -308,7 +320,8 @@ def main():
             msm=msm,
             save=save,
             display=display,
-            outdir=outdir
+            outdir=outdir,
+            ij=ij
         )
 
     # ====PCCA AND TPT====#
@@ -329,6 +342,7 @@ def main():
                 display=display,
                 save=save,
                 outdir=outdir,
+                ij=ij
             )
 
         # Compute PCCA and TPT
@@ -354,6 +368,7 @@ def main():
                 display=display,
                 save=save,
                 outdir=outdir,
+                ij=ij
             )
 
         # Compute the flux for the committor
@@ -377,6 +392,7 @@ def main():
                 display=display,
                 outdir=outdir,
                 save=save,
+                ij=ij
             )
 
         # Render pdb sample files

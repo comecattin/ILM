@@ -35,7 +35,7 @@ def stationary_prob(msm, nstate):
 
 
 def plot_metastable_membership(
-    msm, nstate, data, display=False, save=False, outdir=""
+    msm, nstate, data, display=False, save=False, outdir="",ij=(0,1)
 ):
     """Plot the metastable membership
 
@@ -53,6 +53,8 @@ def plot_metastable_membership(
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -71,17 +73,18 @@ def plot_metastable_membership(
 
     # Metastable distribution plot
     fig, axes = plt.subplots(1, nstate, figsize=(15, 3))
+    x,y = ij
     for i, ax in enumerate(axes.flat):
         pyemma.plots.plot_contour(
-            *data_concatenated.T,
+            *data_concatenated.T[[x,y]],
             msm.metastable_distributions[i][dtrajs_concatenated],
             ax=ax,
             cmap="afmhot_r",
             mask=True,
             cbar_label="Metastable distribution {}".format(i + 1),
         )
-        ax.set_xlabel("Feat 1")
-    axes[0].set_ylabel("Feat 2")
+        ax.set_xlabel(f"Feat {x+1}")
+    axes[0].set_ylabel(f"Feat {y+1}")
 
     if save:
         if outdir == "":
@@ -165,6 +168,7 @@ def plot_mftp(
     display=False,
     save=False,
     outdir="",
+    ij=(0,1)
 ):
     """Plot the flux map with the MFPT
 
@@ -188,6 +192,8 @@ def plot_mftp(
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -203,10 +209,10 @@ def plot_mftp(
         data_concatenated = np.concatenate(data.get_output())
 
     fig, ax = plt.subplots(figsize=(10, 7))
-
+    i,j = ij
     # Plot the state map under
     _, _, misc = pyemma.plots.plot_state_map(
-        *data_concatenated.T, metastable_traj, ax=ax, zorder=-1
+        *data_concatenated.T[[i,j]], metastable_traj, ax=ax, zorder=-1
     )
     # set state numbers 1 ... nstates
     misc["cbar"].set_ticklabels(range(1, nstates + 1))
@@ -223,10 +229,10 @@ def plot_mftp(
         ax=ax,
     )
 
-    ax.set_xlabel("Feat 1")
-    ax.set_ylabel("Feat 2")
-    ax.set_xlim(min(data_concatenated[:, 0]), max(data_concatenated[:, 0]))
-    ax.set_ylim(min(data_concatenated[:, 1]), max(data_concatenated[:, 1]))
+    ax.set_xlabel(f"Feat {i+1}")
+    ax.set_ylabel(f"Feat {j+1}")
+    ax.set_xlim(min(data_concatenated[:, i]), max(data_concatenated[:, i]))
+    ax.set_ylim(min(data_concatenated[:, j]), max(data_concatenated[:, j]))
 
     if save:
         if outdir == "":
@@ -285,6 +291,7 @@ def plot_committor_tpt(
     save=False,
     outdir="",
     display=False,
+    ij = (0,1)
 ):
     """Plot the committor map
 
@@ -310,6 +317,8 @@ def plot_committor_tpt(
        Display or not the plot, by default False
     outdir : str, optional
        Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -326,9 +335,10 @@ def plot_committor_tpt(
     dtrajs_concatenated = np.concatenate(msm.dtrajs_active)
 
     # Committor map behind
+    i,j = ij
     fig, ax = plt.subplots(figsize=(10, 7))
     pyemma.plots.plot_contour(
-        *data_concatenated.T,
+        *data_concatenated.T[[i,j]],
         flux.committor[dtrajs_concatenated],
         cmap="brg",
         ax=ax,
@@ -355,10 +365,10 @@ def plot_committor_tpt(
         show_frame=True,
         arrow_label_format="%2.e / frame",
     )
-    ax.set_xlabel("Feat 1")
-    ax.set_ylabel("Feat 2")
-    ax.set_xlim(min(data_concatenated[:, 0]), max(data_concatenated[:, 0]))
-    ax.set_ylim(min(data_concatenated[:, 1]), max(data_concatenated[:, 1]))
+    ax.set_xlabel(f"Feat {i+1}")
+    ax.set_ylabel(f"Feat {j+1}")
+    ax.set_xlim(min(data_concatenated[:, i]), max(data_concatenated[:, i]))
+    ax.set_ylim(min(data_concatenated[:, j]), max(data_concatenated[:, j]))
 
     if save:
         if outdir == "":
@@ -430,7 +440,7 @@ if __name__ == "__main__":
     filename = "test.pyemma"
     model_name = "GS01_GS02"
     # Feat
-    pairNames = ["64_CA-130_CA", "119_CA-24_CA"]
+    pairNames = ["64_CA-130_CA", "119_CA-24_CA","115_CA-24_CA","119_CA-27_CA"]
     # Parameters
     save = False
     display = False
@@ -439,13 +449,16 @@ if __name__ == "__main__":
     nits = 4
     lags = [1, 2, 5, 10, 20, 50]
     stable_state = 2
+    ij = (0, 2)
+    dim = 3
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
-    feat = create_feat(pdb, pair_indices)
+    feat = create_feat(pdb)
+    feat = feat_atom_distances(feat,pair_indices)
     data = load_data(traj, feat,stride=5,ram=True)
 
     tica = tica_reduction(
-        data=data, lag=lag,dim=2
+        data=data, lag=lag,dim=dim
     )
 
     cluster = clustering(reduction=tica,
@@ -476,6 +489,7 @@ if __name__ == "__main__":
         display=display,
         save=save,
         outdir=outdir,
+        ij=ij
     )
 
     (metastable_traj, highest_membership, coarse_state_centers) = concatenate(
@@ -501,6 +515,7 @@ if __name__ == "__main__":
         display=display,
         save=save,
         outdir=outdir,
+        ij=ij
     )
 
     flux, cgflux = tpt(msm=msm, state=[0, 1])
@@ -516,5 +531,6 @@ if __name__ == "__main__":
         display=display,
         outdir=outdir,
         save=save,
+        ij=ij
     )
     

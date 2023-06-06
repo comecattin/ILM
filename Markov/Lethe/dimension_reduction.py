@@ -27,7 +27,7 @@ def pca_reduction(data, dim):
     return pca
 
 
-def plot_pca(pca, T, dim, save=False, outdir="", display=False):
+def plot_pca(pca, T, dim, save=False, outdir="", display=False,ij=(0,1)):
     """Plot the PCA dimension reduction
 
     Parameters
@@ -44,6 +44,8 @@ def plot_pca(pca, T, dim, save=False, outdir="", display=False):
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -69,15 +71,16 @@ def plot_pca(pca, T, dim, save=False, outdir="", display=False):
     # Free energy plot of the new dimension
     if dim >= 2:
         fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+        i,j = ij
         kT = tools.get_kT(T)
         pyemma.plots.plot_free_energy(
-            *pca_concatenated.T[0:2],
+            *pca_concatenated.T[[i,j]],
             ax=axes,
             kT=kT,
             cbar_label="free energy / kJ.mol-1",
         )
-        axes.set_xlabel("PC 1")
-        axes.set_ylabel("PC 2")
+        axes.set_xlabel(f"PC {i+1}")
+        axes.set_ylabel(f"PC {j+1}")
         if save:
             if outdir == "":
                 raise Exception("Please provide a directory to save the file")
@@ -115,7 +118,7 @@ def tica_reduction(data, lag, dim):
     return tica
 
 
-def plot_tica(tica, T, dim, display=False, save=False, outdir=""):
+def plot_tica(tica, T, dim, display=False, save=False, outdir="",ij=(0,1)):
     """Plot a TICA dimension reduction
 
     Parameters
@@ -132,6 +135,8 @@ def plot_tica(tica, T, dim, display=False, save=False, outdir=""):
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -159,15 +164,16 @@ def plot_tica(tica, T, dim, display=False, save=False, outdir=""):
     # Free energy plot
     if dim >= 2:
         fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+        i,j = ij
         kT = tools.get_kT(T)
         pyemma.plots.plot_free_energy(
-            *tica_concatenated.T[0:2],
+            *tica_concatenated.T[[i,j]],
             ax=axes,
             kT=kT,
             cbar_label="free energy / kJ.mol-1",
         )
-        axes.set_xlabel("TIC 1")
-        axes.set_ylabel("TIC 2")
+        axes.set_xlabel(f"TIC {i+1}")
+        axes.set_ylabel(f"TIC {j+1}")
         if save:
             if outdir == "":
                 raise Exception("Please provide a directory to save the file")
@@ -210,7 +216,7 @@ def clustering(reduction, method, k, stride):
     return cluster
 
 
-def clustering_plot(reduction, cluster, save=False, outdir="", display=False):
+def clustering_plot(reduction, cluster, save=False, outdir="", display=False,ij=(0,1)):
     """Plot of the clustering
 
     Parameters
@@ -225,8 +231,10 @@ def clustering_plot(reduction, cluster, save=False, outdir="", display=False):
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
-
-     Raises
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
+    
+    Raises
     ------
     Exception
         Provide a directory to save the file
@@ -249,12 +257,13 @@ def clustering_plot(reduction, cluster, save=False, outdir="", display=False):
         ax=axes[0],
     )
     # Density plot
+    i,j = ij
     pyemma.plots.plot_density(
-        *reduction_concatenated.T[0:2], ax=axes[1], cbar=False, alpha=0.1, logscale=True
+        *reduction_concatenated.T[[i,j]], ax=axes[1], cbar=False, alpha=0.1, logscale=True
     )
-    axes[1].scatter(*cluster.clustercenters.T[0:2], s=15, c="C1")
-    axes[1].set_xlabel("IC 1")
-    axes[1].set_ylabel("IC 2")
+    axes[1].scatter(*cluster.clustercenters.T[[i,j]], s=15, c="C1")
+    axes[1].set_xlabel(f"IC {i+1}")
+    axes[1].set_ylabel(f"IC {j+1}")
 
     if save:
         if outdir == "":
@@ -288,7 +297,7 @@ def vamp_reduction(data, dim, lag):
     return vamp
 
 
-def plot_vamp(vamp, T, dim, save=False, display=False, outdir=""):
+def plot_vamp(vamp, T, dim, save=False, display=False, outdir="",ij=(0,1)):
     """Plot a VAMP dimension reduction
 
     Parameters
@@ -305,6 +314,8 @@ def plot_vamp(vamp, T, dim, save=False, display=False, outdir=""):
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -333,15 +344,16 @@ def plot_vamp(vamp, T, dim, save=False, display=False, outdir=""):
     # Free energy plot
     if dim >= 2:
         fig, axes = plt.subplots(1, 1, figsize=(5, 4))
+        i,j = ij
         kT = tools.get_kT(T)
         pyemma.plots.plot_free_energy(
-            *vamp_concatenated.T[0:2],
+            *vamp_concatenated.T[[i,j]],
             ax=axes,
             kT=kT,
             cbar_label="free energy / kJ.mol-1",
         )
-        axes.set_xlabel("VAMP 1")
-        axes.set_ylabel("VAMP 2")
+        axes.set_xlabel(f"VAMP {i+1}")
+        axes.set_ylabel(f"VAMP {j+1}")
         if save:
             if outdir == "":
                 raise Exception("Please provide a directory to save the file")
@@ -488,13 +500,14 @@ if __name__ == "__main__":
     ]
     outdir = "/home/ccattin/Documents/Code/outputs"
     # Feat
-    pairNames = ["64_CA-130_CA", "119_CA-24_CA"]
+    pairNames = ["64_CA-130_CA", "119_CA-24_CA","123_CA-24_CA","119_CA-27_CA"]
     # Parameters
     save = True
     display = True
     T = 300
     lag = 300
-    dim = 2
+    dim = 3
+    ij = (0,2)
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
     feat = create_feat(pdb)
@@ -503,25 +516,25 @@ if __name__ == "__main__":
 
     plot_feat_hist(data, feat, display=display, save=save, outdir=outdir)
     plot_density_energy(
-        data=data, T=T, pairNames=pairNames, display=display, save=save, outdir=outdir
+        data=data, T=T, pairNames=pairNames, display=display, save=save, outdir=outdir,ij=ij
     )
     pca = pca_reduction(data=data, dim=dim)
 
-    plot_pca(pca=pca, T=T, dim=dim, save=save, outdir=outdir, display=display)
+    plot_pca(pca=pca, T=T, dim=dim, save=save, outdir=outdir, display=display,ij=ij)
 
     tica = tica_reduction(data=data, lag=lag, dim=dim)
 
-    plot_tica(tica=tica, T=T, dim=dim, save=save, display=display, outdir=outdir)
+    plot_tica(tica=tica, T=T, dim=dim, save=save, display=display, outdir=outdir,ij=ij)
 
     cluster = clustering(reduction=tica, method="kmeans", k=200, stride=1)
 
     clustering_plot(
-        reduction=tica, cluster=cluster, save=save, outdir=outdir, display=display
+        reduction=tica, cluster=cluster, save=save, outdir=outdir, display=display,ij=ij
     )
 
     vamp = vamp_reduction(data=data, dim=dim, lag=lag)
 
-    plot_vamp(vamp=vamp, T=T, dim=dim, save=save, display=display, outdir=outdir)
+    plot_vamp(vamp=vamp, T=T, dim=dim, save=save, display=display, outdir=outdir,ij=ij)
 
     plot_lag_dim_vamp(
         lags=[1,2,5,10,20],
