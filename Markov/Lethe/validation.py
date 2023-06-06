@@ -30,7 +30,7 @@ def implied_time_scale(cluster, lags, nits):
     return its
 
 
-def plot_its(its, data, cluster, save=False, display=False, outdir=""):
+def plot_its(its, data, cluster, save=False, display=False, outdir="",ij=(0,1)):
     """Plot the ITS validation
 
     Parameters
@@ -47,6 +47,8 @@ def plot_its(its, data, cluster, save=False, display=False, outdir=""):
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -64,16 +66,17 @@ def plot_its(its, data, cluster, save=False, display=False, outdir=""):
         data_concatenated = np.concatenate(data.get_output())
 
     # Histogram plot
+    i,j = ij
     pyemma.plots.plot_feature_histograms(
-        data_concatenated[:,0:2], feature_labels=["Feat 1", "Feat 2"], ax=axes[0]
+        data_concatenated[:,[i,j]], feature_labels=[f"Feat {i+1}", f"Feat {j+1}"], ax=axes[0]
     )
     # Density plot
     pyemma.plots.plot_density(
-        *data_concatenated.T[0:2], ax=axes[1], cbar=False, alpha=0.1
+        *data_concatenated.T[[i,j]], ax=axes[1], cbar=False, alpha=0.1
     )
-    axes[1].scatter(*cluster.clustercenters.T[0:2], s=15, c="C1")
-    axes[1].set_xlabel("Feat 1")
-    axes[1].set_ylabel("Feat 2")
+    axes[1].scatter(*cluster.clustercenters.T[[i,j]], s=15, c="C1")
+    axes[1].set_xlabel(f"Feat {i+1}")
+    axes[1].set_ylabel(f"Feat {j+1}")
     # ITS plot
     pyemma.plots.plot_implied_timescales(its, ax=axes[2], units="steps")
 
@@ -86,7 +89,7 @@ def plot_its(its, data, cluster, save=False, display=False, outdir=""):
         plt.show()
 
 
-def cluster_its(data, lags, nits, stride, k_list, save=False, display=False, outdir=""):
+def cluster_its(data, lags, nits, stride, k_list, save=False, display=False, outdir="",ij=(0,1)):
     """ITS validation as a function of the cluster numbers
 
     Parameters
@@ -107,6 +110,8 @@ def cluster_its(data, lags, nits, stride, k_list, save=False, display=False, out
         Display or not the plot, by default False
     outdir : str, optional
         Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
 
     Raises
     ------
@@ -120,8 +125,10 @@ def cluster_its(data, lags, nits, stride, k_list, save=False, display=False, out
     # Data were reduced
     else:
         data_concatenated = np.concatenate(data.get_output())
-
+    
     fig, axes = plt.subplots(2, len(k_list), figsize=(15, 15))
+
+    x,y = ij
 
     for i, k in enumerate(k_list):
         # Loop over the number of cluster provided
@@ -131,12 +138,12 @@ def cluster_its(data, lags, nits, stride, k_list, save=False, display=False, out
 
         # Density plot
         pyemma.plots.plot_density(
-            *data_concatenated.T[0:2], ax=axes[0, i], cbar=False, alpha=0.1
+            *data_concatenated.T[[x,y]], ax=axes[0, i], cbar=False, alpha=0.1
         )
 
-        axes[0, i].scatter(*cluster.clustercenters.T[0:2], s=15, c="C1")
-        axes[0, i].set_xlabel("Feat 1")
-        axes[0, i].set_ylabel("Feat 2")
+        axes[0, i].scatter(*cluster.clustercenters.T[[x,y]], s=15, c="C1")
+        axes[0, i].set_xlabel(f"Feat {x+1}")
+        axes[0, i].set_ylabel(f"Feat {y+1}")
         axes[0, i].set_title("k = {} centers".format(k))
 
         # ITS plot
@@ -211,6 +218,7 @@ if __name__ == "__main__":
     lags = [1, 2, 5, 10, 20, 50]
     k_list = [20, 50, 100]
     stable_state = 4
+    ij = (0,1)
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
     feat = create_feat(pdb)
@@ -228,7 +236,7 @@ if __name__ == "__main__":
     its = implied_time_scale(cluster=cluster, lags=lags, nits=nits)
 
     plot_its(
-        its=its, data=tica, cluster=cluster, save=save, display=display, outdir=outdir
+        its=its, data=tica, cluster=cluster, save=save, display=display, outdir=outdir,ij=ij
     )
 
     cluster_its(
@@ -240,6 +248,7 @@ if __name__ == "__main__":
         stride=1,
         display=display,
         outdir=outdir,
+        ij=ij
     )
 
     msm = create_msm(cluster=cluster, lag=lag, error=True)
