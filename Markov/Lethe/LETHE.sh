@@ -6,7 +6,7 @@
 `# Topology .pdb file` \
 -t /data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/ES_cluster1.pdb \
 `# Distances to analyse` \
--d 64_CA-130_CA 119_CA-24_CA \
+-d 64_CA-130_CA 119_CA-24_CA 65_CA-130_CA 66_CA-130_CA \
 --residue 16-109 17-109 18-109 18-110 19-109 19-110 20-109 20-110 21-109 21-110 109-113 109-169 109-170 109-171 109-172 110-114 \
 --feat-txt /home/ccattin/Documents/Markov/HSP90/Amber19_OPC_300K/elisa_feat/2022_10_26_Liste_interactions_simulations.txt 1 \
 `# Compute the VAMP2 score` \
@@ -17,6 +17,7 @@
 --T 300 \
 `# Plot to draw` \
 -p feat_hist density_energy vamp_lag_dim tica vamp its cluster cktest stationary eigenvalues eigenvectors reweight_free_energy metastable_membership mfpt committor \
+--axis 0 2 \
 `# Do not display the plots` \
 `#--no-plot` \
 --vamp-lags 1 2 5 10 20 50 100 200 500 1000 \
@@ -25,7 +26,7 @@
 --reduction vamp \
 `#--tica-lag 1000` \
 --vamp-lag 1000 \
---dim 2 \
+--dim 3 \
 `# Number of stride` \
 --stride 10 \
 `# Algorithm for clustering` \
