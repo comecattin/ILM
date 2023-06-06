@@ -135,7 +135,14 @@ def plot_feat_hist(data, feat, display=False, save=False, outdir=""):
         plt.show()
 
 
-def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=""):
+def plot_density_energy(
+        data,
+        T,
+        pairNames,
+        save=False,
+        display=False,
+        outdir="",
+        ij=(0,1)):
     """Plot the density map and the energy map
 
     Parameters
@@ -152,18 +159,23 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=""
         Display or not the plots, by default False
     outdir : str, optional
         Path where to save the files, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
     """
     if type(data) == pyemma.coordinates.data.feature_reader.FeatureReader:
         data = data.get_output()
     data_concatenated = np.concatenate(data)
-
+    
+    # Index for the projection
+    i,j=ij
+    
     # Density plot
     fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)
+    
+    pyemma.plots.plot_density(*data_concatenated.T[[i,j]], ax=axes)
 
-    pyemma.plots.plot_density(*data_concatenated.T[0:2], ax=axes)
-
-    axes.set_xlabel(f" {pairNames[0]} (nm)")
-    axes.set_ylabel(f" {pairNames[1]} (nm)")
+    axes.set_xlabel(f" {pairNames[i]} (nm)")
+    axes.set_ylabel(f" {pairNames[j]} (nm)")
 
     if save:
         if outdir == "":
@@ -177,11 +189,11 @@ def plot_density_energy(data, T, pairNames, save=False, display=False, outdir=""
     fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)
     kT = tools.get_kT(T)
     fig, axes = pyemma.plots.plot_free_energy(
-        *data_concatenated.T[0:2], ax=axes, kT=kT, cbar_label="free energy / kJ.mol-1"
+        *data_concatenated.T[[i,j]], ax=axes, kT=kT, cbar_label="free energy / kJ.mol-1"
     )
 
-    axes.set_xlabel(f" {pairNames[0]} (nm)")
-    axes.set_ylabel(f" {pairNames[1]} (nm)")
+    axes.set_xlabel(f" {pairNames[i]} (nm)")
+    axes.set_ylabel(f" {pairNames[j]} (nm)")
 
     if save:
         if outdir == "":
@@ -261,20 +273,22 @@ if __name__ == "__main__":
     ]
     outdir = "/home/ccattin/Documents/Code/outputs"
     # Feat
-    pairNames = ["64_CA-130_CA", "119_CA-24_CA"]
+    pairNames = ["64_CA-130_CA", "119_CA-24_CA","123_CA-24_CA","119_CA-27_CA"]
     # Parameters
     save = True
     display = True
     T = 300
     lag = 1000
+    ij = (1,3)
 
     pair_indices = tools.create_pairIndices_from_pairNames(pdb, pairNames)
-    feat = create_feat(pdb, pair_indices)
+    feat = create_feat(pdb)
+    feat = feat_atom_distances(feat,pair_indices)
     data = load_data(traj, feat, stride=5, ram=True)
 
     plot_feat_hist(data, feat, display=display, save=save, outdir=outdir)
     plot_density_energy(
-        data=data, T=T, pairNames=pairNames, display=display, save=save, outdir=outdir
+        data=data, T=T, pairNames=pairNames, display=display, save=save, outdir=outdir,ij=ij
     )
 
     score = vamp_score(data=data, dim=2)
