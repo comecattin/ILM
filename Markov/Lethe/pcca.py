@@ -73,7 +73,7 @@ def plot_metastable_membership(
     fig, axes = plt.subplots(1, nstate, figsize=(15, 3))
     for i, ax in enumerate(axes.flat):
         pyemma.plots.plot_contour(
-            *data_concatenated.T,
+            *data_concatenated.T[0:2],
             msm.metastable_distributions[i][dtrajs_concatenated],
             ax=ax,
             cmap="afmhot_r",
@@ -206,7 +206,7 @@ def plot_mftp(
 
     # Plot the state map under
     _, _, misc = pyemma.plots.plot_state_map(
-        *data_concatenated.T, metastable_traj, ax=ax, zorder=-1
+        *data_concatenated.T[0:2], metastable_traj, ax=ax, zorder=-1
     )
     # set state numbers 1 ... nstates
     misc["cbar"].set_ticklabels(range(1, nstates + 1))
@@ -328,7 +328,7 @@ def plot_committor_tpt(
     # Committor map behind
     fig, ax = plt.subplots(figsize=(10, 7))
     pyemma.plots.plot_contour(
-        *data_concatenated.T,
+        *data_concatenated.T[0:2],
         flux.committor[dtrajs_concatenated],
         cmap="brg",
         ax=ax,
