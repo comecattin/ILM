@@ -76,7 +76,7 @@ def feat_residue_midist(feat,pair_indices):
         PyEmma featurizer
     """
     # Remove the offset that PyEmma put
-    pair_indices = pair_indices - offset(pair_indices,feat)
+    pair_indices = pair_indices - offset(feat)
     # Add the correct residues
     feat.add_residue_mindist(residue_pairs=pair_indices)
     print(f"PyEmma feat description:\n{feat.describe()}")
