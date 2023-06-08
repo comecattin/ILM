@@ -230,7 +230,7 @@ def plot_eigenvalues(msm, nvalues,save=False,display=False,outdir=''):
     if display:
         plt.show()
 
-def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir='',ij=(0,1)):
+def plot_reweighted_free_energy(data,msm,T,save=False,display=False,outdir='',ij=(0,1)):
     """Plot the energetic landscape after having reweighed the trajectory frames with the stationary probability of the MSM
 
     Parameters
@@ -239,6 +239,8 @@ def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir='',ij=(
         MSM or bayesian MSM
     data : pyemma.load
         Data loaded from pyemma loader
+    T : float
+        Temperature
     save : bool, optional
         Save or not the plot, by default False
     display : bool, optional
@@ -275,11 +277,15 @@ def plot_reweighted_free_energy(data,msm,save=False,display=False,outdir='',ij=(
         cbar_label='Stationary distribution')
     
     # Free energy
+    kT = tools.get_kT(T)
     pyemma.plots.plot_free_energy(
         *data_concatenated[:, [i,j]].T,
         weights=np.concatenate(msm.trajectory_weights()),
         ax=axes[1],
-        legacy=False)
+        legacy=False,
+        kT=kT,
+        cbar_label="free energy / kJ.mol-1"
+    )
     for ax in axes.flat:
         ax.set_xlabel(f'IC {i+1}')
     axes[0].set_ylabel(f'IC {j+1}')
@@ -360,5 +366,7 @@ if __name__ == "__main__":
         msm=msm,
         display=display,
         outdir=outdir,
-        save=save,ij=ij
+        save=save,
+        ij=ij,
+        T=T
     )
