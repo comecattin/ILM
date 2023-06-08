@@ -21,7 +21,19 @@ def create_feat(pdb):
     feat = pyemma.coordinates.featurizer(pdb)
     return feat
 
-def offset(pair_indices, feat):
+def offset(feat):
+    """Get the offset for residue
+
+    Parameters
+    ----------
+    feat : PyEmma object
+        PyEmma featurizer
+
+    Returns
+    -------
+    offset : int
+        offset to subtract
+    """
     with open(feat.topologyfile) as f:
         lines = f.readlines()
         for line in lines:
@@ -63,7 +75,9 @@ def feat_residue_midist(feat,pair_indices):
     feat : PyEmma object
         PyEmma featurizer
     """
+    # Remove the offset that PyEmma put
     pair_indices = pair_indices - offset(pair_indices,feat)
+    # Add the correct residues
     feat.add_residue_mindist(residue_pairs=pair_indices)
     print(f"PyEmma feat description:\n{feat.describe()}")
     return feat
