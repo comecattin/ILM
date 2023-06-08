@@ -321,7 +321,8 @@ def main():
             save=save,
             display=display,
             outdir=outdir,
-            ij=ij
+            ij=ij,
+            T=args.T
         )
 
     # ====PCCA AND TPT====#

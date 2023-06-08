@@ -21,6 +21,13 @@ def create_feat(pdb):
     feat = pyemma.coordinates.featurizer(pdb)
     return feat
 
+def offset(pair_indices, feat):
+    with open(feat.topologyfile) as f:
+        lines = f.readlines()
+        for line in lines:
+            if 'ATOM' in line:
+                return int(line.split()[5])
+
 def feat_atom_distances(feat,pair_indices):
     """Add atom distances to the featurizer
 
@@ -56,6 +63,7 @@ def feat_residue_midist(feat,pair_indices):
     feat : PyEmma object
         PyEmma featurizer
     """
+    pair_indices = pair_indices - offset(pair_indices,feat)
     feat.add_residue_mindist(residue_pairs=pair_indices)
     print(f"PyEmma feat description:\n{feat.describe()}")
     return feat
@@ -291,4 +299,5 @@ if __name__ == "__main__":
         data=data, T=T, pairNames=pairNames, display=display, save=save, outdir=outdir,ij=ij
     )
 
-    score = vamp_score(data=data, dim=2)
+    print(vamp_score(data=data, dim=2))
+    print(offset(pair_indices,feat))

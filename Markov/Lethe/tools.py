@@ -51,7 +51,7 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
 
     print(f"Found indices: {pairsListIndices}")
 
-    return pairsListIndices
+    return np.array(pairsListIndices)
 
 def create_pairIndices_from_indices(pairNames):
     """Get the indices list from the indices input
@@ -76,7 +76,7 @@ def create_pairIndices_from_indices(pairNames):
 
     print(f"Found indices: {pairsListIndices}")
     
-    return pairsListIndices
+    return np.array(pairsListIndices)
 
 
 def get_kT(T):
@@ -180,10 +180,18 @@ def read_feat_from_txt(file_path,quality_max):
     )
 
     selection = data[data[:,-1] == quality_max]
+    pair_indices = selection[:,1:3]
+    unique = remove_double(pair_indices)
+    print(f"Found indices {unique}")
     
-    print(f"Found indices {selection[:,1:3]}")
-    
-    return selection[:,1:3]
+    return unique
+
+def remove_double(pair_indices):
+    sorted = np.sort(pair_indices,axis=1)
+    unique = np.unique(sorted,axis=0)
+    return unique
+
+
 
 if __name__ == "__main__":
     refGS = "/data/cloison/Simulations/HSP90-NT/SIMULATIONS_TRAJECTORIES/AMBER19SB_OPC/GS_cluster1.pdb"
@@ -192,4 +200,6 @@ if __name__ == "__main__":
     pairNames = ['16-109','17-109','18-109']
     print(create_pairIndices_from_indices(pairNames))
     file_path = '/home/ccattin/Documents/Markov/HSP90/Amber19_OPC_300K/elisa_feat/2022_10_26_Liste_interactions_simulations.txt'
-    print(read_feat_from_txt(file_path,1))
+    pair_indices = read_feat_from_txt(file_path,1)
+    pair_indices = remove_double(pair_indices=pair_indices)
+
