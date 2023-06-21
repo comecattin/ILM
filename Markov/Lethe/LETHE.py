@@ -352,6 +352,19 @@ def main():
             msm=msm, cluster=cluster
         )
 
+        # Plot the simple state map
+        if "state_map" in args.plot:
+            print("Rendering simple state map")
+            pcca.plot_state_map(
+                metastable_traj=metastable_traj,
+                data=red,
+                nstates=args.state,
+                ij=ij,
+                save=save,
+                display=display,
+                outdir=outdir
+            )
+
         print("Computing MFPT")
 
         mfpt, inverse_mfpt = pcca.get_mfpt(msm=msm, nstates=args.state)

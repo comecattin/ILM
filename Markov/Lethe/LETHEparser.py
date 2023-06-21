@@ -69,7 +69,7 @@ def parsing():
         "-p",
         "--plot",
         nargs="+",
-        help="Plot wanted (feat_hist, density_energy, vamp_lag_dim, pca, tica, vamp, its, cluster, cktest, stationary, eigenvalues, eigenvectors, metastable_membership, mfpt, committor)",
+        help="Plot wanted (feat_hist, density_energy, vamp_lag_dim, pca, tica, vamp, its, cluster, cktest, stationary, eigenvalues, eigenvectors, metastable_membership, mfpt, state_map, committor)",
         choices=[
             "feat_hist",
             "density_energy",
@@ -86,6 +86,7 @@ def parsing():
             "reweight_free_energy",
             "metastable_membership",
             "mfpt",
+            "state_map",
             "committor",
         ],
         required=True,

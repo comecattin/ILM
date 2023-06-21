@@ -243,6 +243,66 @@ def plot_mftp(
     if display:
         plt.show()
 
+def plot_state_map(
+        metastable_traj,
+        data,
+        nstates,
+        ij=(0,1),
+        save=False,
+        display=False,
+        outdir=''
+        ):
+    """Plot the state map without the network on it. More simple to understand
+
+    Parameters
+    ----------
+    data : pyemma.load
+        Data loaded from pyemma loader
+     nstates : int
+         Number of meta stable state to consider
+     metastable_traj : pyemma.msm.metastable_assignments
+         Trajectories of metastable states
+     save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+
+    # Data without dimension reduction
+    if type(data) == list:
+        data_concatenated = np.concatenate(data)
+    # Dimension reduction
+    else:
+        data_concatenated = np.concatenate(data.get_output())
+
+    # Axes to project
+    i,j = ij
+
+    # Do the plot
+    fig, ax = plt.subplots(figsize=(5, 4))
+    _, _, misc = pyemma.plots.plot_state_map(
+        *data_concatenated.T[[i,j]], metastable_traj, ax=ax)
+    ax.set_xlabel(f"Feat {i+1}")
+    ax.set_ylabel(f"Feat {j+1}")
+    misc['cbar'].set_ticklabels([r'$\mathcal{S}_%d$' % (state + 1)
+                                for state in range(nstates)])
+    if save:
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
+        else:
+            plt.savefig(f"{outdir}/state_map.pdf", dpi=300, bbox_inches="tight")
+
+    if display:
+        plt.show()
 
 def tpt(msm, state):
     """Transition Path Theory between two markov states
@@ -512,6 +572,16 @@ if __name__ == "__main__":
         inverse_mfpt=inverse_mfpt,
         metastable_traj=metastable_traj,
         coarse_state_centers=coarse_state_centers,
+        display=display,
+        save=save,
+        outdir=outdir,
+        ij=ij
+    )
+
+    plot_state_map(
+        data=tica,
+        nstates=stable_state,
+        metastable_traj=metastable_traj,
         display=display,
         save=save,
         outdir=outdir,
