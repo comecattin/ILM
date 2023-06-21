@@ -243,6 +243,38 @@ def plot_mftp(
     if display:
         plt.show()
 
+def plot_state_map(
+        metastable_traj,
+        data,nstates,
+        ij=(0,1),
+        save=False,
+        display=False,
+        outdir=''
+        ):
+
+    if type(data) == list:
+        data_concatenated = np.concatenate(data)
+    # Dimension reduction
+    else:
+        data_concatenated = np.concatenate(data.get_output())
+
+    i,j = ij
+
+    fig, ax = plt.subplots(figsize=(5, 4))
+    _, _, misc = pyemma.plots.plot_state_map(
+        *data_concatenated.T[[i,j]], metastable_traj, ax=ax)
+    ax.set_xlabel(f"Feat {i+1}")
+    ax.set_ylabel(f"Feat {j+1}")
+    misc['cbar'].set_ticklabels([r'$\mathcal{S}_%d$' % (state + 1)
+                                for i in range(nstates)])
+    if save:
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
+        else:
+            plt.savefig(f"{outdir}/state_map.pdf", dpi=300, bbox_inches="tight")
+
+    if display:
+        plt.show()
 
 def tpt(msm, state):
     """Transition Path Theory between two markov states
