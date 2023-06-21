@@ -245,7 +245,8 @@ def plot_mftp(
 
 def plot_state_map(
         metastable_traj,
-        data,nstates,
+        data,
+        nstates,
         ij=(0,1),
         save=False,
         display=False,
@@ -266,7 +267,7 @@ def plot_state_map(
     ax.set_xlabel(f"Feat {i+1}")
     ax.set_ylabel(f"Feat {j+1}")
     misc['cbar'].set_ticklabels([r'$\mathcal{S}_%d$' % (state + 1)
-                                for i in range(nstates)])
+                                for state in range(nstates)])
     if save:
         if outdir == "":
             raise Exception("Please provide a directory to save the file")
@@ -544,6 +545,16 @@ if __name__ == "__main__":
         inverse_mfpt=inverse_mfpt,
         metastable_traj=metastable_traj,
         coarse_state_centers=coarse_state_centers,
+        display=display,
+        save=save,
+        outdir=outdir,
+        ij=ij
+    )
+
+    plot_state_map(
+        data=tica,
+        nstates=stable_state,
+        metastable_traj=metastable_traj,
         display=display,
         save=save,
         outdir=outdir,
