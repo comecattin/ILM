@@ -252,15 +252,42 @@ def plot_state_map(
         display=False,
         outdir=''
         ):
+    """Plot the state map without the network on it. More simple to understand
 
+    Parameters
+    ----------
+    data : pyemma.load
+        Data loaded from pyemma loader
+     nstates : int
+         Number of meta stable state to consider
+     metastable_traj : pyemma.msm.metastable_assignments
+         Trajectories of metastable states
+     save : bool, optional
+        Save or not the plot, by default False
+    display : bool, optional
+        Display or not the plot, by default False
+    outdir : str, optional
+        Output directory to save the plot, by default ''
+    ij : tuple, optional
+        Index to project the representation, by default (0,1)
+
+    Raises
+    ------
+    Exception
+        Provide a directory to save the file
+    """
+
+    # Data without dimension reduction
     if type(data) == list:
         data_concatenated = np.concatenate(data)
     # Dimension reduction
     else:
         data_concatenated = np.concatenate(data.get_output())
 
+    # Axes to project
     i,j = ij
 
+    # Do the plot
     fig, ax = plt.subplots(figsize=(5, 4))
     _, _, misc = pyemma.plots.plot_state_map(
         *data_concatenated.T[[i,j]], metastable_traj, ax=ax)
