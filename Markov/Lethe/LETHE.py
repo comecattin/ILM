@@ -369,6 +369,8 @@ def main():
 
         mfpt, inverse_mfpt = pcca.get_mfpt(msm=msm, nstates=args.state)
 
+        print(f"MFPT: {mfpt}")
+
         # Plot MFPT
         if "mfpt" in args.plot:
             print("Rendering MFPT")
