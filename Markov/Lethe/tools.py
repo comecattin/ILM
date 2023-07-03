@@ -53,6 +53,50 @@ def create_pairIndices_from_pairNames(pdbfilename, pairNames):
 
     return np.array(pairsListIndices)
 
+def create_pairIndices_from_txt(pdbfilename, pairNames):
+    """Get the indices from the names
+
+    Parameters
+    ----------
+    pdbfilename : str
+        Path to the .pdb file
+    pairNames : np.array
+        Array containing the different residue number
+
+    Returns
+    -------
+    pairsListIndices : list
+        List containing the different indices
+    """
+    refu = mda.Universe(pdbfilename)
+    pairsListIndices = []
+    for pairname in pairNames:
+        print(f"Search indices for the pair {pairname}")
+        res1 = pairname[0]
+        name1 = "CA"
+
+        res2 = pairname[1]
+        name2 = "CA"
+
+        # print(name1, res1)
+        index1 = refu.select_atoms(f"name {name1} and resid {res1}").indices
+        # print(name2, res2)
+        index2 = refu.select_atoms(f"name {name2} and resid {res2}").indices
+
+        if len(index1) == 1 and len(index2) == 1:
+            pairsListIndices.append([index1[0], index2[0]])
+
+        else:
+            print(
+                f"WARNING : the pair defined by the name {pairname} do not lead to a pair on indices"
+            )
+
+    print(f"Found indices: {pairsListIndices}")
+
+    return np.array(pairsListIndices)
+
+
+
 def create_pairIndices_from_indices(pairNames):
     """Get the indices list from the indices input
 
@@ -218,4 +262,5 @@ if __name__ == "__main__":
     file_path = '/home/ccattin/Documents/Markov/HSP90/Amber19_OPC_300K/elisa_feat/2022_10_26_Liste_interactions_simulations.txt'
     pair_indices = read_feat_from_txt(file_path,1)
     pair_indices = remove_double(pair_indices=pair_indices)
+    print(create_pairIndices_from_txt(refGS,pairNames=pair_indices))
 

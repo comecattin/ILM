@@ -54,7 +54,11 @@ def main():
             file_path = args.feat_txt[0],
             quality_max = int(args.feat_txt[1])
             )
-        feat = load_feat.feat_residue_midist(feat,pair_indices)
+        pair_indices = tools.create_pairIndices_from_txt(
+            pdbfilename=args.topology,
+            pairNames=pair_indices
+        )
+        feat = load_feat.feat_atom_distances(feat,pair_indices)
 
     # Load the data
     data = load_feat.load_data(
