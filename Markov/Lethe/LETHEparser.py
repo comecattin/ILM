@@ -120,6 +120,7 @@ def parsing():
             "txt"
         ]
     )
+    # The different lag to test
     parser.add_argument(
         "--lags_vamp_feat",
         nargs='+',
