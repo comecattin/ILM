@@ -398,7 +398,7 @@ def plot_lag_dim_vamp(lags,data,dim,save=False,outdir='',display=False):
     # Get a line plot for each lag
     for i, lag in enumerate(lags):
         scores_ = np.array(
-            [score_cv(data=data,dim=d,lag=lag) for d in dims]
+            [score_cv(data=data,dim=d,lag=lag,number_of_splits=3) for d in dims]
         )
         # Score and associated error
         scores = np.mean(scores_, axis=1)
