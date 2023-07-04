@@ -54,7 +54,11 @@ def main():
             file_path = args.feat_txt[0],
             quality_max = int(args.feat_txt[1])
             )
-        feat = load_feat.feat_residue_midist(feat,pair_indices)
+        pair_indices = tools.create_pairIndices_from_txt(
+            pdbfilename=args.topology,
+            pairNames=pair_indices
+        )
+        feat = load_feat.feat_atom_distances(feat,pair_indices)
 
     # Load the data
     data = load_feat.load_data(
@@ -368,6 +372,8 @@ def main():
         print("Computing MFPT")
 
         mfpt, inverse_mfpt = pcca.get_mfpt(msm=msm, nstates=args.state)
+
+        print(f"MFPT: {mfpt}")
 
         # Plot MFPT
         if "mfpt" in args.plot:
