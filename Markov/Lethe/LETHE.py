@@ -30,8 +30,43 @@ def main():
     # Projection on axis default (0,1)
     ij = args.axis
 
+    # ====HANDLE INITIAL PLOTS====#
+    if args.plot:
+        # Parameters
+        display = not args.no_plot
+        if args.outdir:
+            save = True
+            outdir = args.outdir
+        if not args.outdir:
+            save = False
+            outdir = ""
+
     # ====FEAT====#
     aesthetic.feat()
+
+    # Test different feat types
+    if 'vamp_feat_type' in args.plot:
+        data_test, labels = load_feat.get_multiple_feat_type(
+            pdb=args.topology,
+            files=args.files,
+            feat_type=args.vamp_feat_type,
+            stride=args.stride,
+            ram=args.ram,
+            distances=args.distances,
+            txt=args.feat_txt[0],
+            quality=args.feat_txt[1]
+        )
+
+        load_feat.plot_VAMP_feat(
+            dim=args.dim,
+            data=data_test,
+            labels=labels,
+            lags=args.lags_vamp_feat,
+            save=save,
+            display=display,
+            outdir=outdir
+        )   
+
     # Create a feat
     feat = load_feat.create_feat(args.topology)
 
@@ -69,16 +104,7 @@ def main():
     if args.vamp_score:
         vamp = load_feat.vamp_score(data=data, dim=args.dim)
 
-    # ====HANDLE INITIAL PLOTS====#
-    if args.plot:
-        # Parameters
-        display = not args.no_plot
-        if args.outdir:
-            save = True
-            outdir = args.outdir
-        if not args.outdir:
-            save = False
-            outdir = ""
+    
 
         # Plots
         # Histogram plot of the feat

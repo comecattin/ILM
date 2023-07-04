@@ -295,7 +295,7 @@ def plot_VAMP_feat(dim, data,labels,lags,save=False,display=False,outdir=''):
         errors = []
         
         for i in data:
-            scores_data = score_cv(i, lag=lag, dim=dim)
+            scores_data = score_cv(i, lag=lag, dim=dim,number_of_splits=2)
             scores += [scores_data.mean()]
             errors += [scores_data.std()]
         

@@ -69,9 +69,10 @@ def parsing():
         "-p",
         "--plot",
         nargs="+",
-        help="Plot wanted (feat_hist, density_energy, vamp_lag_dim, pca, tica, vamp, its, cluster, cktest, stationary, eigenvalues, eigenvectors, metastable_membership, mfpt, state_map, committor)",
+        help="Plot wanted (feat_hist, vamp_feat_type, density_energy, vamp_lag_dim, pca, tica, vamp, its, cluster, cktest, stationary, eigenvalues, eigenvectors, metastable_membership, mfpt, state_map, committor)",
         choices=[
             "feat_hist",
+            "vamp_feat_type",
             "density_energy",
             "vamp_lag_dim",
             "pca",
@@ -106,6 +107,24 @@ def parsing():
     # Temperature in K of the system
     parser.add_argument(
         "--T", "--temperature", type=float, help="Temperature of the system"
+    )
+    # Plot the VAMP2 score as a function of the feat types
+    parser.add_argument(
+        "--vamp_feat_type",
+        nargs="+",
+        type=str,
+        help="Different feat type to test",
+        choices=[
+            "torsion",
+            "distance",
+            "txt"
+        ]
+    )
+    parser.add_argument(
+        "--lags_vamp_feat",
+        nargs='+',
+        type=int,
+        help="Lag time to perform the VAMP2 score as a function of feat type"
     )
     # Get the lag time and the dimension for dimension reduction
     # Lag time
