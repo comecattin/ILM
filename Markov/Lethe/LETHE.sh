@@ -20,8 +20,10 @@
 --axis 0 1 \
 `# Do not display the plots` \
 `#--no-plot` \
+`#VAMP-2 score bar plot with feat type` \
 --vamp_feat_type torsion txt distance \
 --lags_vamp_feat 100 200 300 \
+`# Get the TICA lag and dimension` \
 --vamp-lags 1 2 5 10 20 50 100 200 500 1000 \
 --vamp-dim 5 \
 `# Do a reduction (tica pca vamp or none)` \
