@@ -285,6 +285,156 @@ def score_cv(data, dim, lag, number_of_splits=10, validation_fraction=0.5):
         scores[n] = vamp.score([d for i, d in enumerate(data) if i in ival])
     return scores
 
+def plot_VAMP_feat(dim, data,labels,lags,save=False,display=False,outdir=''):
+    """Plot the VAMP-2 score as a function of different feature types
+
+    Parameters
+    ----------
+    dim : int
+        Number of VAMP dimension reduction 
+    data : list
+        List of np.array containing the different value of the different features
+    labels : list
+        List containing the different labels for the bar plot 
+    lags : int
+        MSM lag time to test the different feature types
+    save : bool, optional
+        Save or not the plots, by default False
+    display : bool, optional
+        Display or not the plots, by default False
+    outdir : str, optional
+        Path where to save the files, by default ''
+
+    Raises
+    ------
+    Exception
+        If no output directory is given, raise an exception 
+    """
+
+    fig, axes = plt.subplots(1, len(data), figsize=(12, 3), sharey=True)
+
+    # One plot per lag time
+    for ax, lag in zip(axes.flat, lags):
+        
+        # Init the list
+        scores = []
+        errors = []
+        
+        # Loop over the different features type to get their VAMP-2 score
+        for i in data:
+            scores_data = score_cv(i, lag=lag, dim=dim,number_of_splits=2)
+            scores += [scores_data.mean()]
+            errors += [scores_data.std()]
+        
+        ax.bar(labels, scores, yerr=errors, color=['C0', 'C1', 'C2'])
+        ax.set_title(r'lag time $\tau$={:.1f}steps'.format(lag))
+        
+    axes[0].set_ylabel('VAMP2 score')
+    
+    if save:
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
+        else:
+            plt.savefig(
+                f"{outdir}/vamp_compare_feat.pdf",
+                dpi=300,
+                bbox_inches="tight",
+            )
+    if display:
+        plt.show()
+
+def get_multiple_feat_type(
+        pdb,
+        files,
+        feat_type,
+        stride,
+        ram=True,
+        distances='',
+        txt='',
+        quality=1
+    ):
+    """Generate multiple data feature type
+
+    Parameters
+    ----------
+    pdb : str
+        Path to the reference .pdb topology file
+    files : list
+        List of str containing paths to the trajectories
+    feat_type : list
+        List of string containing the different type of features wanted
+    stride : int
+        Stride to consider when loading the data
+    ram : bool, optional
+        Load or not the data into the RAM, by default True
+    distances : str, optional
+        Distances to analyze, by default ''
+    txt : str, optional
+        Path to the .txt file containing the different interaction, by default ''
+    quality : int, optional
+        Maximum quality to consider when reading the .txt file, by default 1
+
+    Returns
+    -------
+    data : list
+        List of np.array containing the different value of the different features
+    labels : list
+        List containing the different labels for the bar plot
+    """
+
+    # Init the outputed data
+    data = []
+    labels = []
+
+    # Torsion feat type
+    if 'torsion' in feat_type:
+        # Create feat
+        torsions_feat = pyemma.coordinates.featurizer(pdb)
+        # Add the torsion
+        torsions_feat.add_backbone_torsions(cossin=True, periodic=False)
+        # Append the data and the label
+        data.append(pyemma.coordinates.load(files, features=torsions_feat))
+        labels += ['backbone\ntorsions']
+
+    # Distance feat type
+    if "distance" in feat_type:
+        # Convert name in indices
+        pair_indices = tools.create_pairIndices_from_pairNames(
+            pdb, distances
+        )
+        # Create the feat and add the right distances
+        feat = create_feat(pdb)
+        feat = feat_atom_distances(feat,pair_indices)
+        # Load the data
+        data.append(load_data(
+            traj=files, feat=feat, stride=stride, ram=ram
+        ))
+        # Add the label
+        labels += ['2 distances']
+    
+    # Features from a .txt file
+    if "txt" in feat_type:
+        # Read the .txt
+        pair_indices = tools.read_feat_from_txt(
+            file_path = txt,
+            quality_max = int(quality)
+        )
+        # Convert the name in indices
+        pair_indices = tools.create_pairIndices_from_txt(
+            pdbfilename=pdb,
+            pairNames=pair_indices
+        )
+        # Create the feat and add the right distances
+        feat = create_feat(pdb)
+        feat = feat_atom_distances(feat,pair_indices)
+        # Load the data
+        data.append(load_data(
+            traj=files, feat=feat, stride=stride, ram=ram
+        ))
+        # Add the label
+        labels += ['Multiple\ndistances']
+
+    return data, labels
 
 if __name__ == "__main__":
     # Path
@@ -296,6 +446,8 @@ if __name__ == "__main__":
     outdir = "/home/ccattin/Documents/Code/outputs"
     # Feat
     pairNames = ["64_CA-130_CA", "119_CA-24_CA","123_CA-24_CA","119_CA-27_CA"]
+    #TXT file
+    txt = '/home/ccattin/Documents/Markov/HSP90/Amber19_OPC_300K/elisa_feat/2022_10_26_Liste_interactions_simulations.txt'
     # Parameters
     save = True
     display = True
@@ -314,4 +466,26 @@ if __name__ == "__main__":
     )
 
     print(vamp_score(data=data, dim=2))
-    print(offset(pair_indices,feat))
+    print(offset(feat))
+
+
+    data, labels = get_multiple_feat_type(
+        pdb=pdb,
+        files=traj,
+        feat_type=['torsion','distance','txt'],
+        stride=1,
+        ram=True,
+        distances=pairNames,
+        txt=txt,
+        quality=1
+    )
+    
+    plot_VAMP_feat(
+        dim=2,
+        data=data,
+        labels=labels,
+        lags=[100,200,300],
+        save=save,
+        display=display,
+        outdir=outdir
+    )
