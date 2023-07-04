@@ -285,6 +285,77 @@ def score_cv(data, dim, lag, number_of_splits=10, validation_fraction=0.5):
         scores[n] = vamp.score([d for i, d in enumerate(data) if i in ival])
     return scores
 
+def plot_VAMP_feat(dim, data,labels,lags,save=False,display=False,outdir=''):
+
+    fig, axes = plt.subplots(1, len(data), figsize=(12, 3), sharey=True)
+
+    for ax, lag in zip(axes.flat, lags):
+        
+        scores = []
+        errors = []
+        
+        for i in data:
+            scores_data = score_cv(i, lag=lag, dim=dim)
+            scores += [scores_data.mean()]
+            errors += [scores_data.std()]
+        
+        ax.bar(labels, scores, yerr=errors, color=['C0', 'C1', 'C2'])
+        ax.set_title(r'lag time $\tau$={:.1f}steps'.format(lag))
+        
+    axes[0].set_ylabel('VAMP2 score')
+    
+    if save:
+        if outdir == "":
+            raise Exception("Please provide a directory to save the file")
+        else:
+            plt.savefig(
+                f"{outdir}/vamp_compare_feat.pdf",
+                dpi=300,
+                bbox_inches="tight",
+            )
+    if display:
+        plt.show()
+
+def get_multiple_feat_type(pdb,files,feat_type, stride, ram=True, distances='',txt='',quality=1):
+    data = []
+    labels = []
+    if 'torsion' in feat_type:
+        torsions_feat = pyemma.coordinates.featurizer(pdb)
+        torsions_feat.add_backbone_torsions(cossin=True, periodic=False)
+        data.append(pyemma.coordinates.load(files, features=torsions_feat))
+        labels += ['backbone\ntorsions']
+
+    if "distance" in feat_type:
+        # Convert name in indices
+        pair_indices = tools.create_pairIndices_from_pairNames(
+            pdb, distances
+        )
+        feat = create_feat(pdb)
+        feat = feat_atom_distances(feat,pair_indices)
+        # Load the data
+        data.append(load_data(
+            traj=files, feat=feat, stride=stride, ram=ram
+        ))
+        labels += ['2 distances']
+    
+    if "txt" in feat_type:
+        pair_indices = tools.read_feat_from_txt(
+            file_path = txt,
+            quality_max = int(quality)
+        )
+        pair_indices = tools.create_pairIndices_from_txt(
+            pdbfilename=pdb,
+            pairNames=pair_indices
+        )
+        feat = create_feat(pdb)
+        feat = feat_atom_distances(feat,pair_indices)
+        # Load the data
+        data.append(load_data(
+            traj=files, feat=feat, stride=stride, ram=ram
+        ))
+        labels += ['Multiple\ndistances']
+
+    return data, labels
 
 if __name__ == "__main__":
     # Path
@@ -296,6 +367,8 @@ if __name__ == "__main__":
     outdir = "/home/ccattin/Documents/Code/outputs"
     # Feat
     pairNames = ["64_CA-130_CA", "119_CA-24_CA","123_CA-24_CA","119_CA-27_CA"]
+    #TXT file
+    txt = '/home/ccattin/Documents/Markov/HSP90/Amber19_OPC_300K/elisa_feat/2022_10_26_Liste_interactions_simulations.txt'
     # Parameters
     save = True
     display = True
@@ -314,4 +387,26 @@ if __name__ == "__main__":
     )
 
     print(vamp_score(data=data, dim=2))
-    print(offset(pair_indices,feat))
+    print(offset(feat))
+
+
+    data, labels = get_multiple_feat_type(
+        pdb=pdb,
+        files=traj,
+        feat_type=['torsion','distance','txt'],
+        stride=1,
+        ram=True,
+        distances=pairNames,
+        txt=txt,
+        quality=1
+    )
+    
+    plot_VAMP_feat(
+        dim=2,
+        data=data,
+        labels=labels,
+        lags=[100,200,300],
+        save=save,
+        display=display,
+        outdir=outdir
+    )
