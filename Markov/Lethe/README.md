@@ -67,3 +67,12 @@ An example of submitting `.sh` file is given
 
 ## Possible plots
 LETHE output plots. The following options are to put after the `-p` flag.
+
+### Features selection
+- `feat_hist` Plot the feature histogram of the selected features.
+![pca_histogram](https://github.com/comecattin/ILM/assets/75748278/17b422b0-c511-48d2-b082-7e89e834cc25)
+
+- `vamp_feat_type` Plot the VAMP2 score as a function of the feature type
+![vamp_compare_feat](https://github.com/comecattin/ILM/assets/75748278/8e270df3-969c-4bba-879d-66ebbb72a38d)
+
+
