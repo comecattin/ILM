@@ -75,4 +75,53 @@ LETHE output plots. The following options are to put after the `-p` flag.
 - `vamp_feat_type` Plot the VAMP2 score as a function of the feature type
 ![vamp_compare_feat](https://github.com/comecattin/ILM/assets/75748278/8e270df3-969c-4bba-879d-66ebbb72a38d)
 
+- `density_energy` Extract the free energy landscape directly from the sample density.
+  ![pca_free_energy_direct_from_density](https://github.com/comecattin/ILM/assets/75748278/5ac73581-7abb-4978-b0ca-e6f7740b318b)
+
+### Dimension reduction
+
+- `vamp_lag_dim` Plot the VAMP2 score as a function of the number of considered dimension and the TICA lag time.
+  ![vamp_lag_dim](https://github.com/comecattin/ILM/assets/75748278/f4f021d7-3aba-45c7-950f-2e4925ebc8de)
+
+- `pca` ; `tica` ; `vamp` Plot the histogram of the reduced dimensions.
+  ![tica_histogram](https://github.com/comecattin/ILM/assets/75748278/22aedb93-b4ce-40ae-87e8-6eaa888594b0)
+
+### Clustering
+
+- `cluster` Plot the micro-clustered phase space.
+  ![cluster](https://github.com/comecattin/ILM/assets/75748278/938b5e6e-14e0-468d-9b94-25d00084382b)
+
+### MSM lag
+
+- `its` Plot the ITS convergence test.
+  ![its_validation](https://github.com/comecattin/ILM/assets/75748278/306c3ef1-d28d-43de-9264-625664bfb427)
+
+### PCCA++ analysis
+
+- `stationary` Plot the stationary distribution
+  ![stationary_distribution](https://github.com/comecattin/ILM/assets/75748278/a0e37c84-f7eb-43e3-8a5a-f337bbd68a80)
+
+- `eigenvalues` ; `eigenvectors` Plot the spectrum analysis of the MSM.
+  ![eigen_values](https://github.com/comecattin/ILM/assets/75748278/f58fa591-6a51-44b0-bf82-3e7e8dbfe4e1)
+  ![eigen_vect](https://github.com/comecattin/ILM/assets/75748278/44c0769b-7d03-46be-80b1-7b00d85b8509)
+
+- `reweight_free_energy` Plot the free energy landscape reweighted by the stationary distribution.
+  ![reweighted_free_energy](https://github.com/comecattin/ILM/assets/75748278/2a442b03-2365-46f1-903d-5cdeec9a3433)
+
+- `metastable_membership` Extract the metastable membership used by the PCCA++ algorithm.
+  ![metastable_membership](https://github.com/comecattin/ILM/assets/75748278/32b6adcd-9a4c-4925-8235-68fddf5100b4)
+
+- `mfpt` Plot the macro-state map with all the associated mean first passage time.
+  ![mfpt](https://github.com/comecattin/ILM/assets/75748278/6833f383-b51b-4b69-aaa7-feee213d3559)
+
+- `state_map` Plot the macro-state map. Without the MFPT.
+  ![state_map](https://github.com/comecattin/ILM/assets/75748278/5e2690fe-3c2a-4144-ad0f-b45a54a98d0d)
+
+- `committor` Plot the commitor between the chosen two macro-states.
+  ![mfpt_committor](https://github.com/comecattin/ILM/assets/75748278/4b7a41db-d832-4f3d-93ec-43ea70b9bdb3)
+
+  ### MSM validation
+
+  - `cktest` Plot the CK test on the chosen number of macro-states.
+    ![cktest](https://github.com/comecattin/ILM/assets/75748278/cc3da527-49ad-45b2-9aad-c4362d152046)
 
