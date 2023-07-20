@@ -16,10 +16,14 @@
 `# Temperature of the system` \
 --T 300 \
 `# Plot to draw` \
--p feat_hist density_energy vamp_lag_dim tica vamp its cluster cktest stationary eigenvalues eigenvectors reweight_free_energy metastable_membership state_map mfpt committor \
+-p feat_hist density_energy vamp_lag_dim tica vamp its cluster cktest stationary eigenvalues eigenvectors reweight_free_energy metastable_membership state_map mfpt committor vamp_feat_type \
 --axis 0 1 \
 `# Do not display the plots` \
 `#--no-plot` \
+`#VAMP-2 score bar plot with feat type` \
+--vamp_feat_type torsion txt distance \
+--lags_vamp_feat 100 200 300 \
+`# Get the TICA lag and dimension` \
 --vamp-lags 1 2 5 10 20 50 100 200 500 1000 \
 --vamp-dim 5 \
 `# Do a reduction (tica pca vamp or none)` \

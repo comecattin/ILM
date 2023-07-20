@@ -19,6 +19,9 @@ Repository of the different codes developed during my M2 insternship at the ILM
 
 ## Markov
   Various codes that use MSM or PyEmma
+
+<img width="472" alt="LETHE_logo" src="https://github.com/comecattin/ILM/assets/75748278/7b46129f-ab24-48b5-86fb-514de5e4f718">
+
   
   Lethe is an implementation of automatize PyEmma MSM pipeline. Manual available using `./LETHE.py -h/--help`
 
